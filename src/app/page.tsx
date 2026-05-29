@@ -1,8 +1,7 @@
 import { Suspense } from 'react'
 
 export const dynamic = 'force-dynamic'
-import { MatchesResponse, StandingsResponse, TeamsResponse } from '@/types/football'
-import { getMatches, getStandings, getTeams } from '@/lib/football-api'
+import { getESPNMatches, getESPNStandings, getESPNTeams } from '@/lib/espn-api'
 import AppShell from '@/components/AppShell'
 
 function AppSkeleton() {
@@ -25,37 +24,16 @@ function AppSkeleton() {
   )
 }
 
-/** Rewrite external crest URL to local Vercel-proxied path (CDN-cached, same domain) */
-function lc(url: string | null | undefined): string {
-  if (!url) return ''
-  return url.replace('https://crests.football-data.org/', '/crests/')
-}
-
 async function AppData() {
   const [matchesResult, standingsResult, teamsResult] = await Promise.allSettled([
-    getMatches() as Promise<MatchesResponse>,
-    getStandings() as Promise<StandingsResponse>,
-    getTeams() as Promise<TeamsResponse>,
+    getESPNMatches(),
+    getESPNStandings(),
+    getESPNTeams(),
   ])
 
-  const teams = teamsResult.status === 'fulfilled'
-    ? teamsResult.value.teams.map(t => ({ ...t, crest: lc(t.crest) }))
-    : []
-
-  const matches = matchesResult.status === 'fulfilled'
-    ? matchesResult.value.matches.map(m => ({
-        ...m,
-        homeTeam: { ...m.homeTeam, crest: lc(m.homeTeam.crest) },
-        awayTeam: { ...m.awayTeam, crest: lc(m.awayTeam.crest) },
-      }))
-    : []
-
-  const standings = standingsResult.status === 'fulfilled'
-    ? standingsResult.value.standings.map(s => ({
-        ...s,
-        table: s.table.map(e => ({ ...e, team: { ...e.team, crest: lc(e.team.crest) } })),
-      }))
-    : []
+  const matches = matchesResult.status === 'fulfilled' ? matchesResult.value : []
+  const standings = standingsResult.status === 'fulfilled' ? standingsResult.value : []
+  const teams = teamsResult.status === 'fulfilled' ? teamsResult.value : []
 
   const liveCount = matches.filter(
     (m) => m.status === 'LIVE' || m.status === 'IN_PLAY',
