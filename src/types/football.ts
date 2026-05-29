@@ -6,12 +6,19 @@ export interface Team {
   crest: string
 }
 
+export type PlayerPosition = 'Goalkeeper' | 'Defence' | 'Midfield' | 'Offence'
+
 export interface Player {
   id: number
   name: string
-  position: 'Goalkeeper' | 'Defence' | 'Midfield' | 'Offence' | null
+  position: PlayerPosition | null
   dateOfBirth: string
   nationality: string
+  club?: string | null
+  caps?: number | null
+  goals?: number | null
+  profileUrl?: string | null
+  source?: 'football-data.org' | 'Wikipedia'
 }
 
 export interface Coach {
@@ -29,6 +36,7 @@ export interface TeamDetail extends Team {
   venue?: string
   coach: Coach
   squad: Player[]
+  squadSource?: 'football-data.org' | 'Wikipedia'
 }
 
 export interface Score {

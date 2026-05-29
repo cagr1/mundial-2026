@@ -27,12 +27,14 @@ function calcAge(dob: string): number {
 function PlayerCard({ player }: { player: Player }) {
   const [flipped, setFlipped] = useState(false)
   const color = player.position ? POSITION_COLOR[player.position] : 'var(--text-muted)'
+  const detailHref = player.profileUrl ?? `/jugador/${player.id}`
+  const isExternalProfile = Boolean(player.profileUrl)
 
   return (
     <button
       onClick={() => setFlipped((f) => !f)}
       className="relative w-full text-left"
-      style={{ perspective: '600px', height: '88px' }}
+      style={{ perspective: '600px', height: '96px' }}
       aria-label={`${player.name} — ver detalles`}
     >
       <div
@@ -65,6 +67,11 @@ function PlayerCard({ player }: { player: Player }) {
           </div>
           <span className="text-sm font-medium flex-1 truncate" style={{ color: 'var(--text-warm)' }}>
             {player.name}
+            {player.club ? (
+              <span className="block eyebrow mt-1 truncate" style={{ color: 'var(--text-disabled)', fontSize: '0.56rem' }}>
+                {player.club}
+              </span>
+            ) : null}
           </span>
           <span className="eyebrow flex-shrink-0" style={{ color: 'var(--text-disabled)', fontSize: '0.6rem' }}>
             toca
@@ -84,7 +91,14 @@ function PlayerCard({ player }: { player: Player }) {
         >
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold truncate" style={{ color: 'var(--champagne)' }}>{player.name}</p>
-            <p className="eyebrow mt-0.5" style={{ color: 'var(--text-muted)' }}>{player.nationality}</p>
+            <p className="eyebrow mt-0.5 truncate" style={{ color: 'var(--text-muted)' }}>
+              {player.club ?? player.nationality}
+            </p>
+            {player.caps != null || player.goals != null ? (
+              <p className="eyebrow mt-0.5 tabnum" style={{ color: 'var(--text-disabled)', fontSize: '0.56rem' }}>
+                {player.caps ?? 0} PJ Â· {player.goals ?? 0} G
+              </p>
+            ) : null}
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             {player.dateOfBirth ? (
@@ -94,10 +108,12 @@ function PlayerCard({ player }: { player: Player }) {
               </div>
             ) : null}
             <Link
-              href={`/jugador/${player.id}`}
+              href={detailHref}
               className="eyebrow px-2 py-1 border"
               style={{ color: 'var(--kinpaku)', borderColor: 'var(--hairline-gold)', borderRadius: 'var(--r-xs)', textDecoration: 'none' }}
               onClick={(e) => e.stopPropagation()}
+              target={isExternalProfile ? '_blank' : undefined}
+              rel={isExternalProfile ? 'noreferrer' : undefined}
             >
               →
             </Link>
@@ -180,7 +196,7 @@ export default function TeamDrawer({ team, onClose }: Props) {
             </h2>
             {detail && (
               <p className="eyebrow mt-0.5" style={{ color: 'var(--text-disabled)' }}>
-                {detail.squad.length} jugadores · {detail.venue ?? ''}
+                {detail.squad.length} jugadores · {detail.squadSource ?? 'football-data.org'}
               </p>
             )}
           </div>
@@ -208,7 +224,7 @@ export default function TeamDrawer({ team, onClose }: Props) {
           {loading ? (
             <div className="space-y-2">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="h-[88px] animate-pulse" style={{ background: 'var(--raised-lacquer)', borderRadius: 'var(--r-md)' }} />
+                <div key={i} className="h-[96px] animate-pulse" style={{ background: 'var(--raised-lacquer)', borderRadius: 'var(--r-md)' }} />
               ))}
             </div>
           ) : (
@@ -236,7 +252,7 @@ export default function TeamDrawer({ team, onClose }: Props) {
         {/* Tip */}
         <div className="px-5 py-3 flex-shrink-0" style={{ borderTop: '1px solid var(--hairline)' }}>
           <p className="eyebrow text-center" style={{ color: 'var(--text-disabled)' }}>
-            Toca cada jugador para ver edad y nacionalidad
+            Plantel desde {detail?.squadSource ?? 'football-data.org'} · toca cada jugador para ver detalles
           </p>
         </div>
       </div>

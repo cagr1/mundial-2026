@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { hostname: "crests.football-data.org" },
+      { hostname: "www.thesportsdb.com" },
       { hostname: "upload.wikimedia.org" },
     ],
   },

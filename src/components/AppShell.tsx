@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect, useTransition, startTransition } from 'react'
-import { ViewTransition } from 'react'
+import { useState, useEffect } from 'react'
 import TimezoneSelect from './TimezoneSelect'
 import MatchList from './MatchList'
 import GroupStandings from './GroupStandings'
@@ -66,10 +65,11 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
   const [tab, setTab] = useState<Tab>('partidos')
   const [timeZone, setTimeZone] = useState('UTC')
   const [selectedMatchday, setSelectedMatchday] = useState<number | null>(null)
-  const [, startTabTransition] = useTransition()
 
   useEffect(() => {
-    setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+    const detectedTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const timer = window.setTimeout(() => setTimeZone(detectedTimeZone), 0)
+    return () => window.clearTimeout(timer)
   }, [])
 
   const matchdays = Array.from(
@@ -80,9 +80,7 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
     selectedMatchday !== null ? matches.filter((m) => m.matchday === selectedMatchday) : matches
 
   function handleTabChange(newTab: Tab) {
-    startTabTransition(() => {
-      startTransition(() => setTab(newTab))
-    })
+    setTab(newTab)
   }
 
   return (
@@ -181,16 +179,15 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
 
       {/* ── Content ──────────────────────────────────────────────────── */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6">
-        <ViewTransition>
-          {tab === 'partidos' ? (
-            <div key="partidos">
+        {tab === 'partidos' ? (
+            <div key="partidos" className="tab-panel">
               <div className="mb-5">
                 <MatchdayFilter matchdays={matchdays} selected={selectedMatchday} onSelect={setSelectedMatchday} />
               </div>
               <MatchList matches={filteredMatches} timeZone={timeZone} />
             </div>
           ) : tab === 'grupos' ? (
-            <div key="grupos">
+            <div key="grupos" className="tab-panel">
               <p className="eyebrow mb-5" style={{ color: 'var(--text-faint)' }}>
                 Los 2 primeros de cada grupo avanzan a la siguiente fase
               </p>
@@ -201,11 +198,10 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
               </div>
             </div>
           ) : (
-            <div key="equipos">
+            <div key="equipos" className="tab-panel">
               <TeamsGrid teams={teams} />
             </div>
           )}
-        </ViewTransition>
       </main>
 
       {/* ── Footer ───────────────────────────────────────────────────── */}
