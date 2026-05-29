@@ -2,9 +2,47 @@
 
 ## 🔴 PRIORIDADES — Próxima sesión
 
-- [x] 🧠 Fix React error #418 (hydration mismatch): reemplazado lazy initializer de `useState` con `useSyncExternalStore` — server snapshot devuelve `false`, client snapshot lee el browser real tras hidratación. Sin `setState` en effect body.
-- [x] 🧠 Reemplazar el banner de instalación por una página `/instalar`: ruta dedicada con guía paso a paso por plataforma (Android Chrome / iOS Safari / Desktop). Botón discreto en header AppShell. Banner eliminado del layout. `/instalar` es Static (pre-renderizado).
-- [ ] 🧠 Decidir fuente de datos alternativa a football-data.org: el token actual puede no cubrir el Mundial 2026 (competición ID 2000), lo que deja la app con datos vacíos. Opciones: (A) JSON estático precargado con el fixture completo del torneo — no necesita API en runtime — o (B) ESPN API no oficial (`site.api.espn.com`) sin key requerida. Evaluar y migrar.
+- [x] 🧠 Fix React error #418 (hydration mismatch).
+- [x] 🧠 Reemplazar banner instalación por `/instalar`.
+- [x] 🧠 Migrar a ESPN API pública (partidos, equipos, standings). football-data.org eliminado de todas las rutas principales.
+
+### Estado actual del proyecto (sesión 2026-05-29)
+
+**Arquitectura de datos:**
+- Partidos / Standings / Lista de equipos → ESPN API pública (`site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/…`)
+- Planteles → Wikipedia "Current squad" primero; ESPN roster como backup (vacío pre-torneo, se activará ~junio 2026)
+- Fotos de jugadores → TheSportsDB (`r2.thesportsdb.com`) + Wikipedia thumbnail fallback; `onError` muestra iniciales
+- football-data.org: **COMPLETAMENTE ELIMINADO** de todas las rutas
+
+**Bugs arreglados en esta sesión (commit 6845f87 + banderas):**
+1. Scroll iOS en TeamDrawer: `pointer-events: none` en back-face de 3D cards (26 links ocultos bloqueaban touch events)
+2. Safe area bottom (`env(safe-area-inset-bottom)`) en footer y scroll del drawer
+3. "Volver" en página de jugador: usa `?from={teamId}` → Link explícito a `/?tab=equipos&equipo={id}` en vez de `router.back()`
+4. URL sync tab+equipo: `AppShell` guarda `?tab=` y `TeamsGrid` guarda `?equipo=` con `history.replaceState`
+5. Al abrir app con esos params (ej. después de "Volver"), el drawer se reabre automáticamente
+6. Imágenes jugadores: `PlayerPhoto` client component con `unoptimized` + `onError` → fallback a iniciales
+7. `r2.thesportsdb.com` añadido a `remotePatterns` (CDN real de TheSportsDB)
+8. Service worker: versión `v3`, `/` y `/jugador/*` excluidos del cache (evita HTML stale con JS chunks viejos)
+9. Banderas en partidos: ESPN scoreboard no incluye `logos[]` en competitors. Fix: derivar URL del crest desde `abbreviation` → `https://a.espncdn.com/i/teamlogos/countries/500/{abbr}.png`
+10. `/api/teams/[id]`: eliminada llamada a football-data.org (IDs ESPN ≠ IDs football-data → 404 siempre). Ahora: Wikipedia → ESPN roster → mensaje amigable
+
+**Pendiente para próximas sesiones:**
+- [ ] ⚡ Verificar plantel de Argentina y otros equipos una vez Wikipedia actualice sus páginas (planteles oficiales ~mayo-junio 2026)
+- [ ] ⚡ Spot-check móvil: scroll drawer, "Volver", fotos de jugadores
+- [ ] ⚡ Verificar que el drawer de vuelta funciona correctamente en iOS (abrir equipo → tap jugador → "Volver" → debe mostrar el drawer del equipo)
+- [ ] 🧠 Considerar añadir foto de jugador desde ESPN cuando el torneo empiece (endpoint: `a.espncdn.com/i/headshots/soccer/players/full/{playerId}.png`, necesita buscar ID por nombre)
+- [ ] ⚡ Test completo en Android y iOS post-deploy
+- [ ] ⚡ Confirmar PWA install en iOS Safari y Android Chrome
+
+**Comandos útiles:**
+```bash
+npm run dev          # servidor local
+npm run build        # build producción
+npm run lint         # eslint
+npm run check:squads -- https://worldcup-kappa.vercel.app --delay=1200
+```
+
+**URL producción:** `https://worldcup-kappa.vercel.app`
 
 ---
 

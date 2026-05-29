@@ -54,12 +54,17 @@ async function espnFetch<T>(path: string, revalidate = 60): Promise<T> {
 // ─── Teams ────────────────────────────────────────────────────────────────────
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapESPNTeam(t: any): Team {
+  // Scoreboard competitor objects don't include logos[], derive from abbreviation
+  const abbr: string = t.abbreviation ?? ''
+  const crest: string =
+    t.logos?.[0]?.href ??
+    (abbr ? `https://a.espncdn.com/i/teamlogos/countries/500/${abbr.toLowerCase()}.png` : '')
   return {
     id: t.id,
     name: t.displayName,
     shortName: t.shortDisplayName ?? t.displayName,
-    tla: t.abbreviation ?? '',
-    crest: t.logos?.[0]?.href ?? '',
+    tla: abbr,
+    crest,
   }
 }
 
