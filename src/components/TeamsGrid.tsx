@@ -32,6 +32,8 @@ function TeamCard({ team, onSelect }: { team: Team; onSelect: () => void }) {
               src={team.crest}
               alt={team.name}
               fill
+              unoptimized
+              loading="lazy"
               className="object-contain"
               sizes="40px"
             />
@@ -74,6 +76,12 @@ function TeamCard({ team, onSelect }: { team: Team; onSelect: () => void }) {
       />
     </button>
   )
+}
+
+function blurActive() {
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur()
+  }
 }
 
 export default function TeamsGrid({ teams }: { teams: Team[] }) {
@@ -129,7 +137,22 @@ export default function TeamsGrid({ teams }: { teams: Team[] }) {
       {/* Grid — 2 cols mobile, more on wider screens */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
         {filtered.map((team) => (
-          <TeamCard key={team.id} team={team} onSelect={() => setSelected(team)} />
+          <TeamCard
+            key={team.id}
+            team={team}
+            onSelect={() => {
+              // Dismiss iOS keyboard before drawer mounts to avoid viewport shift
+              const hadKeyboard =
+                document.activeElement instanceof HTMLInputElement ||
+                document.activeElement instanceof HTMLTextAreaElement
+              blurActive()
+              if (hadKeyboard) {
+                setTimeout(() => setSelected(team), 150)
+              } else {
+                setSelected(team)
+              }
+            }}
+          />
         ))}
       </div>
 
@@ -142,7 +165,14 @@ export default function TeamsGrid({ teams }: { teams: Team[] }) {
       )}
 
       {selected ? (
-        <TeamDrawer key={selected.id} team={selected} onClose={() => setSelected(null)} />
+        <TeamDrawer
+          key={selected.id}
+          team={selected}
+          onClose={() => {
+            blurActive()
+            setSelected(null)
+          }}
+        />
       ) : null}
     </>
   )

@@ -222,7 +222,7 @@ export default function TeamDrawer({ team, onClose }: Props) {
 
       {/* Drawer */}
       <div
-        className="fixed bottom-0 left-0 right-0 z-50 max-h-[92dvh] flex flex-col sm:max-w-lg sm:right-auto sm:top-0 sm:bottom-0 sm:max-h-none overflow-hidden"
+        className="fixed bottom-0 left-0 right-0 z-50 h-[92dvh] flex flex-col sm:max-w-lg sm:right-auto sm:top-0 sm:bottom-0 sm:h-auto overflow-hidden"
         style={{
           background: 'var(--lacquer)',
           borderTop: '1px solid var(--hairline-gold)',
