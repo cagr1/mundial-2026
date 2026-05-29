@@ -98,6 +98,15 @@ export default function AppShell({
   firstMatchDate,
 }: Props) {
   const [tab, setTab] = useState<Tab>('partidos')
+
+  const handleTabChange = useCallback((newTab: Tab) => {
+    setTab(newTab)
+    const params = new URLSearchParams(window.location.search)
+    params.set('tab', newTab)
+    if (newTab !== 'equipos') params.delete('equipo')
+    const qs = params.toString()
+    window.history.replaceState(null, '', qs ? `/?${qs}` : '/')
+  }, [])
   const [timeZone, setTimeZone] = useState('UTC')
   const [selectedMatchday, setSelectedMatchday] = useState<number | null>(null)
   const [deferredInstall, setDeferredInstall] = useState<BeforeInstallPromptEvent | null>(null)
@@ -123,6 +132,15 @@ export default function AppShell({
   const showInstall =
     !installAccepted &&
     (deferredInstall !== null || isIOSSafari)
+
+  // Restore tab from URL on mount (e.g., after pressing back from a player page)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const t = params.get('tab')
+    if (t === 'grupos' || t === 'equipos') {
+      window.setTimeout(() => setTab(t as Tab), 0)
+    }
+  }, [])
 
   useEffect(() => {
     const detected = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -265,7 +283,7 @@ export default function AppShell({
                 <button
                   key={t.id}
                   role="tab"
-                  onClick={() => setTab(t.id)}
+                  onClick={() => handleTabChange(t.id)}
                   aria-selected={isActive}
                   className="flex items-center gap-1.5 px-4 py-2.5 -mb-px border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--kinpaku)]"
                   style={{
@@ -380,7 +398,7 @@ export default function AppShell({
             <button
               key={t.id}
               role="tab"
-              onClick={() => setTab(t.id)}
+              onClick={() => handleTabChange(t.id)}
               aria-selected={isActive}
               aria-label={t.label}
               className="flex-1 flex flex-col items-center justify-center gap-1 py-2.5 transition-colors focus-visible:outline-none"

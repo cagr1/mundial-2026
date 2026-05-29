@@ -7,7 +7,8 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { hostname: "a.espncdn.com" },         // ESPN team logos
-      { hostname: "www.thesportsdb.com" },    // Player photos
+      { hostname: "www.thesportsdb.com" },    // Player photos (legacy)
+      { hostname: "r2.thesportsdb.com" },     // Player photos (CDN R2)
       { hostname: "upload.wikimedia.org" },   // Wikipedia player photos
     ],
   },

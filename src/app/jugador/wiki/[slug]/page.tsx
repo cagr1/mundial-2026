@@ -59,7 +59,7 @@ export default async function WikiPlayerPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>
-  searchParams: Promise<{ pos?: string; club?: string; caps?: string; goals?: string; nat?: string; dob?: string }>
+  searchParams: Promise<{ pos?: string; club?: string; caps?: string; goals?: string; nat?: string; dob?: string; from?: string }>
 }) {
   const { slug } = await params
   const sp = await searchParams
@@ -80,6 +80,7 @@ export default async function WikiPlayerPage({
   const goals        = sp.goals != null ? Number(sp.goals) : null
   const nationality  = sp.nat ?? null
   const dob          = sp.dob ?? null
+  const backHref     = sp.from ? `/?tab=equipos&equipo=${sp.from}` : null
   const age          = dob ? calcAge(dob) : null
   const flag         = nationality ? flagEmoji(nationality) : null
   const posColor     = pos ? (POSITION_COLOR[pos] ?? 'var(--text-muted)') : 'var(--text-muted)'
@@ -112,6 +113,7 @@ export default async function WikiPlayerPage({
       birthLocation={sportsdb?.strBirthLocation ?? null}
       bio={summary?.extract ?? null}
       photoSource={photoSource}
+      backHref={backHref}
     />
   )
 }

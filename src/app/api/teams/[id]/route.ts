@@ -1,21 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getTeam } from "@/lib/football-api";
 import { getWikipediaCurrentSquad } from "@/lib/wikipedia-squads";
-import { Player, TeamDetail } from "@/types/football";
+import { Player, PlayerPosition, TeamDetail } from "@/types/football";
 
-function normalizeFootballDataSquad(data: TeamDetail): TeamDetail {
-  return {
-    ...data,
-    squad: Array.isArray(data.squad)
-      ? data.squad.map((player) => ({
-          ...player,
-          source: player.source ?? "football-data.org",
-        }))
-      : [],
-  };
-}
+const ESPN_POS: Record<string, PlayerPosition> = {
+  G: "Goalkeeper",
+  GK: "Goalkeeper",
+  D: "Defence",
+  DB: "Defence",
+  M: "Midfield",
+  MF: "Midfield",
+  F: "Offence",
+  FW: "Offence",
+};
 
-/** Build a minimal TeamDetail from URL query params — always safe, no API call */
+/** Build a minimal TeamDetail from URL query params (ESPN data already there) */
 function teamFromParams(id: string, req: NextRequest): TeamDetail {
   const { searchParams } = new URL(req.url);
   return {
@@ -32,6 +30,40 @@ function teamFromParams(id: string, req: NextRequest): TeamDetail {
   };
 }
 
+/** Try to fetch squad from ESPN's hidden roster endpoint (returns 0 items pre-tournament) */
+async function getESPNSquad(teamId: string): Promise<Player[]> {
+  try {
+    const res = await fetch(
+      `https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/teams/${teamId}/roster`,
+      { next: { revalidate: 3600 } }
+    );
+    if (!res.ok) return [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data = await res.json() as { athletes?: { position: any; items: any[] }[] };
+    const players: Player[] = [];
+    for (const group of data.athletes ?? []) {
+      const posAbbr: string = group.position?.abbreviation ?? "";
+      const pos = ESPN_POS[posAbbr] ?? null;
+      for (const a of group.items ?? []) {
+        const name: string = a.displayName ?? a.fullName ?? "";
+        if (!name) continue;
+        players.push({
+          id: Number(a.id) || 0,
+          name,
+          position: pos,
+          dateOfBirth: a.dateOfBirth?.split("T")[0] ?? "",
+          nationality: "",
+          club: a.team?.displayName ?? null,
+          source: "football-data.org",
+        });
+      }
+    }
+    return players;
+  } catch {
+    return [];
+  }
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -39,54 +71,43 @@ export async function GET(
   const { id } = await params;
   const base = teamFromParams(id, req);
 
-  // ── Step 1: Try Wikipedia FIRST ──────────────────────────────────────────
-  // Wikipedia has no rate limit and needs no API key. If it resolves we skip
-  // football-data.org entirely for the squad, keeping that quota for teams
-  // that have no Wikipedia squad.
-  let wikipediaSquad: Player[] = [];
+  // ── 1. Wikipedia (primary — free, no key, best current-squad data) ────────
+  let wikiSquad: Player[] = [];
+  let wikiFailed = false;
   try {
-    wikipediaSquad = await getWikipediaCurrentSquad(base.name, base.tla);
+    wikiSquad = await getWikipediaCurrentSquad(base.name, base.tla);
   } catch {
-    // Wikipedia unreachable — fall through to football-data.org
+    wikiFailed = true;
   }
 
-  if (wikipediaSquad.length > 0) {
-    // Wikipedia resolved. Try football-data.org for richer base info
-    // (coach, venue, founded, etc.) but don't block if it 429s.
-    try {
-      const fdData = normalizeFootballDataSquad(
-        (await getTeam(Number(id))) as TeamDetail
-      );
-      return NextResponse.json({
-        ...fdData,
-        squad: wikipediaSquad,
-        squadSource: "Wikipedia",
-      });
-    } catch {
-      // football-data.org failed (429 or auth) — serve params + Wikipedia squad
-      return NextResponse.json({
-        ...base,
-        squad: wikipediaSquad,
-        squadSource: "Wikipedia",
-      });
-    }
-  }
-
-  // ── Step 2: Wikipedia failed → fall back to football-data.org ────────────
-  try {
-    const fdData = normalizeFootballDataSquad(
-      (await getTeam(Number(id))) as TeamDetail
-    );
-    return NextResponse.json({
-      ...fdData,
-      fallbackReason: "Wikipedia current squad did not resolve",
-    });
-  } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "Unknown football-data.org error";
+  if (wikiSquad.length > 0) {
     return NextResponse.json({
       ...base,
-      fallbackReason: message,
-    });
+      squad: wikiSquad,
+      squadSource: "Wikipedia",
+    } satisfies TeamDetail);
   }
+
+  // ── 2. ESPN roster (secondary — no key, available during tournament) ──────
+  const espnSquad = await getESPNSquad(id);
+  if (espnSquad.length > 0) {
+    return NextResponse.json({
+      ...base,
+      squad: espnSquad,
+      squadSource: "football-data.org", // reuse existing label for "external source"
+      fallbackReason: "Plantel de Wikipedia no disponible",
+    } satisfies TeamDetail);
+  }
+
+  // ── 3. Both sources empty ─────────────────────────────────────────────────
+  const reason = wikiFailed
+    ? "No se pudo conectar a Wikipedia"
+    : "El plantel oficial aún no ha sido publicado";
+
+  return NextResponse.json({
+    ...base,
+    squad: [],
+    squadSource: "football-data.org",
+    fallbackReason: reason,
+  } satisfies TeamDetail);
 }

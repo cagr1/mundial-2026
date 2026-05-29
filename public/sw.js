@@ -1,5 +1,6 @@
-const CACHE = 'mundial-2026-v1'
-const PRECACHE = ['/', '/manifest.json', '/brand-mark.svg', '/icon-192.png', '/favicon.ico']
+const CACHE = 'mundial-2026-v3'
+// Do NOT precache '/' — it's force-dynamic and cached HTML may reference stale JS chunks
+const PRECACHE = ['/manifest.json', '/brand-mark.svg', '/icon-192.png', '/favicon.ico']
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -19,12 +20,15 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url)
-  // Skip non-GET, cross-origin, and API routes (always fresh)
+  // Skip non-GET, cross-origin, API routes, and dynamic HTML pages (always fetch fresh)
   if (
     e.request.method !== 'GET' ||
     url.origin !== self.location.origin ||
     url.pathname.startsWith('/api/') ||
-    url.pathname.startsWith('/_next/static/')
+    url.pathname.startsWith('/_next/static/') ||
+    // Dynamic pages — always fetch fresh so stale HTML never references old JS chunks
+    url.pathname === '/' ||
+    url.pathname.startsWith('/jugador/')
   ) return
 
   // Stale-while-revalidate for pages/assets

@@ -30,8 +30,9 @@ function calcAge(dob: string): number {
   return Math.floor(diff / (365.25 * 86_400_000))
 }
 
-/** Always returns an internal app route — never a Wikipedia/external URL */
-function playerInternalHref(player: Player): string {
+/** Always returns an internal app route — never a Wikipedia/external URL.
+ *  Includes `from={teamId}` so the player page can link back to the drawer. */
+function playerInternalHref(player: Player, teamId: number): string {
   if (player.source === 'Wikipedia' && player.profileUrl) {
     const match = player.profileUrl.match(/\/wiki\/(.+)$/)
     if (match) {
@@ -44,17 +45,18 @@ function playerInternalHref(player: Player): string {
       if (player.goals != null) sp.set('goals', String(player.goals))
       if (player.nationality) sp.set('nat', player.nationality)
       if (player.dateOfBirth) sp.set('dob', player.dateOfBirth)
+      sp.set('from', String(teamId))
       const qs = sp.toString()
       return `/jugador/wiki/${slug}${qs ? `?${qs}` : ''}`
     }
   }
-  return `/jugador/${player.id}`
+  return `/jugador/${player.id}?from=${teamId}`
 }
 
-function PlayerCard({ player }: { player: Player }) {
+function PlayerCard({ player, teamId }: { player: Player; teamId: number }) {
   const [flipped, setFlipped] = useState(false)
   const color = player.position ? POSITION_COLOR[player.position] : 'var(--text-muted)'
-  const detailHref = playerInternalHref(player)
+  const detailHref = playerInternalHref(player, teamId)
 
   return (
     <button
@@ -75,6 +77,7 @@ function PlayerCard({ player }: { player: Player }) {
           className="absolute inset-0 flex items-center gap-3 px-3"
           style={{
             backfaceVisibility: 'hidden',
+            pointerEvents: flipped ? 'none' : 'auto',
             background: 'var(--raised-lacquer)',
             border: '1px solid var(--hairline)',
             borderRadius: 'var(--r-md)',
@@ -106,6 +109,7 @@ function PlayerCard({ player }: { player: Player }) {
           style={{
             backfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)',
+            pointerEvents: flipped ? 'auto' : 'none',
             background: 'var(--graphite)',
             border: `1px solid ${color}`,
             borderRadius: 'var(--r-md)',
@@ -313,7 +317,14 @@ export default function TeamDrawer({ team, onClose }: Props) {
         )}
 
         {/* Squad list — this is the ONLY scrolling region */}
-        <div className="overflow-y-auto flex-1 min-h-0 px-4 py-3 space-y-4" style={{ overscrollBehavior: 'contain' }}>
+        <div
+          className="overflow-y-auto flex-1 min-h-0 px-4 pt-3 space-y-4"
+          style={{
+            overscrollBehavior: 'contain',
+            WebkitOverflowScrolling: 'touch',
+            paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
+          }}
+        >
           {loading ? (
             <div className="space-y-2 pt-1">
               {[...Array(8)].map((_, i) => (
@@ -342,7 +353,7 @@ export default function TeamDrawer({ team, onClose }: Props) {
                     <span className="eyebrow tabnum" style={{ color: 'var(--text-disabled)' }}>{players.length}</span>
                   </div>
                   <div className="space-y-1.5">
-                    {players.map((p) => <PlayerCard key={p.id} player={p} />)}
+                    {players.map((p) => <PlayerCard key={p.id} player={p} teamId={team.id} />)}
                   </div>
                 </section>
               )
@@ -365,7 +376,13 @@ export default function TeamDrawer({ team, onClose }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-2.5 flex-shrink-0" style={{ borderTop: '1px solid var(--hairline)' }}>
+        <div
+          className="px-5 pt-2.5 flex-shrink-0"
+          style={{
+            borderTop: '1px solid var(--hairline)',
+            paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0px))',
+          }}
+        >
           <p className="eyebrow text-center" style={{ color: 'var(--text-disabled)' }}>
             {detail?.squadSource ?? 'football-data.org'} · toca cada jugador para ver detalles
           </p>

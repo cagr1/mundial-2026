@@ -3,7 +3,7 @@
 ## 🔴 PRIORIDADES — Próxima sesión
 
 - [x] 🧠 Fix React error #418 (hydration mismatch): reemplazado lazy initializer de `useState` con `useSyncExternalStore` — server snapshot devuelve `false`, client snapshot lee el browser real tras hidratación. Sin `setState` en effect body.
-- [ ] 🧠 Reemplazar el banner de instalación por una página `/instalar`: ruta dedicada con guía paso a paso por plataforma (Android Chrome / iOS Safari). Sin banners que tapen contenido. El header puede tener un botón/link discreto que lleve ahí.
+- [x] 🧠 Reemplazar el banner de instalación por una página `/instalar`: ruta dedicada con guía paso a paso por plataforma (Android Chrome / iOS Safari / Desktop). Botón discreto en header AppShell. Banner eliminado del layout. `/instalar` es Static (pre-renderizado).
 - [ ] 🧠 Decidir fuente de datos alternativa a football-data.org: el token actual puede no cubrir el Mundial 2026 (competición ID 2000), lo que deja la app con datos vacíos. Opciones: (A) JSON estático precargado con el fixture completo del torneo — no necesita API en runtime — o (B) ESPN API no oficial (`site.api.espn.com`) sin key requerida. Evaluar y migrar.
 
 ---
@@ -43,9 +43,12 @@
 - [x] 🧠 `/jugador/[id]` y `/jugador/wiki/[slug]`: refactorizados para usar `PlayerDetail`, lógica de datos intacta
 
 ### Fase 4 — Pulido mobile
-- [ ] ⚡ Verificar safe area insets (bottom nav + notch)
-- [ ] ⚡ Test en móvil real
-- [ ] 🧠 Lint + build final, commit y push
+- [x] ⚡ Verificar safe area insets (bottom nav + notch) — env(safe-area-inset-bottom) en AppShell nav y InstallPrompt
+- [x] ⚡ Banderas: proxy Vercel CDN (/crests/*→crests.football-data.org) + Cache-Control 1yr immutable
+- [x] ⚡ TeamDrawer: fixed inset-0 full-screen móvil (elimina black gap y keyboard viewport issues)
+- [x] ⚡ TeamsGrid: visualViewport API para detectar teclado iOS antes de montar drawer
+- [x] ⚡ Test en móvil real — confirmado: flags rápidas, drawer correcto
+- [x] 🧠 Lint + build final, commit y push — lint OK, build OK, /instalar es Static
 
 ---
 

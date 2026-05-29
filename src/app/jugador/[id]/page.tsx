@@ -77,8 +77,16 @@ async function getWiki(name: string): Promise<WikipediaSummary | null> {
   } catch { return null }
 }
 
-export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function PlayerPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ from?: string }>
+}) {
   const { id } = await params
+  const sp = await searchParams
+  const backHref = sp.from ? `/?tab=equipos&equipo=${sp.from}` : null
   const person = await getPerson(id)
 
   if (!person) {
@@ -127,6 +135,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
       birthLocation={clean(sportsdb?.strBirthLocation)}
       bio={bio}
       photoSource={photoSource}
+      backHref={backHref}
     />
   )
 }

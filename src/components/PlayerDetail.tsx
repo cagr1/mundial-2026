@@ -1,6 +1,6 @@
-import Image from 'next/image'
-import Link from 'next/link'
 import { Icon } from '@iconify/react'
+import BackButton from './BackButton'
+import PlayerPhoto from './PlayerPhoto'
 
 export interface PlayerDetailProps {
   name: string
@@ -21,6 +21,8 @@ export interface PlayerDetailProps {
   birthLocation: string | null
   bio: string | null
   photoSource?: string | null
+  /** If set, "Volver" links here instead of using router.back() */
+  backHref?: string | null
 }
 
 /* Simple pentagonal radar — pure SVG, no deps */
@@ -148,6 +150,7 @@ export default function PlayerDetail({
   birthLocation,
   bio,
   photoSource,
+  backHref,
 }: PlayerDetailProps) {
   const hasPhysical = height || weight || birthLocation
   const hasStats = goals != null || caps != null
@@ -165,14 +168,7 @@ export default function PlayerDetail({
           borderBottom: '1px solid var(--glass-border)',
         }}
       >
-        <Link
-          href="/"
-          className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--kinpaku)]"
-          style={{ color: 'var(--text-muted)' }}
-        >
-          <Icon icon="material-symbols:arrow-back" width={20} height={20} />
-          <span className="eyebrow" style={{ letterSpacing: '0.1em' }}>Volver</span>
-        </Link>
+        <BackButton href={backHref} />
         <span
           className="font-extrabold tracking-tighter uppercase text-sm"
           style={{ color: 'var(--kinpaku)', fontFamily: 'var(--font-hanken)' }}
@@ -184,14 +180,7 @@ export default function PlayerDetail({
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="relative w-full" style={{ minHeight: '360px', maxHeight: '500px', height: '55vw' }}>
         {photoUrl ? (
-          <Image
-            src={photoUrl}
-            alt={name}
-            fill
-            priority
-            className="object-cover object-top"
-            sizes="100vw"
-          />
+          <PlayerPhoto photoUrl={photoUrl} name={name} initials={initials} posColor={posColor} />
         ) : (
           <div
             className="absolute inset-0 flex items-center justify-center"

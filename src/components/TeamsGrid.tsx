@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Icon } from '@iconify/react'
 import { Team } from '@/types/football'
@@ -84,9 +84,31 @@ function blurActive() {
   }
 }
 
+function updateTeamUrl(teamId: number | null) {
+  const params = new URLSearchParams(window.location.search)
+  params.set('tab', 'equipos')
+  if (teamId != null) {
+    params.set('equipo', String(teamId))
+  } else {
+    params.delete('equipo')
+  }
+  const qs = params.toString()
+  window.history.replaceState(null, '', qs ? `/?${qs}` : '/')
+}
+
 export default function TeamsGrid({ teams }: { teams: Team[] }) {
   const [selected, setSelected] = useState<Team | null>(null)
   const [query, setQuery] = useState('')
+  const teamsRef = useRef(teams)
+
+  // Reopen drawer on mount if URL has ?equipo= (e.g., after pressing back from player page)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const equipoId = params.get('equipo')
+    if (!equipoId) return
+    const team = teamsRef.current.find((t) => String(t.id) === equipoId)
+    if (team) window.setTimeout(() => setSelected(team), 0)
+  }, [])
 
   const openDrawer = useCallback((team: Team) => {
     const hadKeyboard =
@@ -95,8 +117,13 @@ export default function TeamsGrid({ teams }: { teams: Team[] }) {
 
     blurActive()
 
-    if (!hadKeyboard) {
+    const openNow = () => {
       setSelected(team)
+      updateTeamUrl(team.id)
+    }
+
+    if (!hadKeyboard) {
+      openNow()
       return
     }
 
@@ -105,24 +132,23 @@ export default function TeamsGrid({ teams }: { teams: Team[] }) {
     if (vv) {
       const threshold = window.screen.height * 0.65
       if (vv.height > threshold) {
-        // Keyboard already closed (or not iOS)
-        setSelected(team)
+        openNow()
         return
       }
       const onResize = () => {
         if (vv.height > threshold) {
           vv.removeEventListener('resize', onResize)
           clearTimeout(fallback)
-          setSelected(team)
+          openNow()
         }
       }
       vv.addEventListener('resize', onResize)
       const fallback = setTimeout(() => {
         vv.removeEventListener('resize', onResize)
-        setSelected(team)
+        openNow()
       }, 600)
     } else {
-      setTimeout(() => setSelected(team), 300)
+      setTimeout(openNow, 300)
     }
   }, [])
 
@@ -194,6 +220,7 @@ export default function TeamsGrid({ teams }: { teams: Team[] }) {
           onClose={() => {
             blurActive()
             setSelected(null)
+            updateTeamUrl(null)
           }}
         />
       ) : null}
