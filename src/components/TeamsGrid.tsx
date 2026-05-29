@@ -66,7 +66,7 @@ export default function TeamsGrid({ teams }: { teams: Team[] }) {
       </div>
 
       {selected ? (
-        <TeamDrawer team={selected} onClose={() => setSelected(null)} />
+        <TeamDrawer key={selected.id} team={selected} onClose={() => setSelected(null)} />
       ) : null}
     </>
   )

@@ -77,15 +77,29 @@ function getCells(rowHtml: string): string[] {
   return cells
 }
 
-function firstLink(cellHtml: string): { href: string | null; label: string | null } {
-  const match = cellHtml.match(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i)
-  if (!match) return { href: null, label: null }
+function cellLinks(cellHtml: string): { href: string | null; label: string | null }[] {
+  const links: { href: string | null; label: string | null }[] = []
+  const linkRegex = /<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi
+  let match: RegExpExecArray | null
 
-  const href = decodeHtml(match[1])
-  return {
-    href: href.startsWith('/wiki/') ? `https://en.wikipedia.org${href}` : href,
-    label: stripTags(match[2]),
+  while ((match = linkRegex.exec(cellHtml))) {
+    const href = decodeHtml(match[1])
+    const label = stripTags(match[2])
+    links.push({
+      href: href.startsWith('/wiki/') ? `https://en.wikipedia.org${href}` : href,
+      label: label || null,
+    })
   }
+
+  return links
+}
+
+function firstTextLink(cellHtml: string): { href: string | null; label: string | null } {
+  return cellLinks(cellHtml).find((link) => link.label) ?? { href: null, label: null }
+}
+
+function lastTextLink(cellHtml: string): { href: string | null; label: string | null } {
+  return cellLinks(cellHtml).filter((link) => link.label).at(-1) ?? { href: null, label: null }
 }
 
 function extractDateOfBirth(cellHtml: string): string {
@@ -112,10 +126,10 @@ function parseCurrentSquad(html: string, nationality: string): Player[] {
 
     const rawPosition = stripTags(cells[1]).replace(/[0-9]/g, '').trim()
     const position = POSITION_MAP[rawPosition] ?? null
-    const playerLink = firstLink(cells[2])
+    const playerLink = firstTextLink(cells[2])
     const name = playerLink.label ?? stripTags(cells[2])
     const dateOfBirth = extractDateOfBirth(cells[3])
-    const clubLink = firstLink(cells[6])
+    const clubLink = lastTextLink(cells[6])
 
     if (!name || !position) continue
 

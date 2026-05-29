@@ -132,15 +132,32 @@ interface Props {
 export default function TeamDrawer({ team, onClose }: Props) {
   const [detail, setDetail] = useState<TeamDetail | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const handleClose = useCallback(() => onClose(), [onClose])
 
   useEffect(() => {
-    fetch(`/api/teams/${team.id}`)
+    const params = new URLSearchParams({
+      name: team.name,
+      shortName: team.shortName,
+      tla: team.tla,
+      crest: team.crest,
+    })
+
+    fetch(`/api/teams/${team.id}?${params}`)
       .then((r) => r.json())
-      .then((d) => { setDetail(d); setLoading(false) })
-      .catch(() => setLoading(false))
-  }, [team.id])
+      .then((d: TeamDetail) => {
+        setDetail({ ...d, squad: Array.isArray(d.squad) ? d.squad : [] })
+        setError(d.error ?? d.fallbackReason ?? null)
+        setLoading(false)
+      })
+      .catch((err) => {
+        const message = err instanceof Error ? err.message : 'No se pudo cargar el plantel'
+        setDetail({ ...team, squad: [], squadSource: 'football-data.org', fallbackReason: message })
+        setError(message)
+        setLoading(false)
+      })
+  }, [team])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose() }
@@ -152,7 +169,8 @@ export default function TeamDrawer({ team, onClose }: Props) {
     }
   }, [handleClose])
 
-  const grouped = detail?.squad.reduce<Record<string, Player[]>>((acc, p) => {
+  const squad = Array.isArray(detail?.squad) ? detail.squad : []
+  const grouped = squad.reduce<Record<string, Player[]>>((acc, p) => {
     const pos = p.position ?? 'Unknown'
     acc[pos] = [...(acc[pos] ?? []), p]
     return acc
@@ -196,7 +214,7 @@ export default function TeamDrawer({ team, onClose }: Props) {
             </h2>
             {detail && (
               <p className="eyebrow mt-0.5" style={{ color: 'var(--text-disabled)' }}>
-                {detail.squad.length} jugadores · {detail.squadSource ?? 'football-data.org'}
+                {squad.length} jugadores · {detail.squadSource ?? 'football-data.org'}
               </p>
             )}
           </div>
@@ -227,7 +245,7 @@ export default function TeamDrawer({ team, onClose }: Props) {
                 <div key={i} className="h-[96px] animate-pulse" style={{ background: 'var(--raised-lacquer)', borderRadius: 'var(--r-md)' }} />
               ))}
             </div>
-          ) : (
+          ) : squad.length ? (
             POSITION_ORDER.map((pos) => {
               const players = grouped[pos] ?? []
               if (!players.length) return null
@@ -246,6 +264,16 @@ export default function TeamDrawer({ team, onClose }: Props) {
                 </section>
               )
             })
+          ) : (
+            <div
+              className="px-4 py-5 text-center"
+              style={{ background: 'var(--raised-lacquer)', border: '1px solid var(--hairline)', borderRadius: 'var(--r-lg)' }}
+            >
+              <p className="eyebrow mb-2" style={{ color: 'var(--kinpaku)' }}>Plantel no disponible</p>
+              <p className="text-sm leading-6" style={{ color: 'var(--text-muted)' }}>
+                {error ?? 'No pudimos cargar jugadores para esta seleccion en este momento.'}
+              </p>
+            </div>
           )}
         </div>
 

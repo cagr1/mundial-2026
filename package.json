@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:squads": "node scripts/check-squads.mjs"
   },
   "dependencies": {
     "@next/font": "^14.2.15",

@@ -34,9 +34,11 @@ export interface TeamDetail extends Team {
   founded?: number
   clubColors?: string
   venue?: string
-  coach: Coach
+  coach?: Coach
   squad: Player[]
   squadSource?: 'football-data.org' | 'Wikipedia'
+  fallbackReason?: string
+  error?: string
 }
 
 export interface Score {
