@@ -1,4 +1,14 @@
-const baseUrl = (process.argv[2] ?? process.env.APP_URL ?? 'http://127.0.0.1:3000').replace(/\/$/, '')
+const args = process.argv.slice(2)
+const baseUrl = (args.find((arg) => !arg.startsWith('--')) ?? process.env.APP_URL ?? 'http://127.0.0.1:3000').replace(/\/$/, '')
+const jsonOutput = args.includes('--json')
+// --delay N  →  wait N ms between each team-detail request (default 0)
+// Use --delay 1200 when testing against production to avoid football-data.org 429s
+const delayArg = args.find((a) => a.startsWith('--delay='))
+const delayMs = delayArg ? Number(delayArg.split('=')[1]) : 0
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 async function fetchJson(path) {
   const res = await fetch(`${baseUrl}${path}`)
@@ -22,9 +32,38 @@ function teamDetailPath(team) {
   return `/api/teams/${team.id}?${params}`
 }
 
+function validateDetail(detail) {
+  const issues = []
+  const squad = Array.isArray(detail.squad) ? detail.squad : []
+
+  if (!detail || typeof detail !== 'object') {
+    return { ok: false, squad, issues: ['detail response is not an object'] }
+  }
+
+  if (!Array.isArray(detail.squad)) {
+    issues.push('missing squad array')
+  }
+
+  if (!detail.squadSource) {
+    issues.push('missing squadSource')
+  }
+
+  if (squad.length === 0 && !detail.fallbackReason && !detail.error) {
+    issues.push('empty squad without fallbackReason/error')
+  }
+
+  if (squad.some((player) => !player.name || !player.position)) {
+    issues.push('one or more players missing name/position')
+  }
+
+  return { ok: issues.length === 0, squad, issues }
+}
+
 async function main() {
-  console.log(`# Squad Source Check\n`)
-  console.log(`Base URL: ${baseUrl}\n`)
+  if (!jsonOutput) {
+    console.log(`# Squad Source Check\n`)
+    console.log(`Base URL: ${baseUrl}\n`)
+  }
 
   const teamsData = await fetchJson('/api/teams')
   const teams = teamsData.teams ?? []
@@ -36,38 +75,52 @@ async function main() {
   const results = []
 
   for (const team of teams) {
+    if (delayMs > 0) await sleep(delayMs)
     try {
       const detail = await fetchJson(teamDetailPath(team))
-      const count = Array.isArray(detail.squad) ? detail.squad.length : 0
-      const ok = detail.squadSource === 'Wikipedia' && count > 0
-      const marker = ok ? '[x]' : '[ ]'
+      const validation = validateDetail(detail)
+      const count = validation.squad.length
+      const marker = validation.ok ? '[x]' : '[ ]'
       const reason = detail.fallbackReason ? ` - ${detail.fallbackReason}` : ''
+      const issueText = validation.issues.length ? ` - ${validation.issues.join('; ')}` : ''
 
       results.push({
+        id: team.id,
         team: team.name,
         source: detail.squadSource ?? 'unknown',
         count,
-        ok,
+        ok: validation.ok,
+        issues: validation.issues,
         reason: detail.fallbackReason ?? '',
       })
 
-      console.log(`${marker} ${team.name} | ${detail.squadSource ?? 'unknown'} | ${count} players${reason}`)
+      if (!jsonOutput) {
+        console.log(`${marker} ${team.name} | ${detail.squadSource ?? 'unknown'} | ${count} players${reason}${issueText}`)
+      }
     } catch (error) {
       results.push({
+        id: team.id,
         team: team.name,
         source: 'error',
         count: 0,
         ok: false,
+        issues: ['request failed'],
         reason: error instanceof Error ? error.message : String(error),
       })
-      console.log(`[ ] ${team.name} | error | 0 players - ${error instanceof Error ? error.message : error}`)
+      if (!jsonOutput) {
+        console.log(`[ ] ${team.name} | error | 0 players - ${error instanceof Error ? error.message : error}`)
+      }
     }
   }
 
   const passed = results.filter((result) => result.ok).length
   const failed = results.length - passed
 
-  console.log(`\nSummary: ${passed}/${results.length} resolved from Wikipedia, ${failed} need review.`)
+  if (jsonOutput) {
+    console.log(JSON.stringify({ baseUrl, passed, failed, total: results.length, results }, null, 2))
+  } else {
+    console.log(`\nSummary: ${passed}/${results.length} team detail responses passed contract validation, ${failed} need review.`)
+  }
 
   if (failed) {
     process.exitCode = 1
