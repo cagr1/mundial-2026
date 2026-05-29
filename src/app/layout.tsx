@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Alumni_Sans_Pinstripe, Albert_Sans, Geist_Mono } from "next/font/google";
-import SplashScreen from "@/components/SplashScreen";
 import "./globals.css";
 
 const alumniPinstripe = Alumni_Sans_Pinstripe({
@@ -48,10 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="es"
       className={`${alumniPinstripe.variable} ${albertSans.variable} ${geistMono.variable} antialiased`}
     >
-      <body className="min-h-dvh flex flex-col">
-        <SplashScreen />
-        {children}
-      </body>
+      <body className="min-h-dvh flex flex-col">{children}</body>
     </html>
   );
 }

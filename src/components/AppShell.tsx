@@ -98,17 +98,38 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
           {/* Brand + timezone */}
           <div className="flex items-center justify-between h-14 gap-3">
             <div className="flex items-center gap-3 min-w-0 flex-shrink-0">
-              {/* Wordmark — app-logo shows WORLD CUP · ball · 26 */}
-              <div className="flex-shrink-0" aria-label="Mundial 2026">
+              {/* Wordmark: spinning ball + text */}
+              <style>{`
+                @keyframes nav-ball-spin {
+                  from { transform: rotate(0deg); }
+                  to   { transform: rotate(360deg); }
+                }
+              `}</style>
+              <div className="flex items-center gap-2 flex-shrink-0" aria-label="World Cup 26">
                 <div
-                  className="relative"
+                  className="relative flex-shrink-0"
                   style={{
-                    width: 48,
-                    height: 48,
-                    filter: 'drop-shadow(0 0 10px oklch(84% 0.19 80.46 / 0.22))',
+                    width: 34,
+                    height: 34,
+                    animation: 'nav-ball-spin 1.4s cubic-bezier(0.22, 1, 0.36, 1) both',
+                    filter: 'drop-shadow(0 0 8px oklch(84% 0.19 80.46 / 0.22))',
                   }}
                 >
-                  <Image src="/app-logo.svg" alt="Mundial 2026" fill priority sizes="48px" />
+                  <Image src="/brand-mark.svg" alt="" fill priority sizes="34px" />
+                </div>
+                <div className="flex flex-col leading-none gap-0.5">
+                  <span
+                    className="eyebrow"
+                    style={{ color: 'var(--text-muted)', fontSize: '0.6rem', letterSpacing: '0.16em' }}
+                  >
+                    WORLD CUP
+                  </span>
+                  <span
+                    className="tabnum font-bold"
+                    style={{ color: 'var(--kinpaku)', fontFamily: 'var(--font-albert)', fontSize: '1rem', lineHeight: 1 }}
+                  >
+                    26
+                  </span>
                 </div>
               </div>
 
