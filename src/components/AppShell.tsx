@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import TimezoneSelect from './TimezoneSelect'
 import MatchList from './MatchList'
 import GroupStandings from './GroupStandings'
@@ -100,16 +101,13 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
               {/* Wordmark */}
               <div className="flex items-center gap-2.5 flex-shrink-0">
                 <div
-                  className="w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0"
+                  className="relative w-8 h-8 flex-shrink-0"
                   style={{
-                    background: 'var(--kinpaku)',
-                    color: 'var(--lacquer-deep)',
-                    borderRadius: 'var(--r-xs)',
-                    fontFamily: 'var(--font-albert)',
+                    filter: 'drop-shadow(0 0 10px oklch(84% 0.19 80.46 / 0.18))',
                   }}
                   aria-hidden="true"
                 >
-                  W
+                  <Image src="/brand-mark.svg" alt="" fill priority sizes="32px" />
                 </div>
                 <h1
                   className="text-sm font-semibold leading-none whitespace-nowrap"
