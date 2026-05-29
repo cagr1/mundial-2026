@@ -25,6 +25,9 @@ Ship a fast mobile-ready promo app today. The app must show team info reliably, 
 - [x] Do not scrape 365Scores unless they provide a public documented API.
 - [x] Mobile animations must be short, CSS-only, and must not delay taps.
 - [ ] 🧠 All roster logic must be validated across every team returned by `/api/teams`.
+  - Tool is ready: `npm run check:squads -- <base-url>`.
+  - Local validation is blocked until `/api/teams` has a valid `FOOTBALL_API_TOKEN`/subscription.
+  - Run against production or a local env with token, then paste the output into this plan.
 
 ## 2. Critical Bug: Country Drawer Loads Nothing
 
@@ -44,12 +47,14 @@ Ship a fast mobile-ready promo app today. The app must show team info reliably, 
 - [x] 🧠 Build generic Wikipedia page resolver using `<Team name>_national_football_team`.
 - [x] 🧠 Add initial special mappings for USA, England, Scotland, Wales, South Korea/Korea Republic, Iran, and Turkey/Turkiye.
 - [x] 🧠 Create a script/debug command that tests Wikipedia squad resolution for every team from `/api/teams`.
+- [x] 🧠 Update checker so a team passes when it returns a valid nonblank contract, not only when Wikipedia resolves.
 - [ ] ⚡ Run the all-team checker and record pass/fail for each team.
 - [ ] ⚡ Identify teams where generic Wikipedia page resolution fails.
 - [ ] ⚡ Identify teams where a Wikipedia page exists but has no `Current squad` table.
 - [ ] 🧠 Add missing special mappings in `src/lib/wikipedia-squads.ts`.
 - [ ] 🧠 Ensure each team returns `squadSource`, `squad`, and a fallback reason when needed.
 - [x] 🧠 Add `npm run check:squads -- <base-url>` for all-team validation.
+- [x] 🧠 Add optional JSON output: `npm run check:squads -- <base-url> --json`.
 - [ ] ⚡ Run `npm run check:squads -- <production-or-local-url-with-token>` and paste results into this plan.
 - [ ] ⚡ Spot-check at least 10 non-Ecuador teams manually.
 - [ ] 🧠 Mark this section complete only when all teams either resolve or fail gracefully.
@@ -63,26 +68,32 @@ Ship a fast mobile-ready promo app today. The app must show team info reliably, 
 - [x] 🧠 Add `fallbackReason` to `TeamDetail` for UI/debug visibility.
 - [x] 🧠 Avoid throwing 500 if Wikipedia fails.
 - [x] 🧠 Avoid throwing 500 if football-data.org returns no squad but base team info exists.
-- [ ] 🧠 Cache Wikipedia requests server-side with `revalidate: 86400`.
+- [x] 🧠 Cache Wikipedia requests server-side with `revalidate: 86400`. (already implemented in `wikipediaJson()` helper)
 
 ## 5. Team Drawer UI
 
 - [x] 🧠 Show roster source, club, caps, and goals in `TeamDrawer`.
-- [ ] 🧠 Show loading state consistently.
+- [x] 🧠 Show loading state consistently. (skeleton pulses shown during fetch)
 - [x] 🧠 Show empty/error state when squad cannot load.
+- [x] 🧠 HIGH: Redesign drawer layout so users do not need to scroll to the bottom to understand or access the full squad. (compact header + filter pills + single scroll region)
+- [x] 🧠 HIGH: Keep country header compact/sticky and make the roster area the primary scroll region.
+- [x] 🧠 HIGH: Add compact roster rows or a segmented position filter so the squad is easier to scan on phone. (ALL/GK/DF/MF/FW pills with player count)
 - [ ] 🧠 Keep drawer height and scrolling stable on mobile.
 - [ ] ⚡ Check long club names do not overflow.
 - [ ] ⚡ Check players with no date of birth do not create broken age UI.
-- [ ] 🧠 Keep click behavior clear: card flips, detail button opens player page/source.
+- [x] 🧠 HIGH: Remove all external Wikipedia navigation from player taps/buttons. (`playerInternalHref()` always returns `/jugador/wiki/[slug]` or `/jugador/[id]`)
+- [x] 🧠 Keep click behavior clear: card flips, detail button opens an internal player detail view only.
 
 ## 6. Player Detail Pages
 
 - [x] 🧠 Football-data player pages fetch TheSportsDB enrichment by player name.
 - [x] 🧠 Football-data player pages fall back to Wikipedia summary.
-- [ ] 🧠 Create app-native detail pages for Wikipedia-sourced players.
-- [ ] 🧠 Use Wikipedia player article title/link from `profileUrl` as the stable identifier.
-- [ ] 🧠 Show current club from squad table on Wikipedia-sourced player pages.
-- [ ] 🧠 Keep external Wikipedia as source attribution, not as the main click destination.
+- [x] 🧠 HIGH: Create app-native detail pages for Wikipedia-sourced players. (`/jugador/wiki/[slug]/page.tsx`)
+- [x] 🧠 Use Wikipedia player article title/link from `profileUrl` as the stable identifier. (slug extracted from profileUrl in `playerInternalHref`)
+- [x] 🧠 Show current club from squad table on Wikipedia-sourced player pages. (passed as `?club=` query param)
+- [x] 🧠 Keep external Wikipedia as source attribution only, never as the main click destination.
+- [x] 🧠 Add internal API/page flow for Wikipedia players: use Wikipedia REST summary + TheSportsDB fallback by name.
+- [x] 🧠 If player detail data is missing, show an internal fallback page with name, position, club, caps/goals, and source note. (initials fallback, graceful missing data)
 - [ ] 🧠 Avoid loading player photos inside roster lists.
 
 ## 7. Mobile Performance
@@ -103,6 +114,8 @@ Ship a fast mobile-ready promo app today. The app must show team info reliably, 
 - [ ] ⚡ At least Ecuador, Argentina, Brazil, Mexico, USA, Spain, France, England, Germany, and Japan are spot-checked.
 - [ ] ⚡ Mobile home screen loads quickly.
 - [ ] ⚡ Mobile team drawer shows players or a clear fallback message.
+- [ ] ⚡ Mobile team drawer shows enough roster info without forcing the user to scroll to the very bottom.
+- [ ] ⚡ No player tap or button sends the user to Wikipedia or any external site.
 - [ ] ⚡ Player detail page shows photo or clean initials fallback.
 - [ ] 🧠 Commit and push final changes.
 
@@ -110,8 +123,12 @@ Ship a fast mobile-ready promo app today. The app must show team info reliably, 
 
 - [x] 🧠 Verify `src/app/layout.tsx` references `/manifest.json`.
 - [x] 🧠 Verify `public/manifest.json` exists.
-- [ ] 🧠 Add missing `public/icon-192.png` referenced by manifest.
-- [ ] 🧠 Add missing `public/icon-512.png` referenced by manifest.
+- [x] 🧠 Add missing `public/icon-192.png` referenced by manifest.
+- [x] 🧠 Add missing `public/icon-512.png` referenced by manifest.
+- [x] 🧠 Add `public/icon-maskable-512.png` for Android adaptive/maskable installs.
+- [x] 🧠 Add `public/apple-touch-icon.png` for iOS home screen.
+- [x] 🧠 Add `public/favicon.ico`.
+- [x] 🧠 Add `public/brand-mark.svg` and use it in the top header.
 - [ ] 🧠 Configure `next-pwa` in `next.config.ts` or remove dependency if not used.
 - [ ] 🧠 Verify production HTTPS is active after deploy.
 - [ ] 🧠 Add an in-app install helper for Android Chrome using `beforeinstallprompt`.
@@ -146,5 +163,13 @@ Ship a fast mobile-ready promo app today. The app must show team info reliably, 
 
 - [x] 🧠 `npm run lint` passed after the drawer/API fixes.
 - [x] 🧠 `npm run build` passed after the drawer/API fixes.
+- [x] 🧠 `npm run lint` + `npm run build` passed after Claude session: TeamDrawer redesign + wiki player pages + PWA icons.
 - [x] 🧠 Local direct test passed: `/api/teams/123?name=Ecuador&shortName=Ecuador&tla=ECU&crest=` returns 34 Wikipedia players and clubs.
 - [ ] ⚡ `npm run check:squads -- http://127.0.0.1:3001` could not complete locally because `/api/teams` needs a valid `FOOTBALL_API_TOKEN`/subscription in this environment.
+- [x] 🧠 Improved `scripts/check-squads.mjs` so it validates every team detail response contract:
+  - requires `squad` array
+  - requires `squadSource`
+  - accepts empty squads only when `fallbackReason` or `error` explains why
+  - checks that player rows include `name` and `position`
+- [ ] ⚡ Next required command when production URL is known:
+  `npm run check:squads -- https://YOUR_DEPLOYMENT_URL`

@@ -18,23 +18,49 @@ const POSITION_COLOR: Record<string, string> = {
   Midfield: 'oklch(74% 0.13 290)',
   Offence: 'var(--vermilion)',
 }
+const POSITION_ABBR: Record<string, string> = {
+  Goalkeeper: 'GK',
+  Defence: 'DF',
+  Midfield: 'MF',
+  Offence: 'FW',
+}
 
 function calcAge(dob: string): number {
   const diff = Date.now() - new Date(dob).getTime()
   return Math.floor(diff / (365.25 * 86_400_000))
 }
 
+/** Always returns an internal app route — never a Wikipedia/external URL */
+function playerInternalHref(player: Player): string {
+  if (player.source === 'Wikipedia' && player.profileUrl) {
+    const match = player.profileUrl.match(/\/wiki\/(.+)$/)
+    if (match) {
+      // match[1] may already be percent-encoded by the Wikipedia HTML parser
+      const slug = match[1]
+      const sp = new URLSearchParams()
+      if (player.position) sp.set('pos', player.position)
+      if (player.club) sp.set('club', player.club)
+      if (player.caps != null) sp.set('caps', String(player.caps))
+      if (player.goals != null) sp.set('goals', String(player.goals))
+      if (player.nationality) sp.set('nat', player.nationality)
+      if (player.dateOfBirth) sp.set('dob', player.dateOfBirth)
+      const qs = sp.toString()
+      return `/jugador/wiki/${slug}${qs ? `?${qs}` : ''}`
+    }
+  }
+  return `/jugador/${player.id}`
+}
+
 function PlayerCard({ player }: { player: Player }) {
   const [flipped, setFlipped] = useState(false)
   const color = player.position ? POSITION_COLOR[player.position] : 'var(--text-muted)'
-  const detailHref = player.profileUrl ?? `/jugador/${player.id}`
-  const isExternalProfile = Boolean(player.profileUrl)
+  const detailHref = playerInternalHref(player)
 
   return (
     <button
       onClick={() => setFlipped((f) => !f)}
       className="relative w-full text-left"
-      style={{ perspective: '600px', height: '96px' }}
+      style={{ perspective: '600px', height: '88px' }}
       aria-label={`${player.name} — ver detalles`}
     >
       <div
@@ -59,16 +85,12 @@ function PlayerCard({ player }: { player: Player }) {
             className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-xs font-bold"
             style={{ background: 'var(--graphite)', borderRadius: 'var(--r-xs)', color }}
           >
-            {player.position === 'Goalkeeper' ? 'GK'
-              : player.position === 'Defence' ? 'DF'
-              : player.position === 'Midfield' ? 'MF'
-              : player.position === 'Offence' ? 'FW'
-              : '?'}
+            {POSITION_ABBR[player.position ?? ''] ?? '?'}
           </div>
           <span className="text-sm font-medium flex-1 truncate" style={{ color: 'var(--text-warm)' }}>
             {player.name}
             {player.club ? (
-              <span className="block eyebrow mt-1 truncate" style={{ color: 'var(--text-disabled)', fontSize: '0.56rem' }}>
+              <span className="block eyebrow mt-0.5 truncate" style={{ color: 'var(--text-disabled)', fontSize: '0.56rem' }}>
                 {player.club}
               </span>
             ) : null}
@@ -94,9 +116,9 @@ function PlayerCard({ player }: { player: Player }) {
             <p className="eyebrow mt-0.5 truncate" style={{ color: 'var(--text-muted)' }}>
               {player.club ?? player.nationality}
             </p>
-            {player.caps != null || player.goals != null ? (
+            {(player.caps != null || player.goals != null) ? (
               <p className="eyebrow mt-0.5 tabnum" style={{ color: 'var(--text-disabled)', fontSize: '0.56rem' }}>
-                {player.caps ?? 0} PJ Â· {player.goals ?? 0} G
+                {player.caps ?? 0} PJ · {player.goals ?? 0} G
               </p>
             ) : null}
           </div>
@@ -110,10 +132,13 @@ function PlayerCard({ player }: { player: Player }) {
             <Link
               href={detailHref}
               className="eyebrow px-2 py-1 border"
-              style={{ color: 'var(--kinpaku)', borderColor: 'var(--hairline-gold)', borderRadius: 'var(--r-xs)', textDecoration: 'none' }}
+              style={{
+                color: 'var(--kinpaku)',
+                borderColor: 'var(--hairline-gold)',
+                borderRadius: 'var(--r-xs)',
+                textDecoration: 'none',
+              }}
               onClick={(e) => e.stopPropagation()}
-              target={isExternalProfile ? '_blank' : undefined}
-              rel={isExternalProfile ? 'noreferrer' : undefined}
             >
               →
             </Link>
@@ -133,6 +158,7 @@ export default function TeamDrawer({ team, onClose }: Props) {
   const [detail, setDetail] = useState<TeamDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [posFilter, setPosFilter] = useState<string>('ALL')
 
   const handleClose = useCallback(() => onClose(), [onClose])
 
@@ -160,7 +186,9 @@ export default function TeamDrawer({ team, onClose }: Props) {
   }, [team])
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose() }
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleClose()
+    }
     document.addEventListener('keydown', handler)
     document.body.style.overflow = 'hidden'
     return () => {
@@ -170,11 +198,17 @@ export default function TeamDrawer({ team, onClose }: Props) {
   }, [handleClose])
 
   const squad = Array.isArray(detail?.squad) ? detail.squad : []
+
   const grouped = squad.reduce<Record<string, Player[]>>((acc, p) => {
     const pos = p.position ?? 'Unknown'
     acc[pos] = [...(acc[pos] ?? []), p]
     return acc
-  }, {}) ?? {}
+  }, {})
+
+  const positionsWithPlayers = POSITION_ORDER.filter((pos) => (grouped[pos] ?? []).length > 0)
+  const visiblePositions = posFilter === 'ALL'
+    ? positionsWithPlayers
+    : positionsWithPlayers.filter((p) => p === posFilter)
 
   return (
     <>
@@ -198,22 +232,22 @@ export default function TeamDrawer({ team, onClose }: Props) {
         role="dialog"
         aria-label={`Plantel de ${team.name}`}
       >
-        {/* Header */}
+        {/* Header — compact, non-scrolling */}
         <div
-          className="flex items-center gap-3 px-5 py-4 flex-shrink-0"
+          className="flex items-center gap-3 px-5 py-3 flex-shrink-0"
           style={{ borderBottom: '1px solid var(--hairline)' }}
         >
           {team.crest ? (
-            <div className="relative w-10 h-10 flex-shrink-0">
-              <Image src={team.crest} alt={team.name} fill className="object-contain" sizes="40px" unoptimized />
+            <div className="relative w-9 h-9 flex-shrink-0">
+              <Image src={team.crest} alt={team.name} fill className="object-contain" sizes="36px" unoptimized />
             </div>
           ) : null}
           <div className="flex-1 min-w-0">
-            <h2 className="text-base font-bold truncate" style={{ color: 'var(--champagne)', fontFamily: 'var(--font-albert)' }}>
+            <h2 className="text-sm font-bold truncate" style={{ color: 'var(--champagne)', fontFamily: 'var(--font-albert)' }}>
               {team.name}
             </h2>
             {detail && (
-              <p className="eyebrow mt-0.5" style={{ color: 'var(--text-disabled)' }}>
+              <p className="eyebrow" style={{ color: 'var(--text-disabled)', marginTop: '1px' }}>
                 {squad.length} jugadores · {detail.squadSource ?? 'football-data.org'}
               </p>
             )}
@@ -228,31 +262,82 @@ export default function TeamDrawer({ team, onClose }: Props) {
           </button>
         </div>
 
-        {/* Coach */}
+        {/* Coach — compact */}
         {detail?.coach && (
-          <div className="px-5 py-3 flex-shrink-0" style={{ borderBottom: '1px solid var(--hairline)' }}>
+          <div className="px-5 py-2 flex-shrink-0" style={{ borderBottom: '1px solid var(--hairline)' }}>
             <span className="eyebrow" style={{ color: 'var(--text-disabled)' }}>Técnico · </span>
-            <span className="text-sm font-medium" style={{ color: 'var(--text-warm)' }}>{detail.coach.name}</span>
-            <span className="eyebrow ml-2" style={{ color: 'var(--text-disabled)' }}>{detail.coach.nationality}</span>
+            <span className="text-xs font-medium" style={{ color: 'var(--text-warm)' }}>{detail.coach.name}</span>
+            {detail.coach.nationality && (
+              <span className="eyebrow ml-2" style={{ color: 'var(--text-disabled)' }}>{detail.coach.nationality}</span>
+            )}
           </div>
         )}
 
-        {/* Squad list */}
-        <div className="overflow-y-auto flex-1 px-5 py-4 space-y-5">
+        {/* Position filter pills — only after loading, only if there are players */}
+        {!loading && squad.length > 0 && (
+          <div
+            className="flex gap-2 px-5 py-2.5 flex-shrink-0 overflow-x-auto"
+            style={{ borderBottom: '1px solid var(--hairline)' }}
+          >
+            {(['ALL', ...positionsWithPlayers] as string[]).map((pos) => {
+              const isActive = posFilter === pos
+              const label = pos === 'ALL' ? 'Todos' : (POSITION_ABBR[pos] ?? pos)
+              const count = pos === 'ALL' ? squad.length : (grouped[pos] ?? []).length
+              return (
+                <button
+                  key={pos}
+                  onClick={() => setPosFilter(pos)}
+                  className="eyebrow flex-shrink-0 flex items-center gap-1.5 transition-colors"
+                  style={{
+                    padding: '4px 10px',
+                    background: isActive ? 'var(--kinpaku)' : 'transparent',
+                    color: isActive ? 'var(--lacquer-deep)' : 'var(--text-muted)',
+                    border: `1px solid ${isActive ? 'var(--kinpaku)' : 'var(--hairline)'}`,
+                    borderRadius: 'var(--r-sm)',
+                    fontWeight: isActive ? 700 : 500,
+                  }}
+                >
+                  {label}
+                  <span
+                    className="tabnum"
+                    style={{
+                      fontSize: '0.58rem',
+                      color: isActive ? 'var(--lacquer-deep)' : 'var(--text-disabled)',
+                      fontWeight: isActive ? 700 : 400,
+                    }}
+                  >
+                    {count}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Squad list — this is the ONLY scrolling region */}
+        <div className="overflow-y-auto flex-1 px-4 py-3 space-y-4">
           {loading ? (
-            <div className="space-y-2">
+            <div className="space-y-2 pt-1">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="h-[96px] animate-pulse" style={{ background: 'var(--raised-lacquer)', borderRadius: 'var(--r-md)' }} />
+                <div
+                  key={i}
+                  className="h-[88px] animate-pulse"
+                  style={{ background: 'var(--raised-lacquer)', borderRadius: 'var(--r-md)' }}
+                />
               ))}
             </div>
           ) : squad.length ? (
-            POSITION_ORDER.map((pos) => {
+            visiblePositions.map((pos) => {
               const players = grouped[pos] ?? []
               if (!players.length) return null
               return (
                 <section key={pos}>
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-1 h-3" style={{ background: POSITION_COLOR[pos], borderRadius: '1px' }} aria-hidden="true" />
+                    <div
+                      className="w-1 h-3 flex-shrink-0"
+                      style={{ background: POSITION_COLOR[pos], borderRadius: '1px' }}
+                      aria-hidden="true"
+                    />
                     <h3 className="eyebrow" style={{ color: POSITION_COLOR[pos], letterSpacing: '0.14em' }}>
                       {POSITION_LABEL[pos]}
                     </h3>
@@ -267,20 +352,24 @@ export default function TeamDrawer({ team, onClose }: Props) {
           ) : (
             <div
               className="px-4 py-5 text-center"
-              style={{ background: 'var(--raised-lacquer)', border: '1px solid var(--hairline)', borderRadius: 'var(--r-lg)' }}
+              style={{
+                background: 'var(--raised-lacquer)',
+                border: '1px solid var(--hairline)',
+                borderRadius: 'var(--r-lg)',
+              }}
             >
               <p className="eyebrow mb-2" style={{ color: 'var(--kinpaku)' }}>Plantel no disponible</p>
               <p className="text-sm leading-6" style={{ color: 'var(--text-muted)' }}>
-                {error ?? 'No pudimos cargar jugadores para esta seleccion en este momento.'}
+                {error ?? 'No pudimos cargar jugadores para esta selección en este momento.'}
               </p>
             </div>
           )}
         </div>
 
-        {/* Tip */}
-        <div className="px-5 py-3 flex-shrink-0" style={{ borderTop: '1px solid var(--hairline)' }}>
+        {/* Footer */}
+        <div className="px-5 py-2.5 flex-shrink-0" style={{ borderTop: '1px solid var(--hairline)' }}>
           <p className="eyebrow text-center" style={{ color: 'var(--text-disabled)' }}>
-            Plantel desde {detail?.squadSource ?? 'football-data.org'} · toca cada jugador para ver detalles
+            {detail?.squadSource ?? 'football-data.org'} · toca cada jugador para ver detalles
           </p>
         </div>
       </div>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Neo Kinpaku: lacquer background, kinpaku gold, Geist Mono-style numerals -->
+  <rect width="512" height="512" rx="96" fill="#0f0e0c"/>
+  <!-- Gold top label -->
+  <text
+    x="256" y="148"
+    font-family="system-ui, -apple-system, Arial, sans-serif"
+    font-weight="400"
+    font-size="52"
+    text-anchor="middle"
+    fill="#d4a73d"
+    letter-spacing="14"
+  >MUNDIAL</text>
+  <!-- Large "26" number -->
+  <text
+    x="256" y="340"
+    font-family="system-ui, -apple-system, Arial, sans-serif"
+    font-weight="700"
+    font-size="248"
+    text-anchor="middle"
+    fill="#d4a73d"
+    letter-spacing="-8"
+  >26</text>
+  <!-- Thin gold line separator -->
+  <line x1="80" y1="172" x2="432" y2="172" stroke="#d4a73d" stroke-width="1.5" opacity="0.4"/>
+  <!-- Bottom label -->
+  <text
+    x="256" y="430"
+    font-family="system-ui, -apple-system, Arial, sans-serif"
+    font-weight="400"
+    font-size="40"
+    text-anchor="middle"
+    fill="#d4a73d"
+    opacity="0.5"
+    letter-spacing="8"
+  >FIFA WC</text>
+</svg>
