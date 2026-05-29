@@ -2,9 +2,50 @@
 
 ## 🔴 PRIORIDADES — Próxima sesión
 
-- [ ] 🧠 Fix React error #418 (hydration mismatch): `InstallPrompt` en `layout.tsx` genera HTML diferente en servidor vs cliente porque `useState` lazy initializer accede a `window`/`sessionStorage` durante hidratación. Solución: mover toda la lógica de detección a `useEffect` con estado inicializado en `false` (coincide con SSR), o mover el componente fuera del layout.
+- [x] 🧠 Fix React error #418 (hydration mismatch): reemplazado lazy initializer de `useState` con `useSyncExternalStore` — server snapshot devuelve `false`, client snapshot lee el browser real tras hidratación. Sin `setState` en effect body.
 - [ ] 🧠 Reemplazar el banner de instalación por una página `/instalar`: ruta dedicada con guía paso a paso por plataforma (Android Chrome / iOS Safari). Sin banners que tapen contenido. El header puede tener un botón/link discreto que lleve ahí.
 - [ ] 🧠 Decidir fuente de datos alternativa a football-data.org: el token actual puede no cubrir el Mundial 2026 (competición ID 2000), lo que deja la app con datos vacíos. Opciones: (A) JSON estático precargado con el fixture completo del torneo — no necesita API en runtime — o (B) ESPN API no oficial (`site.api.espn.com`) sin key requerida. Evaluar y migrar.
+
+---
+
+## 13. Victory Noir — Migración de Diseño
+
+**Sistema de diseño nuevo**: Victory Noir — dark glassmorphism premium, fondo Deep Void `#0B0B0A`, acento Trophy Gold `#D9B34D`/`#F7CF65`, glassmorphism cards con `backdrop-blur: 24px`, fuentes Hanken Grotesk + JetBrains Mono.
+
+**Fuente de diseño**: `E:\Carlos\Development Tools\Proyectos\worldcup\stitch_world_cup_match_center\`
+
+**4 pantallas de referencia**:
+- Carpeta `(0)` — Groups Stage (tabla de grupos A-D)
+- Carpeta `(1)` — Player Profile (stats, radar, heatmap)
+- Carpeta `(2)` — Home (countdown, próximos partidos, noticias)
+- Carpeta `(3)` — Teams (grid con búsqueda y filtros)
+
+**Reglas de migración**:
+- Funcionalidad sin cambios — solo el diseño visual
+- 3 tabs existentes (Partidos / Grupos / Equipos) se mantienen — el 4to "Stats" se omite por ahora
+- Bottom nav reemplaza los tabs del header en mobile; desktop mantiene layout adaptado
+- Iconify (`@iconify/react`) para todos los íconos del nav y UI
+
+### Fase 1 — Design system base
+- [x] 🧠 Instalar `@iconify/react`
+- [x] 🧠 Actualizar fuentes en `layout.tsx`: Hanken Grotesk + JetBrains Mono (reemplaza Alumni + Geist Mono)
+- [x] 🧠 Actualizar `globals.css`: tokens Victory Noir manteniendo nombres actuales para compatibilidad, agregar `.glass-card` y `.stadium-glow`
+- [x] 🧠 Actualizar `AppShell`: header Victory Noir + bottom nav con iconify en mobile, nav superior en desktop
+- [x] ⚡ Build + lint pasan
+
+### Fase 2 — Componentes de contenido
+- [x] 🧠 `MatchCard` / `MatchList`: glassmorphism card, fuente Hanken Grotesk, score 2.25rem bold
+- [x] 🧠 `GroupStandings`: glass-card, accent lateral gold en clasificados, "QUALIFICATION ROUND" label, tabla simplificada PJ/DG/Pts
+- [x] 🧠 `TeamsGrid`: grid 2col mobile / 3-5 desktop, search con icon Iconify, glassmorphism card con chevron hover
+
+### Fase 3 — Player Profile
+- [x] 🧠 `PlayerDetail` — componente compartido Victory Noir: hero full-width con gradiente, stats bento 2×2, radar SVG pentagonal con color por posición, bio + nacimiento glass cards
+- [x] 🧠 `/jugador/[id]` y `/jugador/wiki/[slug]`: refactorizados para usar `PlayerDetail`, lógica de datos intacta
+
+### Fase 4 — Pulido mobile
+- [ ] ⚡ Verificar safe area insets (bottom nav + notch)
+- [ ] ⚡ Test en móvil real
+- [ ] 🧠 Lint + build final, commit y push
 
 ---
 

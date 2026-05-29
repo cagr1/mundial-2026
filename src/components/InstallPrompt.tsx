@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useSyncExternalStore } from 'react'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
@@ -8,7 +8,6 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 function isIOSSafari(): boolean {
-  if (typeof window === 'undefined') return false
   const ua = navigator.userAgent
   const isIOS = /iphone|ipad|ipod/i.test(ua) && !/crios/i.test(ua)
   const isSafari = /^((?!chrome|android).)*safari/i.test(ua)
@@ -16,28 +15,31 @@ function isIOSSafari(): boolean {
 }
 
 function isAlreadyInstalled(): boolean {
-  if (typeof window === 'undefined') return false
   if (window.matchMedia('(display-mode: standalone)').matches) return true
   if ((navigator as { standalone?: boolean }).standalone) return true
   return false
 }
 
+function getShowIOSSnapshot(): boolean {
+  if (isAlreadyInstalled()) return false
+  if (sessionStorage.getItem('pwa-prompt-dismissed')) return false
+  return isIOSSafari()
+}
+
+// Static snapshot — iOS detection never changes after mount
+const noop = () => () => {}
+
 export default function InstallPrompt() {
-  // Lazy initializer runs client-side only — avoids setState-in-effect
-  const [showIOS] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false
-    if (isAlreadyInstalled()) return false
-    if (sessionStorage.getItem('pwa-prompt-dismissed')) return false
-    return isIOSSafari()
-  })
+  // Server renders false; client reads real browser state after hydration — no mismatch
+  const showIOS = useSyncExternalStore(noop, getShowIOSSnapshot, () => false)
 
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
+    if (showIOS) return
     if (isAlreadyInstalled()) return
     if (sessionStorage.getItem('pwa-prompt-dismissed')) return
-    if (showIOS) return // iOS handled via lazy state above
 
     const handler = (e: Event) => {
       e.preventDefault()

@@ -1,29 +1,36 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-albert);
-  --font-display: var(--font-alumni-pinstripe);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-hanken);
+  --font-mono: var(--font-jetbrains);
 }
 
-/* ─── Kinpaku Token System (OKLCH) ─────────────────────────────────────── */
+/* ─── Victory Noir Token System ─────────────────────────────────────────── */
 :root {
-  /* Surfaces */
-  --lacquer:        oklch(7% 0.006 95);
-  --lacquer-deep:   oklch(4% 0.004 95);
-  --raised-lacquer: oklch(11% 0.006 95);
-  --graphite:       oklch(15% 0.008 95);
-  --graphite-2:     oklch(19% 0.008 95);
+  /* Surfaces — Deep Void base */
+  --lacquer-deep:   #0B0B0A;
+  --lacquer:        #16130c;
+  --raised-lacquer: #231f18;
+  --graphite:       #2d2a22;
+  --graphite-2:     #38342c;
 
-  /* Gold ramp */
-  --kinpaku:        oklch(84% 0.19 80.46);
-  --kinpaku-pale:   oklch(86% 0.07 84);
-  --kinpaku-rich:   oklch(77% 0.13 82);
-  --kinpaku-deep:   oklch(61% 0.085 78);
-  --hairline:       oklch(78% 0 0 / 0.16);
-  --hairline-gold:  oklch(74% 0.09 82 / 0.6);
+  /* Glass layer */
+  --glass-bg:       rgba(35, 31, 24, 0.6);
+  --glass-border:   rgba(161, 161, 170, 0.2);
+  --glass-top:      rgba(247, 207, 101, 0.08);
 
-  /* Patina (secondary / live states) */
+  /* Trophy Gold ramp */
+  --kinpaku:        #f7cf65;
+  --kinpaku-pale:   #ffdf93;
+  --kinpaku-rich:   #d9b34d;
+  --kinpaku-deep:   #594400;
+  --hairline:       rgba(161, 161, 170, 0.18);
+  --hairline-gold:  rgba(247, 207, 101, 0.25);
+
+  /* Stadium glow */
+  --stadium-glow:   rgba(217, 179, 77, 0.12);
+
+  /* Patina (live states) */
   --patina:         oklch(70% 0.12 188);
   --patina-pale:    oklch(82% 0.07 188);
   --patina-deep:    oklch(49% 0.08 188);
@@ -31,14 +38,14 @@
   /* Warning */
   --vermilion:      oklch(58% 0.15 35);
 
-  /* Text */
-  --champagne:      oklch(91% 0 0);
-  --text-warm:      oklch(88% 0 0);
-  --text-muted:     oklch(72% 0 0);
-  --text-faint:     oklch(62% 0 0);
-  --text-disabled:  oklch(52% 0 0);
+  /* Text — Victory Noir palette */
+  --champagne:      #eae1d6;
+  --text-warm:      #eae1d6;
+  --text-muted:     #A1A1AA;
+  --text-faint:     #6b6b6b;
+  --text-disabled:  #4a4a4a;
 
-  /* Radii */
+  /* Radii — tight architectural feel */
   --r-xs: 2px;
   --r-sm: 4px;
   --r-md: 6px;
@@ -47,15 +54,30 @@
 
 html {
   color-scheme: dark;
-  background-color: var(--lacquer);
+  background-color: var(--lacquer-deep);
 }
 
 body {
-  background:
-    radial-gradient(ellipse 90% 40% at 50% -10%, oklch(84% 0.19 80.46 / 0.05), transparent),
-    var(--lacquer);
+  background-color: var(--lacquer-deep);
   color: var(--text-warm);
+  font-family: var(--font-hanken), 'Hanken Grotesk', sans-serif;
   min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ─── Glassmorphism card ────────────────────────────────────────────────── */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-top-color: var(--glass-top);
+  border-left-color: var(--glass-top);
+}
+
+.glass-card-glow {
+  box-shadow: inset 0 0 12px var(--stadium-glow);
 }
 
 /* ─── View Transitions ──────────────────────────────────────────────────── */
@@ -74,31 +96,33 @@ body {
 
 /* ─── Eyebrow / mono label ──────────────────────────────────────────────── */
 .eyebrow {
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-jetbrains), 'JetBrains Mono', monospace;
   font-size: 0.68rem;
   font-weight: 500;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 /* ─── Match card ────────────────────────────────────────────────────────── */
 .match-card {
-  background: var(--raised-lacquer);
-  border: 1px solid var(--hairline);
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-lg);
-  transition: border-color 180ms ease, background 180ms ease;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
 }
 .match-card:hover {
-  background: var(--graphite);
   border-color: var(--hairline-gold);
+  box-shadow: inset 0 0 12px var(--stadium-glow);
 }
 .match-card.is-live {
   border-color: oklch(70% 0.12 188 / 0.5);
   box-shadow: 0 0 28px oklch(70% 0.12 188 / 0.08);
 }
 .match-card.is-today:not(.is-live) {
-  border-color: oklch(74% 0.09 82 / 0.3);
+  border-color: rgba(247, 207, 101, 0.2);
 }
 
 /* ─── Patina live pulse ─────────────────────────────────────────────────── */
@@ -111,10 +135,18 @@ body {
 /* ─── Tabular numbers ───────────────────────────────────────────────────── */
 .tabnum { font-variant-numeric: tabular-nums; }
 
+/* ─── Gold gradient text ────────────────────────────────────────────────── */
+.gold-text {
+  background: linear-gradient(135deg, #f7cf65 0%, #d9b34d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* ─── Custom scrollbar ──────────────────────────────────────────────────── */
 ::-webkit-scrollbar         { width: 4px; }
 ::-webkit-scrollbar-track   { background: transparent; }
-::-webkit-scrollbar-thumb   { background: var(--hairline); border-radius: 9999px; }
+::-webkit-scrollbar-thumb   { background: var(--glass-border); border-radius: 9999px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--hairline-gold); }
 
 /* ─── Reduced motion ────────────────────────────────────────────────────── */

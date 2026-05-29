@@ -1,24 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Alumni_Sans_Pinstripe, Albert_Sans, Geist_Mono } from "next/font/google";
+import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import InstallPrompt from "@/components/InstallPrompt";
 import "./globals.css";
 
-const alumniPinstripe = Alumni_Sans_Pinstripe({
-  variable: "--font-alumni-pinstripe",
+const hankenGrotesk = Hanken_Grotesk({
+  variable: "--font-hanken",
   subsets: ["latin"],
-  weight: "400",
+  weight: ["400", "500", "700", "800"],
 });
 
-const albertSans = Albert_Sans({
-  variable: "--font-albert",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
@@ -47,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="es"
-      className={`${alumniPinstripe.variable} ${albertSans.variable} ${geistMono.variable} antialiased`}
+      className={`${hankenGrotesk.variable} ${jetbrainsMono.variable} antialiased`}
     >
       <body className="min-h-dvh flex flex-col">
         {children}

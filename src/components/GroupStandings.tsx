@@ -22,40 +22,53 @@ interface Props {
 
 export default function GroupStandings({ standing }: Props) {
   const label = standing.group.replace('GROUP_', 'Group ')
-  const accent = GROUP_ACCENT[label] ?? 'var(--text-muted)'
+  const accent = GROUP_ACCENT[label] ?? 'var(--kinpaku)'
 
   return (
     <div
-      className="overflow-hidden"
-      style={{
-        background: 'var(--raised-lacquer)',
-        border: '1px solid var(--hairline)',
-        borderRadius: 'var(--r-lg)',
-      }}
+      className="glass-card overflow-hidden"
+      style={{ borderRadius: 'var(--r-lg)' }}
     >
       {/* Group header */}
       <div
-        className="px-4 py-3 flex items-center gap-2"
-        style={{ borderBottom: '1px solid var(--hairline)' }}
+        className="px-4 py-3 flex items-center gap-2.5"
+        style={{ borderBottom: '1px solid var(--glass-border)' }}
       >
         <div
           className="w-1 h-4 flex-shrink-0"
           style={{ background: accent, borderRadius: '1px' }}
           aria-hidden="true"
         />
-        <h3 className="eyebrow" style={{ color: accent, letterSpacing: '0.14em' }}>
+        <h3
+          className="eyebrow"
+          style={{ color: accent, letterSpacing: '0.16em' }}
+        >
           {label}
         </h3>
+        <span className="eyebrow ml-auto" style={{ color: 'var(--text-disabled)', fontSize: '0.58rem' }}>
+          QUALIFICATION ROUND
+        </span>
       </div>
 
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr style={{ borderBottom: '1px solid var(--hairline)' }}>
-              <th className="text-left px-4 py-2 eyebrow w-full" style={{ color: 'var(--text-disabled)' }}>Equipo</th>
-              {['PJ', 'G', 'E', 'P', 'DG', 'Pts'].map((h) => (
-                <th key={h} className="px-3 py-2 eyebrow tabnum" style={{ color: 'var(--text-disabled)' }}>{h}</th>
+            <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
+              <th
+                className="text-left px-4 py-2 eyebrow w-full"
+                style={{ color: 'var(--text-disabled)', fontSize: '0.58rem' }}
+              >
+                Equipo
+              </th>
+              {['PJ', 'DG', 'Pts'].map((h) => (
+                <th
+                  key={h}
+                  className="px-3 py-2 eyebrow tabnum"
+                  style={{ color: 'var(--text-disabled)', fontSize: '0.58rem' }}
+                >
+                  {h}
+                </th>
               ))}
             </tr>
           </thead>
@@ -66,39 +79,68 @@ export default function GroupStandings({ standing }: Props) {
                 <tr
                   key={entry.team.id}
                   style={{
-                    borderBottom: i < standing.table.length - 1 ? '1px solid var(--hairline)' : undefined,
-                    borderLeft: qualifies ? `2px solid ${accent}` : '2px solid transparent',
+                    borderBottom:
+                      i < standing.table.length - 1
+                        ? '1px solid var(--glass-border)'
+                        : undefined,
+                    borderLeft: qualifies
+                      ? `2px solid ${accent}`
+                      : '2px solid transparent',
+                    background: qualifies
+                      ? `color-mix(in srgb, ${accent} 4%, transparent)`
+                      : undefined,
                   }}
                 >
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-2">
-                      <span className="eyebrow tabnum w-3 text-right" style={{ color: 'var(--text-disabled)' }}>
+                      <span
+                        className="eyebrow tabnum w-3 text-right flex-shrink-0"
+                        style={{ color: 'var(--text-disabled)', fontSize: '0.58rem' }}
+                      >
                         {entry.position}
                       </span>
                       {entry.team.crest ? (
                         <div className="relative w-5 h-5 flex-shrink-0">
-                          <Image src={entry.team.crest} alt={entry.team.name} fill className="object-contain" sizes="20px" />
+                          <Image
+                            src={entry.team.crest}
+                            alt={entry.team.name}
+                            fill
+                            className="object-contain"
+                            sizes="20px"
+                          />
                         </div>
                       ) : (
-                        <div className="w-5 h-5 rounded flex-shrink-0" style={{ background: 'var(--graphite)' }} />
+                        <div
+                          className="w-5 h-5 rounded flex-shrink-0"
+                          style={{ background: 'var(--graphite)' }}
+                        />
                       )}
-                      <span className="text-xs font-medium truncate" style={{ color: 'var(--text-warm)' }}>
+                      <span
+                        className="text-xs font-semibold truncate"
+                        style={{ color: qualifies ? 'var(--champagne)' : 'var(--text-warm)' }}
+                      >
                         {entry.team.shortName}
                       </span>
                     </div>
                   </td>
-                  {[
-                    entry.playedGames,
-                    entry.won,
-                    entry.draw,
-                    entry.lost,
-                    entry.goalDifference > 0 ? `+${entry.goalDifference}` : entry.goalDifference,
-                  ].map((val, vi) => (
-                    <td key={vi} className="px-3 py-2.5 text-center tabnum text-xs" style={{ color: 'var(--text-muted)' }}>
-                      {val}
-                    </td>
-                  ))}
-                  <td className="px-3 py-2.5 text-center tabnum text-xs font-bold" style={{ color: 'var(--champagne)' }}>
+                  <td
+                    className="px-3 py-2.5 text-center tabnum text-xs"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    {entry.playedGames}
+                  </td>
+                  <td
+                    className="px-3 py-2.5 text-center tabnum text-xs"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    {entry.goalDifference > 0
+                      ? `+${entry.goalDifference}`
+                      : entry.goalDifference}
+                  </td>
+                  <td
+                    className="px-3 py-2.5 text-center tabnum text-sm font-bold"
+                    style={{ color: qualifies ? accent : 'var(--champagne)' }}
+                  >
                     {entry.points}
                   </td>
                 </tr>
