@@ -1,4 +1,6 @@
 import { Suspense } from 'react'
+
+export const dynamic = 'force-dynamic'
 import { MatchesResponse, StandingsResponse, TeamsResponse } from '@/types/football'
 import { getMatches, getStandings, getTeams } from '@/lib/football-api'
 import AppShell from '@/components/AppShell'
