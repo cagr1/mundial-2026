@@ -77,7 +77,7 @@ export default function GroupStandings({ standing }: Props) {
                       </span>
                       {entry.team.crest ? (
                         <div className="relative w-5 h-5 flex-shrink-0">
-                          <Image src={entry.team.crest} alt={entry.team.name} fill className="object-contain" sizes="20px" unoptimized />
+                          <Image src={entry.team.crest} alt={entry.team.name} fill className="object-contain" sizes="20px" />
                         </div>
                       ) : (
                         <div className="w-5 h-5 rounded flex-shrink-0" style={{ background: 'var(--graphite)' }} />

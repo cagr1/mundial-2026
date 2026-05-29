@@ -36,7 +36,7 @@ function TeamCrest({ crest, name }: { crest: string; name: string }) {
   }
   return (
     <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0">
-      <Image src={crest} alt={name} fill className="object-contain drop-shadow" sizes="48px" unoptimized />
+      <Image src={crest} alt={name} fill className="object-contain drop-shadow" sizes="48px" />
     </div>
   )
 }

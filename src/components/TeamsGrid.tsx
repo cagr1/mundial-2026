@@ -29,7 +29,7 @@ function TeamCard({ team, onSelect }: { team: Team; onSelect: () => void }) {
     >
       {team.crest ? (
         <div className="relative w-12 h-12 transition-transform duration-150 group-hover:scale-110">
-          <Image src={team.crest} alt={team.name} fill className="object-contain" sizes="48px" unoptimized />
+          <Image src={team.crest} alt={team.name} fill className="object-contain" sizes="48px" />
         </div>
       ) : (
         <div

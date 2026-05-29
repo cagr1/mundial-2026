@@ -159,7 +159,6 @@ export default async function WikiPlayerPage({
                   fill
                   className="object-cover"
                   sizes="80px"
-                  unoptimized
                 />
               </div>
             ) : (

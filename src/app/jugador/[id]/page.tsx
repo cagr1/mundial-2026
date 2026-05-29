@@ -383,7 +383,6 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
                   fill
                   className="object-contain"
                   sizes="56px"
-                  unoptimized
                 />
               </div>
             )}

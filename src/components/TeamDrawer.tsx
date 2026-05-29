@@ -239,7 +239,7 @@ export default function TeamDrawer({ team, onClose }: Props) {
         >
           {team.crest ? (
             <div className="relative w-9 h-9 flex-shrink-0">
-              <Image src={team.crest} alt={team.name} fill className="object-contain" sizes="36px" unoptimized />
+              <Image src={team.crest} alt={team.name} fill className="object-contain" sizes="36px" />
             </div>
           ) : null}
           <div className="flex-1 min-w-0">
@@ -315,7 +315,7 @@ export default function TeamDrawer({ team, onClose }: Props) {
         )}
 
         {/* Squad list — this is the ONLY scrolling region */}
-        <div className="overflow-y-auto flex-1 px-4 py-3 space-y-4">
+        <div className="overflow-y-auto flex-1 min-h-0 px-4 py-3 space-y-4" style={{ overscrollBehavior: 'contain' }}>
           {loading ? (
             <div className="space-y-2 pt-1">
               {[...Array(8)].map((_, i) => (

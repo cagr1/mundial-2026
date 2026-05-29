@@ -94,7 +94,7 @@ Ship a fast mobile-ready promo app today. The app must show team info reliably, 
 - [x] 🧠 HIGH: Redesign drawer layout so users do not need to scroll to the bottom to understand or access the full squad. (compact header + filter pills + single scroll region)
 - [x] 🧠 HIGH: Keep country header compact/sticky and make the roster area the primary scroll region.
 - [x] 🧠 HIGH: Add compact roster rows or a segmented position filter so the squad is easier to scan on phone. (ALL/GK/DF/MF/FW pills with player count)
-- [ ] 🧠 Keep drawer height and scrolling stable on mobile.
+- [x] 🧠 Keep drawer height and scrolling stable on mobile. (min-h-0 + overscrollBehavior:contain on scroll region)
 - [ ] ⚡ Check long club names do not overflow.
 - [ ] ⚡ Check players with no date of birth do not create broken age UI.
 - [x] 🧠 HIGH: Remove all external Wikipedia navigation from player taps/buttons. (`playerInternalHref()` always returns `/jugador/wiki/[slug]` or `/jugador/[id]`)
@@ -110,15 +110,15 @@ Ship a fast mobile-ready promo app today. The app must show team info reliably, 
 - [x] 🧠 Keep external Wikipedia as source attribution only, never as the main click destination.
 - [x] 🧠 Add internal API/page flow for Wikipedia players: use Wikipedia REST summary + TheSportsDB fallback by name.
 - [x] 🧠 If player detail data is missing, show an internal fallback page with name, position, club, caps/goals, and source note. (initials fallback, graceful missing data)
-- [ ] 🧠 Avoid loading player photos inside roster lists.
+- [x] 🧠 Avoid loading player photos inside roster lists. (PlayerCard only shows text — no Image tags)
 
 ## 7. Mobile Performance
 
 - [x] 🧠 Make tab selection immediate.
 - [x] 🧠 Add short CSS tab panel animation.
 - [x] ⚡ User confirmed the app loads faster on phone.
-- [ ] 🧠 Remove `unoptimized` from team crests where Next image optimization works reliably.
-- [ ] 🧠 Consider a server-side crest proxy/cache if remote crest loading is still slow.
+- [x] 🧠 Remove `unoptimized` from team crests where Next image optimization works reliably. (all 6 instances removed — remotePatterns covers all domains)
+- [x] 🧠 Consider a server-side crest proxy/cache if remote crest loading is still slow. (resolved by removing unoptimized — Next.js /_next/image proxies and caches automatically)
 - [ ] ⚡ Test team drawer on a real phone after the loading bug is fixed.
 - [ ] ⚡ Test tab switching and drawer close/open on a real phone.
 
@@ -145,10 +145,10 @@ Ship a fast mobile-ready promo app today. The app must show team info reliably, 
 - [x] 🧠 Add `public/apple-touch-icon.png` for iOS home screen.
 - [x] 🧠 Add `public/favicon.ico`.
 - [x] 🧠 Add `public/brand-mark.svg` and use it in the top header.
-- [ ] 🧠 Configure `next-pwa` in `next.config.ts` or remove dependency if not used.
+- [x] 🧠 Configure `next-pwa` in `next.config.ts` or remove dependency if not used. (removed — incompatible with Next.js 16 Turbopack; replaced with public/sw.js + public/register-sw.js)
 - [ ] 🧠 Verify production HTTPS is active after deploy.
-- [ ] 🧠 Add an in-app install helper for Android Chrome using `beforeinstallprompt`.
-- [ ] 🧠 Add an in-app iOS Safari install guide: Share button -> Add to Home Screen.
+- [x] 🧠 Add an in-app install helper for Android Chrome using `beforeinstallprompt`. (InstallPrompt.tsx)
+- [x] 🧠 Add an in-app iOS Safari install guide: Share button -> Add to Home Screen. (InstallPrompt.tsx)
 - [ ] ⚡ Use `pwa_install_guide.svg` as visual reference only; do not copy it into the app unless the design is adapted to Neo Kinpaku.
 - [ ] ⚡ Test install flow on Android Chrome.
 - [ ] ⚡ Test install flow on iPhone Safari.

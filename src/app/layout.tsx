@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Alumni_Sans_Pinstripe, Albert_Sans, Geist_Mono } from "next/font/google";
+import Script from "next/script";
+import InstallPrompt from "@/components/InstallPrompt";
 import "./globals.css";
 
 const alumniPinstripe = Alumni_Sans_Pinstripe({
@@ -47,7 +49,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="es"
       className={`${alumniPinstripe.variable} ${albertSans.variable} ${geistMono.variable} antialiased`}
     >
-      <body className="min-h-dvh flex flex-col">{children}</body>
+      <body className="min-h-dvh flex flex-col">
+        {children}
+        <InstallPrompt />
+        <Script src="/register-sw.js" strategy="afterInteractive" />
+      </body>
     </html>
   );
 }
