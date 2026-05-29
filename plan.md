@@ -1,5 +1,13 @@
 # Mundial 2026 Promo App Plan
 
+## 🔴 PRIORIDADES — Próxima sesión
+
+- [ ] 🧠 Fix React error #418 (hydration mismatch): `InstallPrompt` en `layout.tsx` genera HTML diferente en servidor vs cliente porque `useState` lazy initializer accede a `window`/`sessionStorage` durante hidratación. Solución: mover toda la lógica de detección a `useEffect` con estado inicializado en `false` (coincide con SSR), o mover el componente fuera del layout.
+- [ ] 🧠 Reemplazar el banner de instalación por una página `/instalar`: ruta dedicada con guía paso a paso por plataforma (Android Chrome / iOS Safari). Sin banners que tapen contenido. El header puede tener un botón/link discreto que lleve ahí.
+- [ ] 🧠 Decidir fuente de datos alternativa a football-data.org: el token actual puede no cubrir el Mundial 2026 (competición ID 2000), lo que deja la app con datos vacíos. Opciones: (A) JSON estático precargado con el fixture completo del torneo — no necesita API en runtime — o (B) ESPN API no oficial (`site.api.espn.com`) sin key requerida. Evaluar y migrar.
+
+---
+
 ## Goal For Today
 
 Ship a fast mobile-ready promo app today. The app must show team info reliably, use current squad data for every team where possible, and degrade gracefully when a free data source fails.
