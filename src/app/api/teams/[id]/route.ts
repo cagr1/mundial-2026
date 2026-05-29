@@ -3,9 +3,15 @@ import { getTeam } from "@/lib/football-api";
 import { getWikipediaCurrentSquad } from "@/lib/wikipedia-squads";
 import { Player, TeamDetail } from "@/types/football";
 
+function lc(url: string | null | undefined): string {
+  if (!url) return ''
+  return url.replace('https://crests.football-data.org/', '/crests/')
+}
+
 function normalizeFootballDataSquad(data: TeamDetail): TeamDetail {
   return {
     ...data,
+    crest: lc(data.crest),
     squad: Array.isArray(data.squad)
       ? data.squad.map((player) => ({
           ...player,

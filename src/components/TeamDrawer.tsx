@@ -212,22 +212,20 @@ export default function TeamDrawer({ team, onClose }: Props) {
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop — desktop only (drawer is full-screen on mobile) */}
       <div
-        className="fixed inset-0 z-40"
+        className="hidden sm:block fixed inset-0 z-40"
         style={{ background: 'oklch(4% 0.004 95 / 0.85)' }}
         onClick={handleClose}
         aria-hidden="true"
       />
 
-      {/* Drawer */}
+      {/* Drawer — full-screen on mobile, side panel on desktop */}
       <div
-        className="fixed bottom-0 left-0 right-0 z-50 h-[92dvh] flex flex-col sm:max-w-lg sm:right-auto sm:top-0 sm:bottom-0 sm:h-auto overflow-hidden"
+        className="fixed inset-0 z-50 flex flex-col overflow-hidden sm:right-auto sm:max-w-lg"
         style={{
           background: 'var(--lacquer)',
-          borderTop: '1px solid var(--hairline-gold)',
           borderRight: '1px solid var(--hairline)',
-          borderRadius: '12px 12px 0 0',
         }}
         role="dialog"
         aria-label={`Plantel de ${team.name}`}

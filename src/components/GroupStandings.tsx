@@ -105,6 +105,7 @@ export default function GroupStandings({ standing }: Props) {
                             src={entry.team.crest}
                             alt={entry.team.name}
                             fill
+                            unoptimized
                             className="object-contain"
                             sizes="20px"
                           />

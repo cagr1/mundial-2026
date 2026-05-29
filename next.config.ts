@@ -6,10 +6,30 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      { hostname: "crests.football-data.org" },
       { hostname: "www.thesportsdb.com" },
       { hostname: "upload.wikimedia.org" },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/crests/:path*",
+        destination: "https://crests.football-data.org/:path*",
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: "/crests/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, s-maxage=31536000, immutable",
+          },
+        ],
+      },
+    ];
   },
 };
 

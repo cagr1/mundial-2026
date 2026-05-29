@@ -25,6 +25,12 @@ function AppSkeleton() {
   )
 }
 
+/** Rewrite external crest URL to local Vercel-proxied path (CDN-cached, same domain) */
+function lc(url: string | null | undefined): string {
+  if (!url) return ''
+  return url.replace('https://crests.football-data.org/', '/crests/')
+}
+
 async function AppData() {
   const [matchesResult, standingsResult, teamsResult] = await Promise.allSettled([
     getMatches() as Promise<MatchesResponse>,
@@ -32,9 +38,24 @@ async function AppData() {
     getTeams() as Promise<TeamsResponse>,
   ])
 
-  const matches = matchesResult.status === 'fulfilled' ? matchesResult.value.matches : []
-  const standings = standingsResult.status === 'fulfilled' ? standingsResult.value.standings : []
-  const teams = teamsResult.status === 'fulfilled' ? teamsResult.value.teams : []
+  const teams = teamsResult.status === 'fulfilled'
+    ? teamsResult.value.teams.map(t => ({ ...t, crest: lc(t.crest) }))
+    : []
+
+  const matches = matchesResult.status === 'fulfilled'
+    ? matchesResult.value.matches.map(m => ({
+        ...m,
+        homeTeam: { ...m.homeTeam, crest: lc(m.homeTeam.crest) },
+        awayTeam: { ...m.awayTeam, crest: lc(m.awayTeam.crest) },
+      }))
+    : []
+
+  const standings = standingsResult.status === 'fulfilled'
+    ? standingsResult.value.standings.map(s => ({
+        ...s,
+        table: s.table.map(e => ({ ...e, team: { ...e.team, crest: lc(e.team.crest) } })),
+      }))
+    : []
 
   const liveCount = matches.filter(
     (m) => m.status === 'LIVE' || m.status === 'IN_PLAY',

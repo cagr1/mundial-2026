@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import Image from 'next/image'
 import { Icon } from '@iconify/react'
 import { Team } from '@/types/football'
@@ -88,6 +88,44 @@ export default function TeamsGrid({ teams }: { teams: Team[] }) {
   const [selected, setSelected] = useState<Team | null>(null)
   const [query, setQuery] = useState('')
 
+  const openDrawer = useCallback((team: Team) => {
+    const hadKeyboard =
+      document.activeElement instanceof HTMLInputElement ||
+      document.activeElement instanceof HTMLTextAreaElement
+
+    blurActive()
+
+    if (!hadKeyboard) {
+      setSelected(team)
+      return
+    }
+
+    // Use visualViewport API to wait for the iOS keyboard to actually close
+    const vv = window.visualViewport
+    if (vv) {
+      const threshold = window.screen.height * 0.65
+      if (vv.height > threshold) {
+        // Keyboard already closed (or not iOS)
+        setSelected(team)
+        return
+      }
+      const onResize = () => {
+        if (vv.height > threshold) {
+          vv.removeEventListener('resize', onResize)
+          clearTimeout(fallback)
+          setSelected(team)
+        }
+      }
+      vv.addEventListener('resize', onResize)
+      const fallback = setTimeout(() => {
+        vv.removeEventListener('resize', onResize)
+        setSelected(team)
+      }, 600)
+    } else {
+      setTimeout(() => setSelected(team), 300)
+    }
+  }, [])
+
   const filtered = useMemo(() => {
     if (!query.trim()) return teams
     const q = query.toLowerCase()
@@ -137,22 +175,7 @@ export default function TeamsGrid({ teams }: { teams: Team[] }) {
       {/* Grid — 2 cols mobile, more on wider screens */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
         {filtered.map((team) => (
-          <TeamCard
-            key={team.id}
-            team={team}
-            onSelect={() => {
-              // Dismiss iOS keyboard before drawer mounts to avoid viewport shift
-              const hadKeyboard =
-                document.activeElement instanceof HTMLInputElement ||
-                document.activeElement instanceof HTMLTextAreaElement
-              blurActive()
-              if (hadKeyboard) {
-                setTimeout(() => setSelected(team), 150)
-              } else {
-                setSelected(team)
-              }
-            }}
-          />
+          <TeamCard key={team.id} team={team} onSelect={() => openDrawer(team)} />
         ))}
       </div>
 
