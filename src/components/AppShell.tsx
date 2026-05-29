@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useSyncExternalStore } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Icon } from '@iconify/react'
@@ -101,8 +101,28 @@ export default function AppShell({
   const [timeZone, setTimeZone] = useState('UTC')
   const [selectedMatchday, setSelectedMatchday] = useState<number | null>(null)
   const [deferredInstall, setDeferredInstall] = useState<BeforeInstallPromptEvent | null>(null)
-  const [showInstall, setShowInstall] = useState(false)
+  const [installAccepted, setInstallAccepted] = useState(false)
   const router = useRouter()
+
+  // Detect iOS Safari on client — server snapshot returns false, no hydration mismatch
+  const isIOSSafari = useSyncExternalStore(
+    () => () => {},
+    () => {
+      const ua = navigator.userAgent
+      const isIOS = /iphone|ipad|ipod/i.test(ua) && !/crios/i.test(ua)
+      const isSafari = /^((?!chrome|android).)*safari/i.test(ua)
+      const standalone =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        (navigator as { standalone?: boolean }).standalone === true
+      return isIOS && isSafari && !standalone
+    },
+    () => false,
+  )
+
+  // showInstall: derived — no setState in effect body
+  const showInstall =
+    !installAccepted &&
+    (deferredInstall !== null || isIOSSafari)
 
   useEffect(() => {
     const detected = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -119,16 +139,8 @@ export default function AppShell({
     const handler = (e: Event) => {
       e.preventDefault()
       setDeferredInstall(e as BeforeInstallPromptEvent)
-      setShowInstall(true)
     }
     window.addEventListener('beforeinstallprompt', handler)
-
-    // iOS Safari doesn't fire beforeinstallprompt — show install hint anyway
-    const ua = navigator.userAgent
-    const isIOS = /iphone|ipad|ipod/i.test(ua) && !/crios/i.test(ua)
-    const isSafari = /^((?!chrome|android).)*safari/i.test(ua)
-    if (isIOS && isSafari) setShowInstall(true)
-
     return () => window.removeEventListener('beforeinstallprompt', handler)
   }, [])
 
@@ -136,7 +148,7 @@ export default function AppShell({
     if (deferredInstall) {
       await deferredInstall.prompt()
       const { outcome } = await deferredInstall.userChoice
-      if (outcome === 'accepted') setShowInstall(false)
+      if (outcome === 'accepted') setInstallAccepted(true)
       setDeferredInstall(null)
     } else {
       router.push('/instalar')

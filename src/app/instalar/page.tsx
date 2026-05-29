@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import { Icon } from '@iconify/react'
 
@@ -78,30 +78,33 @@ function PlatformCard({
   )
 }
 
+const noop = () => () => {}
+
 export default function InstalarPage() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
-  const [installed, setInstalled] = useState(false)
+  const [manualInstalled, setManualInstalled] = useState(false)
   const [installing, setInstalling] = useState(false)
 
+  // Server renders false; client reads real browser state — no hydration mismatch
+  const alreadyInstalled = useSyncExternalStore(noop, isAlreadyInstalled, () => false)
+  const installed = alreadyInstalled || manualInstalled
+
   useEffect(() => {
-    if (isAlreadyInstalled()) {
-      setInstalled(true)
-      return
-    }
+    if (alreadyInstalled) return
     const handler = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
     }
     window.addEventListener('beforeinstallprompt', handler)
     return () => window.removeEventListener('beforeinstallprompt', handler)
-  }, [])
+  }, [alreadyInstalled])
 
   const handleInstall = async () => {
     if (!deferredPrompt) return
     setInstalling(true)
     await deferredPrompt.prompt()
     const { outcome } = await deferredPrompt.userChoice
-    if (outcome === 'accepted') setInstalled(true)
+    if (outcome === 'accepted') setManualInstalled(true)
     setInstalling(false)
     setDeferredPrompt(null)
   }
