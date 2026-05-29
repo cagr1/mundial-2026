@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 
 export default function CalendarButton() {
   const [open, setOpen] = useState(false)
@@ -27,21 +28,21 @@ export default function CalendarButton() {
         <span className="hidden sm:inline">Calendario</span>
       </button>
 
-      {open && (
+      {open && createPortal(
         <>
-          {/* Backdrop */}
+          {/* Backdrop — renders in document.body to escape header stacking context */}
           <div
-            className="fixed inset-0 z-50"
-            style={{ background: 'oklch(4% 0.004 95 / 0.8)' }}
+            className="fixed inset-0 z-[60]"
+            style={{ background: 'rgba(11,11,10,0.82)' }}
             onClick={() => setOpen(false)}
             aria-hidden="true"
           />
 
           {/* Modal */}
           <div
-            className="fixed bottom-0 left-0 right-0 z-50 sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-sm sm:w-full p-6 space-y-5"
+            className="fixed bottom-0 left-0 right-0 z-[60] sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-sm sm:w-full p-6 space-y-5"
             style={{
-              background: 'var(--lacquer)',
+              background: 'var(--raised-lacquer)',
               border: '1px solid var(--hairline-gold)',
               borderRadius: '12px 12px 0 0',
             }}
@@ -50,7 +51,7 @@ export default function CalendarButton() {
           >
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-base font-bold" style={{ color: 'var(--champagne)', fontFamily: 'var(--font-albert)' }}>
+                <h2 className="text-base font-bold" style={{ color: 'var(--champagne)', fontFamily: 'var(--font-hanken)' }}>
                   Agregar al calendario
                 </h2>
                 <p className="eyebrow mt-1" style={{ color: 'var(--text-disabled)' }}>
@@ -82,8 +83,8 @@ export default function CalendarButton() {
               >
                 <span className="text-xl" aria-hidden="true">📲</span>
                 <div>
-                  <p className="text-sm font-bold" style={{ fontFamily: 'var(--font-albert)' }}>Suscribirse (recomendado)</p>
-                  <p style={{ fontSize: '0.7rem', fontFamily: 'var(--font-albert)', opacity: 0.75 }}>
+                  <p className="text-sm font-bold" style={{ fontFamily: 'var(--font-hanken)' }}>Suscribirse (recomendado)</p>
+                  <p style={{ fontSize: '0.7rem', fontFamily: 'var(--font-hanken)', opacity: 0.75 }}>
                     Se actualiza automáticamente · iOS y Android
                   </p>
                 </div>
@@ -96,15 +97,15 @@ export default function CalendarButton() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-4 py-3.5 w-full transition-colors"
                 style={{
-                  background: 'var(--raised-lacquer)',
-                  border: '1px solid var(--hairline)',
+                  background: 'var(--graphite)',
+                  border: '1px solid var(--glass-border)',
                   borderRadius: 'var(--r-md)',
                   textDecoration: 'none',
                 }}
               >
                 <span className="text-xl" aria-hidden="true">📆</span>
                 <div>
-                  <p className="text-sm font-semibold" style={{ color: 'var(--text-warm)', fontFamily: 'var(--font-albert)' }}>Google Calendar</p>
+                  <p className="text-sm font-semibold" style={{ color: 'var(--text-warm)', fontFamily: 'var(--font-hanken)' }}>Google Calendar</p>
                   <p className="eyebrow" style={{ color: 'var(--text-disabled)', fontSize: '0.62rem' }}>Agregar desde Google</p>
                 </div>
               </a>
@@ -115,15 +116,15 @@ export default function CalendarButton() {
                 download="mundial-2026.ics"
                 className="flex items-center gap-3 px-4 py-3.5 w-full transition-colors"
                 style={{
-                  background: 'var(--raised-lacquer)',
-                  border: '1px solid var(--hairline)',
+                  background: 'var(--graphite)',
+                  border: '1px solid var(--glass-border)',
                   borderRadius: 'var(--r-md)',
                   textDecoration: 'none',
                 }}
               >
                 <span className="text-xl" aria-hidden="true">⬇️</span>
                 <div>
-                  <p className="text-sm font-semibold" style={{ color: 'var(--text-warm)', fontFamily: 'var(--font-albert)' }}>Descargar .ics</p>
+                  <p className="text-sm font-semibold" style={{ color: 'var(--text-warm)', fontFamily: 'var(--font-hanken)' }}>Descargar .ics</p>
                   <p className="eyebrow" style={{ color: 'var(--text-disabled)', fontSize: '0.62rem' }}>Outlook · Apple Calendar · otros</p>
                 </div>
               </a>
@@ -133,7 +134,8 @@ export default function CalendarButton() {
               Todos los horarios en UTC — tu app los convierte automáticamente
             </p>
           </div>
-        </>
+        </>,
+        document.body,
       )}
     </>
   )
