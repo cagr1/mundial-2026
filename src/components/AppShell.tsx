@@ -6,6 +6,7 @@ import TimezoneSelect from './TimezoneSelect'
 import MatchList from './MatchList'
 import GroupStandings from './GroupStandings'
 import TeamsGrid from './TeamsGrid'
+import Countdown from './Countdown'
 import { Match, Standing, Team } from '@/types/football'
 
 type Tab = 'partidos' | 'grupos' | 'equipos'
@@ -21,6 +22,7 @@ interface Props {
   standings: Standing[]
   teams: Team[]
   liveCount: number
+  firstMatchDate: string
 }
 
 function MatchdayFilter({
@@ -59,7 +61,7 @@ function MatchdayFilter({
   )
 }
 
-export default function AppShell({ matches, standings, teams, liveCount }: Props) {
+export default function AppShell({ matches, standings, teams, liveCount, firstMatchDate }: Props) {
   const [tab, setTab] = useState<Tab>('partidos')
   const [timeZone, setTimeZone] = useState('UTC')
   const [selectedMatchday, setSelectedMatchday] = useState<number | null>(null)
@@ -165,6 +167,13 @@ export default function AppShell({ matches, standings, teams, liveCount }: Props
           </div>
         </div>
       </header>
+
+      {/* ── Countdown (only on Partidos tab, tournament not started) ── */}
+      {tab === 'partidos' && liveCount === 0 && (
+        <div className="max-w-7xl mx-auto w-full pt-5 relative">
+          <Countdown targetDate={firstMatchDate} />
+        </div>
+      )}
 
       {/* ── Content ──────────────────────────────────────────────────── */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6">

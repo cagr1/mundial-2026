@@ -1,23 +1,31 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
 import { Team } from '@/types/football'
+import TeamDrawer from './TeamDrawer'
 
-function TeamCard({ team }: { team: Team }) {
+function TeamCard({ team, onSelect }: { team: Team; onSelect: () => void }) {
   return (
-    <div
-      className="flex flex-col items-center gap-3 p-4 cursor-default group transition-colors"
+    <button
+      onClick={onSelect}
+      className="flex flex-col items-center gap-3 p-4 w-full text-left group transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--kinpaku)]"
       style={{
         background: 'var(--raised-lacquer)',
         border: '1px solid var(--hairline)',
         borderRadius: 'var(--r-lg)',
       }}
       onMouseEnter={(e) => {
-        ;(e.currentTarget as HTMLDivElement).style.borderColor = 'var(--hairline-gold)'
-        ;(e.currentTarget as HTMLDivElement).style.background = 'var(--graphite)'
+        const el = e.currentTarget
+        el.style.borderColor = 'var(--hairline-gold)'
+        el.style.background = 'var(--graphite)'
       }}
       onMouseLeave={(e) => {
-        ;(e.currentTarget as HTMLDivElement).style.borderColor = 'var(--hairline)'
-        ;(e.currentTarget as HTMLDivElement).style.background = 'var(--raised-lacquer)'
+        const el = e.currentTarget
+        el.style.borderColor = 'var(--hairline)'
+        el.style.background = 'var(--raised-lacquer)'
       }}
+      aria-label={`Ver plantel de ${team.name}`}
     >
       {team.crest ? (
         <div className="relative w-12 h-12 transition-transform duration-150 group-hover:scale-110">
@@ -39,21 +47,27 @@ function TeamCard({ team }: { team: Team }) {
           {team.tla}
         </p>
       </div>
-    </div>
+    </button>
   )
 }
 
 export default function TeamsGrid({ teams }: { teams: Team[] }) {
+  const [selected, setSelected] = useState<Team | null>(null)
+
   return (
-    <div>
+    <>
       <p className="eyebrow mb-5 tabnum" style={{ color: 'var(--text-faint)' }}>
-        {teams.length} selecciones clasificadas
+        {teams.length} selecciones · toca para ver plantel
       </p>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2.5">
         {teams.map((team) => (
-          <TeamCard key={team.id} team={team} />
+          <TeamCard key={team.id} team={team} onSelect={() => setSelected(team)} />
         ))}
       </div>
-    </div>
+
+      {selected ? (
+        <TeamDrawer team={selected} onClose={() => setSelected(null)} />
+      ) : null}
+    </>
   )
 }

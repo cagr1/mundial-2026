@@ -6,6 +6,31 @@ export interface Team {
   crest: string
 }
 
+export interface Player {
+  id: number
+  name: string
+  position: 'Goalkeeper' | 'Defence' | 'Midfield' | 'Offence' | null
+  dateOfBirth: string
+  nationality: string
+}
+
+export interface Coach {
+  id: number
+  name: string
+  nationality: string
+  dateOfBirth?: string
+}
+
+export interface TeamDetail extends Team {
+  address?: string
+  website?: string
+  founded?: number
+  clubColors?: string
+  venue?: string
+  coach: Coach
+  squad: Player[]
+}
+
 export interface Score {
   winner: 'HOME_TEAM' | 'AWAY_TEAM' | 'DRAW' | null
   duration: 'REGULAR' | 'EXTRA_TIME' | 'PENALTY_SHOOTOUT'
