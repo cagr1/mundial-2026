@@ -15,7 +15,7 @@ export default function TimezoneSelect({ value, onChange }: Props) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-label="Seleccionar zona horaria"
-        className="eyebrow px-2 py-1.5 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--kinpaku)]"
+        className="eyebrow px-2 py-1.5 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--kinpaku)] max-w-[6.5rem] sm:max-w-none"
         style={{
           background: 'var(--graphite)',
           border: '1px solid var(--hairline)',

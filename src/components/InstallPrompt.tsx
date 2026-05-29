@@ -65,33 +65,29 @@ export default function InstallPrompt() {
 
   return (
     <div
-      className="fixed bottom-4 left-4 right-4 z-50 flex items-start gap-3 p-4 sm:left-auto sm:right-4 sm:max-w-sm"
+      className="fixed bottom-0 left-0 right-0 z-50 flex items-center gap-3 px-4 py-3"
       style={{
-        background: 'var(--raised-lacquer)',
-        border: '1px solid var(--hairline-gold)',
-        borderRadius: 'var(--r-lg)',
-        boxShadow: '0 8px 32px oklch(4% 0.004 95 / 0.6)',
+        background: 'var(--lacquer-deep)',
+        borderTop: '1px solid var(--hairline-gold)',
+        paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))',
       }}
       role="dialog"
       aria-label="Instalar app"
     >
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold" style={{ color: 'var(--champagne)', fontFamily: 'var(--font-albert)' }}>
-          Instalar app
-        </p>
         {showIOS ? (
-          <p className="eyebrow mt-1 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-            Toca <span style={{ color: 'var(--kinpaku)' }}>Compartir ↑</span> y luego{' '}
+          <p className="eyebrow leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+            Toca <span style={{ color: 'var(--kinpaku)' }}>Compartir ↑</span> →{' '}
             <span style={{ color: 'var(--kinpaku)' }}>&ldquo;Añadir a inicio&rdquo;</span>
           </p>
         ) : (
-          <p className="eyebrow mt-1" style={{ color: 'var(--text-muted)' }}>
-            Accede rápido desde tu pantalla de inicio
+          <p className="eyebrow" style={{ color: 'var(--text-muted)' }}>
+            Instala la app en tu pantalla de inicio
           </p>
         )}
       </div>
 
-      <div className="flex items-center gap-2 flex-shrink-0 mt-0.5">
+      <div className="flex items-center gap-2 flex-shrink-0">
         {!showIOS && (
           <button
             onClick={install}

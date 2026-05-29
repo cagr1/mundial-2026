@@ -10,6 +10,16 @@ interface Props {
 export default function MatchList({ matches, timeZone }: Props) {
   const grouped = groupMatchesByDay(matches, timeZone)
 
+  if (!matches.length) {
+    return (
+      <div className="py-12 text-center">
+        <p className="eyebrow" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>
+          No hay partidos disponibles en este momento
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-8">
       {Array.from(grouped.entries()).map(([dateKey, dayMatches]) => {

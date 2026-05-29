@@ -202,14 +202,24 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
             </div>
           ) : tab === 'grupos' ? (
             <div key="grupos" className="tab-panel">
-              <p className="eyebrow mb-5" style={{ color: 'var(--text-faint)' }}>
-                Los 2 primeros de cada grupo avanzan a la siguiente fase
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                {standings.map((s) => (
-                  <GroupStandings key={s.group} standing={s} />
-                ))}
-              </div>
+              {standings.length > 0 ? (
+                <>
+                  <p className="eyebrow mb-5" style={{ color: 'var(--text-faint)' }}>
+                    Los 2 primeros de cada grupo avanzan a la siguiente fase
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {standings.map((s) => (
+                      <GroupStandings key={s.group} standing={s} />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="py-12 text-center">
+                  <p className="eyebrow" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>
+                    Grupos no disponibles en este momento
+                  </p>
+                </div>
+              )}
             </div>
           ) : (
             <div key="equipos" className="tab-panel">
