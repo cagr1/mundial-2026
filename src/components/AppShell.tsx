@@ -98,23 +98,18 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
           {/* Brand + timezone */}
           <div className="flex items-center justify-between h-14 gap-3">
             <div className="flex items-center gap-3 min-w-0 flex-shrink-0">
-              {/* Wordmark */}
-              <div className="flex items-center gap-2.5 flex-shrink-0">
+              {/* Wordmark — app-logo shows WORLD CUP · ball · 26 */}
+              <div className="flex-shrink-0" aria-label="Mundial 2026">
                 <div
-                  className="relative w-8 h-8 flex-shrink-0"
+                  className="relative"
                   style={{
-                    filter: 'drop-shadow(0 0 10px oklch(84% 0.19 80.46 / 0.18))',
+                    width: 48,
+                    height: 48,
+                    filter: 'drop-shadow(0 0 10px oklch(84% 0.19 80.46 / 0.22))',
                   }}
-                  aria-hidden="true"
                 >
-                  <Image src="/brand-mark.svg" alt="" fill priority sizes="32px" />
+                  <Image src="/app-logo.svg" alt="Mundial 2026" fill priority sizes="48px" />
                 </div>
-                <h1
-                  className="text-sm font-semibold leading-none whitespace-nowrap"
-                  style={{ color: 'var(--champagne)', fontFamily: 'var(--font-albert)', letterSpacing: '0.05em' }}
-                >
-                  Mundial <span style={{ color: 'var(--kinpaku)' }}>2026</span>
-                </h1>
               </div>
 
               {liveCount > 0 ? (

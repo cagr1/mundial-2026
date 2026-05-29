@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Alumni_Sans_Pinstripe, Albert_Sans, Geist_Mono } from "next/font/google";
+import SplashScreen from "@/components/SplashScreen";
 import "./globals.css";
 
 const alumniPinstripe = Alumni_Sans_Pinstripe({
@@ -24,11 +25,11 @@ export const metadata: Metadata = {
   description: "Partidos, grupos y horarios del World Cup 2026",
   manifest: "/manifest.json",
   icons: {
+    // SVG first → modern browsers use it immediately, no .ico loading
     icon: [
+      { url: "/brand-mark.svg", type: "image/svg+xml" },
       { url: "/favicon.ico" },
-      { url: "/icon.svg", type: "image/svg+xml" },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
@@ -47,7 +48,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="es"
       className={`${alumniPinstripe.variable} ${albertSans.variable} ${geistMono.variable} antialiased`}
     >
-      <body className="min-h-dvh flex flex-col">{children}</body>
+      <body className="min-h-dvh flex flex-col">
+        <SplashScreen />
+        {children}
+      </body>
     </html>
   );
 }
