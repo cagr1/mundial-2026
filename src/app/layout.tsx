@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
-import InstallPrompt from "@/components/InstallPrompt";
 import "./globals.css";
 
 const hankenGrotesk = Hanken_Grotesk({
@@ -46,7 +45,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="min-h-dvh flex flex-col">
         {children}
-        <InstallPrompt />
         <Script src="/register-sw.js" strategy="afterInteractive" />
       </body>
     </html>

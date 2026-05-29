@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { Icon } from '@iconify/react'
 import TimezoneSelect from './TimezoneSelect'
 import MatchList from './MatchList'
@@ -10,6 +11,11 @@ import TeamsGrid from './TeamsGrid'
 import Countdown from './Countdown'
 import CalendarButton from './CalendarButton'
 import { Match, Standing, Team } from '@/types/football'
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
+}
 
 type Tab = 'partidos' | 'grupos' | 'equipos'
 
@@ -94,12 +100,48 @@ export default function AppShell({
   const [tab, setTab] = useState<Tab>('partidos')
   const [timeZone, setTimeZone] = useState('UTC')
   const [selectedMatchday, setSelectedMatchday] = useState<number | null>(null)
+  const [deferredInstall, setDeferredInstall] = useState<BeforeInstallPromptEvent | null>(null)
+  const [showInstall, setShowInstall] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     const detected = Intl.DateTimeFormat().resolvedOptions().timeZone
     const timer = window.setTimeout(() => setTimeZone(detected), 0)
     return () => window.clearTimeout(timer)
   }, [])
+
+  useEffect(() => {
+    const alreadyInstalled =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (navigator as { standalone?: boolean }).standalone === true
+    if (alreadyInstalled) return
+
+    const handler = (e: Event) => {
+      e.preventDefault()
+      setDeferredInstall(e as BeforeInstallPromptEvent)
+      setShowInstall(true)
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+
+    // iOS Safari doesn't fire beforeinstallprompt — show install hint anyway
+    const ua = navigator.userAgent
+    const isIOS = /iphone|ipad|ipod/i.test(ua) && !/crios/i.test(ua)
+    const isSafari = /^((?!chrome|android).)*safari/i.test(ua)
+    if (isIOS && isSafari) setShowInstall(true)
+
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  const handleInstallClick = useCallback(async () => {
+    if (deferredInstall) {
+      await deferredInstall.prompt()
+      const { outcome } = await deferredInstall.userChoice
+      if (outcome === 'accepted') setShowInstall(false)
+      setDeferredInstall(null)
+    } else {
+      router.push('/instalar')
+    }
+  }, [deferredInstall, router])
 
   const matchdays = Array.from(
     new Set(
@@ -174,6 +216,30 @@ export default function AppShell({
 
             {/* Right controls */}
             <div className="flex items-center gap-2">
+              {showInstall && (
+                <button
+                  onClick={handleInstallClick}
+                  aria-label="Instalar app"
+                  title="Instalar app"
+                  className="w-8 h-8 flex items-center justify-center transition-colors"
+                  style={{
+                    color: 'var(--text-muted)',
+                    borderRadius: 'var(--r-sm)',
+                    border: '1px solid var(--glass-border)',
+                    background: 'transparent',
+                  }}
+                  onMouseEnter={(e) => {
+                    ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--kinpaku)'
+                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--hairline-gold)'
+                  }}
+                  onMouseLeave={(e) => {
+                    ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)'
+                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--glass-border)'
+                  }}
+                >
+                  <Icon icon="material-symbols:install-mobile" width={18} height={18} />
+                </button>
+              )}
               <CalendarButton />
               <TimezoneSelect value={timeZone} onChange={setTimeZone} />
             </div>
