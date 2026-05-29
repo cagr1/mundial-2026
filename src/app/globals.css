@@ -1,26 +1,118 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-albert);
+  --font-display: var(--font-alumni-pinstripe);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Kinpaku Token System (OKLCH) ─────────────────────────────────────── */
+:root {
+  /* Surfaces */
+  --lacquer:        oklch(7% 0.006 95);
+  --lacquer-deep:   oklch(4% 0.004 95);
+  --raised-lacquer: oklch(11% 0.006 95);
+  --graphite:       oklch(15% 0.008 95);
+  --graphite-2:     oklch(19% 0.008 95);
+
+  /* Gold ramp */
+  --kinpaku:        oklch(84% 0.19 80.46);
+  --kinpaku-pale:   oklch(86% 0.07 84);
+  --kinpaku-rich:   oklch(77% 0.13 82);
+  --kinpaku-deep:   oklch(61% 0.085 78);
+  --hairline:       oklch(78% 0 0 / 0.16);
+  --hairline-gold:  oklch(74% 0.09 82 / 0.6);
+
+  /* Patina (secondary / live states) */
+  --patina:         oklch(70% 0.12 188);
+  --patina-pale:    oklch(82% 0.07 188);
+  --patina-deep:    oklch(49% 0.08 188);
+
+  /* Warning */
+  --vermilion:      oklch(58% 0.15 35);
+
+  /* Text */
+  --champagne:      oklch(91% 0 0);
+  --text-warm:      oklch(88% 0 0);
+  --text-muted:     oklch(72% 0 0);
+  --text-faint:     oklch(62% 0 0);
+  --text-disabled:  oklch(52% 0 0);
+
+  /* Radii */
+  --r-xs: 2px;
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 8px;
+}
+
+html {
+  color-scheme: dark;
+  background-color: var(--lacquer);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(ellipse 90% 40% at 50% -10%, oklch(84% 0.19 80.46 / 0.05), transparent),
+    var(--lacquer);
+  color: var(--text-warm);
+  min-height: 100dvh;
+}
+
+/* ─── View Transitions ──────────────────────────────────────────────────── */
+::view-transition-old(root) { animation: 160ms ease-out both vt-out; }
+::view-transition-new(root) { animation: 200ms ease-in  both vt-in;  }
+@keyframes vt-out { to   { opacity: 0; transform: translateY(-3px); } }
+@keyframes vt-in  { from { opacity: 0; transform: translateY(3px);  } }
+
+/* ─── Eyebrow / mono label ──────────────────────────────────────────────── */
+.eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ─── Match card ────────────────────────────────────────────────────────── */
+.match-card {
+  background: var(--raised-lacquer);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  transition: border-color 180ms ease, background 180ms ease;
+}
+.match-card:hover {
+  background: var(--graphite);
+  border-color: var(--hairline-gold);
+}
+.match-card.is-live {
+  border-color: oklch(70% 0.12 188 / 0.5);
+  box-shadow: 0 0 28px oklch(70% 0.12 188 / 0.08);
+}
+.match-card.is-today:not(.is-live) {
+  border-color: oklch(74% 0.09 82 / 0.3);
+}
+
+/* ─── Patina live pulse ─────────────────────────────────────────────────── */
+@keyframes patina-pulse {
+  0%, 100% { opacity: 1;   transform: scale(1);    }
+  50%       { opacity: 0.4; transform: scale(0.75); }
+}
+.live-dot { animation: patina-pulse 1.4s ease-in-out infinite; }
+
+/* ─── Tabular numbers ───────────────────────────────────────────────────── */
+.tabnum { font-variant-numeric: tabular-nums; }
+
+/* ─── Custom scrollbar ──────────────────────────────────────────────────── */
+::-webkit-scrollbar         { width: 4px; }
+::-webkit-scrollbar-track   { background: transparent; }
+::-webkit-scrollbar-thumb   { background: var(--hairline); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--hairline-gold); }
+
+/* ─── Reduced motion ────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+  .live-dot   { animation: none; }
+  .match-card { transition: none; }
 }
