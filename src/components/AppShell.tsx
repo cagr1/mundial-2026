@@ -7,6 +7,7 @@ import MatchList from './MatchList'
 import GroupStandings from './GroupStandings'
 import TeamsGrid from './TeamsGrid'
 import Countdown from './Countdown'
+import CalendarButton from './CalendarButton'
 import { Match, Standing, Team } from '@/types/football'
 
 type Tab = 'partidos' | 'grupos' | 'equipos'
@@ -136,7 +137,10 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
               ) : null}
             </div>
 
-            <TimezoneSelect value={timeZone} onChange={setTimeZone} />
+            <div className="flex items-center gap-2">
+              <CalendarButton />
+              <TimezoneSelect value={timeZone} onChange={setTimeZone} />
+            </div>
           </div>
 
           {/* ── Tabs ─────────────────────────────────────────────────── */}

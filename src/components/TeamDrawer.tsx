@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Team, TeamDetail, Player } from '@/types/football'
 
 const POSITION_ORDER = ['Goalkeeper', 'Defence', 'Midfield', 'Offence'] as const
@@ -81,18 +82,26 @@ function PlayerCard({ player }: { player: Player }) {
             borderRadius: 'var(--r-md)',
           }}
         >
-          <div>
-            <p className="text-sm font-semibold" style={{ color: 'var(--champagne)' }}>{player.name}</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold truncate" style={{ color: 'var(--champagne)' }}>{player.name}</p>
             <p className="eyebrow mt-0.5" style={{ color: 'var(--text-muted)' }}>{player.nationality}</p>
           </div>
-          {player.dateOfBirth ? (
-            <div className="text-right flex-shrink-0">
-              <p className="tabnum text-2xl font-bold leading-none" style={{ color }}>
-                {calcAge(player.dateOfBirth)}
-              </p>
-              <p className="eyebrow" style={{ fontSize: '0.58rem', color: 'var(--text-disabled)' }}>años</p>
-            </div>
-          ) : null}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {player.dateOfBirth ? (
+              <div className="text-right">
+                <p className="tabnum text-2xl font-bold leading-none" style={{ color }}>{calcAge(player.dateOfBirth)}</p>
+                <p className="eyebrow" style={{ fontSize: '0.58rem', color: 'var(--text-disabled)' }}>años</p>
+              </div>
+            ) : null}
+            <Link
+              href={`/jugador/${player.id}`}
+              className="eyebrow px-2 py-1 border"
+              style={{ color: 'var(--kinpaku)', borderColor: 'var(--hairline-gold)', borderRadius: 'var(--r-xs)', textDecoration: 'none' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              →
+            </Link>
+          </div>
         </div>
       </div>
     </button>
