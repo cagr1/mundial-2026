@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
-  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Mundial 2026" },
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "WC 26" },
 };
 
 export const viewport: Viewport = {

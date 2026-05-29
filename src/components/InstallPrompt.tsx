@@ -25,6 +25,7 @@ function isAlreadyInstalled(): boolean {
 export default function InstallPrompt() {
   // Lazy initializer runs client-side only — avoids setState-in-effect
   const [showIOS] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false
     if (isAlreadyInstalled()) return false
     if (sessionStorage.getItem('pwa-prompt-dismissed')) return false
     return isIOSSafari()

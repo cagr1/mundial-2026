@@ -26,25 +26,29 @@ function AppSkeleton() {
 }
 
 async function AppData() {
-  const [matchesData, standingsData, teamsData] = await Promise.all([
+  const [matchesResult, standingsResult, teamsResult] = await Promise.allSettled([
     getMatches() as Promise<MatchesResponse>,
     getStandings() as Promise<StandingsResponse>,
     getTeams() as Promise<TeamsResponse>,
   ])
 
-  const liveCount = matchesData.matches.filter(
+  const matches = matchesResult.status === 'fulfilled' ? matchesResult.value.matches : []
+  const standings = standingsResult.status === 'fulfilled' ? standingsResult.value.standings : []
+  const teams = teamsResult.status === 'fulfilled' ? teamsResult.value.teams : []
+
+  const liveCount = matches.filter(
     (m) => m.status === 'LIVE' || m.status === 'IN_PLAY',
   ).length
 
-  const firstMatchDate = matchesData.matches.reduce((earliest, m) => {
+  const firstMatchDate = matches.reduce((earliest, m) => {
     return m.utcDate < earliest ? m.utcDate : earliest
-  }, matchesData.matches[0]?.utcDate ?? '')
+  }, matches[0]?.utcDate ?? '')
 
   return (
     <AppShell
-      matches={matchesData.matches}
-      standings={standingsData.standings}
-      teams={teamsData.teams}
+      matches={matches}
+      standings={standings}
+      teams={teams}
       liveCount={liveCount}
       firstMatchDate={firstMatchDate}
     />
