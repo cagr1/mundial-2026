@@ -344,10 +344,20 @@ function parseWikitable(html: string, nationality: string): Player[] {
 
 // ── Section HTML parser — tries nat-fs first, then wikitable ─────────────────
 
+function deduplicateByName(players: Player[]): Player[] {
+  const seen = new Set<string>()
+  return players.filter((p) => {
+    const key = p.name.toLowerCase().trim()
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
 function parseCurrentSquad(html: string, nationality: string): Player[] {
-  const natFs = parseNatFsRows(html, nationality)
+  const natFs = deduplicateByName(parseNatFsRows(html, nationality))
   if (natFs.length > 0) return natFs
-  return parseWikitable(html, nationality)
+  return deduplicateByName(parseWikitable(html, nationality))
 }
 
 // ── Wikipedia API helpers ─────────────────────────────────────────────────────

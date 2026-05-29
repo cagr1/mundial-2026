@@ -52,8 +52,10 @@ function validateDetail(detail) {
     issues.push('empty squad without fallbackReason/error')
   }
 
-  if (squad.some((player) => !player.name || !player.position)) {
-    issues.push('one or more players missing name/position')
+  // position may be null — that is valid per the Player TypeScript type.
+  // Only fail when name is missing entirely (structural contract issue).
+  if (squad.some((player) => !player.name)) {
+    issues.push('one or more players missing name')
   }
 
   return { ok: issues.length === 0, squad, issues }
