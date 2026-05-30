@@ -241,9 +241,13 @@ export default function TeamDrawer({ team, onClose }: Props) {
       >
         {/* Header — compact, non-scrolling */}
         <div
-          className="flex items-center gap-3 px-5 py-3 flex-shrink-0"
-          style={{ borderBottom: '1px solid var(--hairline)' }}
+          className="flex-shrink-0"
+          style={{
+            borderBottom: '1px solid var(--hairline)',
+            paddingTop: 'env(safe-area-inset-top)',
+          }}
         >
+        <div className="flex items-center gap-3 px-5 py-3">
           {team.crest ? (
             <div className="relative w-9 h-9 flex-shrink-0">
               <Image src={team.crest} alt={team.name} fill className="object-contain" sizes="36px" />
@@ -267,6 +271,7 @@ export default function TeamDrawer({ team, onClose }: Props) {
           >
             ✕
           </button>
+        </div>
         </div>
 
         {/* Coach — compact */}
