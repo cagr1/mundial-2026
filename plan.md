@@ -6,6 +6,57 @@
 - [x] 🧠 Reemplazar banner instalación por `/instalar`.
 - [x] 🧠 Migrar a ESPN API pública (partidos, equipos, standings). football-data.org eliminado de todas las rutas principales.
 
+---
+
+## 🆕 NUEVAS FEATURES — Backlog aprobado (sesión 2026-05-30)
+
+### A. "Mi Equipo" — favorito con partido próximo pinned
+- [x] 🧠 Añadir botón ⭐ en cada tarjeta del TeamsGrid (toggle favorito)
+- [x] 🧠 Guardar/leer favorito en localStorage (`favoriteTeam: { id, name, crest, tla }`)
+- [x] 🧠 En AppShell/home: si hay favorito guardado, mostrar card destacado encima de la lista de partidos con: escudo, nombre, próximo partido, countdown hasta el partido
+- [x] 🧠 Si el equipo favorito no tiene partido próximo, mostrar último resultado
+- [ ] ⚡ Verificar que persiste al cerrar y reabrir la app (localStorage)
+- [ ] ⚡ Verificar que el card no rompe layout en móvil
+
+**Notas técnicas:**
+- Solo localStorage — cero backend, cero costo
+- El partido próximo se filtra del array de matches que ya se carga en home
+- Si no hay partido próximo (fase de grupos terminó, knockout no empezó) mostrar el próximo partido del torneo del equipo favorito
+
+---
+
+### B. Share Card — compartir partido como imagen
+- [ ] 🧠 Instalar `html2canvas` o usar Satori (Vercel OG) para generar imagen
+- [ ] 🧠 Añadir botón "Compartir" en cada MatchCard
+- [ ] 🧠 La imagen generada incluye: escudos de ambos equipos, nombres, fecha/hora en timezone del usuario, marcador si el partido ya jugó, diseño Victory Noir (fondo oscuro + gold)
+- [ ] 🧠 En móvil: usar `navigator.share({ files: [imageFile] })` para abrir el share sheet nativo (WhatsApp, Instagram, etc.)
+- [ ] 🧠 En desktop: descargar la imagen como PNG
+- [ ] ⚡ Probar en iOS Safari y Android Chrome que el share sheet se abre correctamente
+- [ ] ⚡ Verificar que la imagen se ve bien en preview de WhatsApp
+
+**Notas técnicas:**
+- `navigator.share` con `files` requiere HTTPS (ya cubierto por Vercel)
+- Satori genera la imagen en un Edge Function sin librerías pesadas en el bundle del cliente
+- html2canvas es más simple pero renderiza el DOM — riesgo de fuentes/estilos no alineados
+- Recomendado: Satori + OG route (`/api/og/match?homeTeam=...&awayTeam=...&score=...`)
+
+---
+
+### C. Bracket Visual de Eliminatorias
+- [ ] 🧠 Crear tab "Bracket" en AppShell (visible solo cuando haya datos de fase knockout)
+- [ ] 🧠 Construir componente `KnockoutBracket.tsx`: árbol SVG/flexbox de Octavos → Cuartos → Semis → Final → Campeón
+- [ ] 🧠 Consumir partidos de fase knockout desde ESPN API (ya disponible en `/api/matches`)
+- [ ] 🧠 Cada nodo del bracket: escudo + nombre del equipo, score si ya jugó, "Por definir" si aún no hay clasificado
+- [ ] 🧠 Diseño Victory Noir: líneas gold conectando los partidos, fondo glass-card
+- [ ] ⚡ Verificar scroll horizontal en móvil (el bracket no cabe en una pantalla vertical)
+- [ ] ⚡ Verificar que equipos con nombres largos no rompen los nodos
+
+**Notas técnicas:**
+- Los datos de knockout empiezan ~julio 2026 cuando termine la fase de grupos
+- Mientras tanto el tab puede mostrarse deshabilitado o con un mensaje "Disponible en Fase Knockout"
+- El bracket del Mundial tiene formato de 32 equipos en Octavos (no hay "grupo" en knockout)
+- Referencia visual: sofascore.com → cualquier torneo con eliminación directa
+
 ### Estado actual del proyecto (sesión 2026-05-29)
 
 **Arquitectura de datos:**

@@ -10,6 +10,8 @@ import GroupStandings from './GroupStandings'
 import TeamsGrid from './TeamsGrid'
 import Countdown from './Countdown'
 import CalendarButton from './CalendarButton'
+import FavoriteTeamCard from './FavoriteTeamCard'
+import { useFavoriteTeam } from '@/hooks/useFavoriteTeam'
 import { Match, Standing, Team } from '@/types/football'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -98,6 +100,14 @@ export default function AppShell({
   firstMatchDate,
 }: Props) {
   const [tab, setTab] = useState<Tab>('partidos')
+  const { favorite, saveFavorite } = useFavoriteTeam()
+
+  const handleToggleFavorite = useCallback(
+    (team: Team) => {
+      saveFavorite(favorite?.id === team.id ? null : team)
+    },
+    [favorite, saveFavorite],
+  )
 
   const handleTabChange = useCallback((newTab: Tab) => {
     setTab(newTab)
@@ -323,6 +333,14 @@ export default function AppShell({
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 pb-28 sm:pb-8">
         {tab === 'partidos' ? (
           <div key="partidos" className="tab-panel">
+            {favorite && (
+              <FavoriteTeamCard
+                team={favorite}
+                matches={matches}
+                timeZone={timeZone}
+                onRemove={() => saveFavorite(null)}
+              />
+            )}
             <div className="mb-5">
               <MatchdayFilter
                 matchdays={matchdays}
@@ -361,7 +379,11 @@ export default function AppShell({
           </div>
         ) : (
           <div key="equipos" className="tab-panel">
-            <TeamsGrid teams={teams} />
+            <TeamsGrid
+              teams={teams}
+              favoriteId={favorite?.id ?? null}
+              onToggleFavorite={handleToggleFavorite}
+            />
           </div>
         )}
       </main>

@@ -6,12 +6,24 @@ import { Icon } from '@iconify/react'
 import { Team } from '@/types/football'
 import TeamDrawer from './TeamDrawer'
 
-function TeamCard({ team, onSelect }: { team: Team; onSelect: () => void }) {
+function TeamCard({
+  team,
+  isFavorite,
+  onSelect,
+  onToggleFavorite,
+}: {
+  team: Team
+  isFavorite: boolean
+  onSelect: () => void
+  onToggleFavorite: (e: React.MouseEvent) => void
+}) {
   return (
-    <button
-      onClick={onSelect}
-      className="glass-card flex items-center gap-3 p-3.5 w-full text-left group transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--kinpaku)]"
-      style={{ borderRadius: 'var(--r-lg)' }}
+    <div
+      className="glass-card group relative transition-all duration-200"
+      style={{
+        borderRadius: 'var(--r-lg)',
+        borderColor: isFavorite ? 'rgba(247, 207, 101, 0.45)' : undefined,
+      }}
       onMouseEnter={(e) => {
         const el = e.currentTarget
         el.style.borderColor = 'rgba(247, 207, 101, 0.35)'
@@ -19,62 +31,90 @@ function TeamCard({ team, onSelect }: { team: Team; onSelect: () => void }) {
       }}
       onMouseLeave={(e) => {
         const el = e.currentTarget
-        el.style.borderColor = ''
-        el.style.boxShadow = ''
+        el.style.borderColor = isFavorite ? 'rgba(247, 207, 101, 0.45)' : ''
+        el.style.boxShadow = isFavorite ? `inset 0 0 10px var(--stadium-glow)` : ''
       }}
-      aria-label={`Ver plantel de ${team.name}`}
     >
-      {/* Crest */}
-      <div className="flex-shrink-0">
-        {team.crest ? (
-          <div className="relative w-10 h-10 transition-transform duration-150 group-hover:scale-110">
-            <Image
-              src={team.crest}
-              alt={team.name}
-              fill
-              unoptimized
-              loading="lazy"
-              className="object-contain"
-              sizes="40px"
-            />
-          </div>
-        ) : (
-          <div
-            className="w-10 h-10 flex items-center justify-center transition-transform duration-150 group-hover:scale-110"
-            style={{ background: 'var(--graphite)', borderRadius: 'var(--r-sm)' }}
+      <button
+        onClick={onSelect}
+        className="flex items-center gap-3 p-3.5 w-full text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--kinpaku)]"
+        style={{ borderRadius: 'var(--r-lg)' }}
+        aria-label={`Ver plantel de ${team.name}`}
+      >
+        {/* Crest */}
+        <div className="flex-shrink-0">
+          {team.crest ? (
+            <div className="relative w-10 h-10 transition-transform duration-150 group-hover:scale-110">
+              <Image
+                src={team.crest}
+                alt={team.name}
+                fill
+                unoptimized
+                loading="lazy"
+                className="object-contain"
+                sizes="40px"
+              />
+            </div>
+          ) : (
+            <div
+              className="w-10 h-10 flex items-center justify-center transition-transform duration-150 group-hover:scale-110"
+              style={{ background: 'var(--graphite)', borderRadius: 'var(--r-sm)' }}
+            >
+              <span className="eyebrow text-[9px]" style={{ color: 'var(--text-faint)' }}>
+                {team.tla}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Info */}
+        <div className="min-w-0 flex-1">
+          <p
+            className="text-sm font-semibold leading-tight truncate"
+            style={{ color: 'var(--champagne)' }}
           >
-            <span className="eyebrow text-[9px]" style={{ color: 'var(--text-faint)' }}>
-              {team.tla}
-            </span>
-          </div>
-        )}
-      </div>
+            {team.shortName ?? team.name}
+          </p>
+          <p
+            className="eyebrow mt-0.5 truncate"
+            style={{ fontSize: '0.58rem', color: 'var(--text-disabled)' }}
+          >
+            {team.tla}
+          </p>
+        </div>
 
-      {/* Info */}
-      <div className="min-w-0 flex-1">
-        <p
-          className="text-sm font-semibold leading-tight truncate"
-          style={{ color: 'var(--champagne)' }}
-        >
-          {team.shortName ?? team.name}
-        </p>
-        <p
-          className="eyebrow mt-0.5 truncate"
-          style={{ fontSize: '0.58rem', color: 'var(--text-disabled)' }}
-        >
-          {team.tla}
-        </p>
-      </div>
+        {/* Arrow */}
+        <Icon
+          icon="material-symbols:chevron-right"
+          width={16}
+          height={16}
+          className="flex-shrink-0 opacity-0 group-hover:opacity-60 transition-opacity"
+          style={{ color: 'var(--kinpaku)' }}
+        />
+      </button>
 
-      {/* Arrow */}
-      <Icon
-        icon="material-symbols:chevron-right"
-        width={16}
-        height={16}
-        className="flex-shrink-0 opacity-0 group-hover:opacity-60 transition-opacity"
-        style={{ color: 'var(--kinpaku)' }}
-      />
-    </button>
+      {/* Favorite star — absolute top-right */}
+      <button
+        onClick={onToggleFavorite}
+        aria-label={isFavorite ? `Quitar ${team.name} de favoritos` : `Marcar ${team.name} como favorito`}
+        className="absolute top-1.5 right-1.5 p-1 transition-all duration-150 focus-visible:outline-none"
+        style={{ borderRadius: 'var(--r-sm)', color: isFavorite ? 'var(--kinpaku)' : 'var(--text-disabled)' }}
+        onMouseEnter={(e) => {
+          if (!isFavorite)
+            (e.currentTarget as HTMLButtonElement).style.color = 'var(--kinpaku-rich)'
+        }}
+        onMouseLeave={(e) => {
+          if (!isFavorite)
+            (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-disabled)'
+        }}
+      >
+        <Icon
+          icon={isFavorite ? 'material-symbols:star' : 'material-symbols:star-outline'}
+          width={14}
+          height={14}
+        />
+      </button>
+    </div>
   )
 }
 
@@ -96,7 +136,13 @@ function updateTeamUrl(teamId: number | null) {
   window.history.replaceState(null, '', qs ? `/?${qs}` : '/')
 }
 
-export default function TeamsGrid({ teams }: { teams: Team[] }) {
+interface TeamsGridProps {
+  teams: Team[]
+  favoriteId?: number | null
+  onToggleFavorite?: (team: Team) => void
+}
+
+export default function TeamsGrid({ teams, favoriteId, onToggleFavorite }: TeamsGridProps) {
   const [selected, setSelected] = useState<Team | null>(null)
   const [query, setQuery] = useState('')
   const teamsRef = useRef(teams)
@@ -201,7 +247,16 @@ export default function TeamsGrid({ teams }: { teams: Team[] }) {
       {/* Grid — 2 cols mobile, more on wider screens */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
         {filtered.map((team) => (
-          <TeamCard key={team.id} team={team} onSelect={() => openDrawer(team)} />
+          <TeamCard
+            key={team.id}
+            team={team}
+            isFavorite={favoriteId === team.id}
+            onSelect={() => openDrawer(team)}
+            onToggleFavorite={(e) => {
+              e.stopPropagation()
+              onToggleFavorite?.(team)
+            }}
+          />
         ))}
       </div>
 
