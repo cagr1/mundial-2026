@@ -43,11 +43,12 @@
 ---
 
 ### C. Bracket Visual de Eliminatorias
-- [ ] 🧠 Crear tab "Bracket" en AppShell (visible solo cuando haya datos de fase knockout)
-- [ ] 🧠 Construir componente `KnockoutBracket.tsx`: árbol SVG/flexbox de Octavos → Cuartos → Semis → Final → Campeón
-- [ ] 🧠 Consumir partidos de fase knockout desde ESPN API (ya disponible en `/api/matches`)
-- [ ] 🧠 Cada nodo del bracket: escudo + nombre del equipo, score si ya jugó, "Por definir" si aún no hay clasificado
-- [ ] 🧠 Diseño Victory Noir: líneas gold conectando los partidos, fondo glass-card
+- [x] 🧠 Crear tab "Bracket" en AppShell (siempre visible, con estado vacío hasta julio 2026)
+- [x] 🧠 Construir componente `KnockoutBracket.tsx`: árbol flexbox QF → SF → Final → Campeón con líneas gold CSS
+- [x] 🧠 Consumir partidos de fase knockout desde matches array (filtra stages knockout)
+- [x] 🧠 Cada nodo del bracket: escudo + nombre del equipo, score si ya jugó, "Por definir" si aún no hay clasificado
+- [x] 🧠 Diseño Victory Noir: líneas gold conectando los partidos, fondo glass-card; estado dimmed en placeholder
+- [x] 🧠 R32/R16: se muestran como listas de partidos (2-col grid); árbol empieza en QF
 - [ ] ⚡ Verificar scroll horizontal en móvil (el bracket no cabe en una pantalla vertical)
 - [ ] ⚡ Verificar que equipos con nombres largos no rompen los nodos
 

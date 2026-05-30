@@ -11,6 +11,7 @@ import TeamsGrid from './TeamsGrid'
 import Countdown from './Countdown'
 import CalendarButton from './CalendarButton'
 import FavoriteTeamCard from './FavoriteTeamCard'
+import KnockoutBracket from './KnockoutBracket'
 import { useFavoriteTeam } from '@/hooks/useFavoriteTeam'
 import { Match, Standing, Team } from '@/types/football'
 
@@ -19,7 +20,7 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
 }
 
-type Tab = 'partidos' | 'grupos' | 'equipos'
+type Tab = 'partidos' | 'grupos' | 'equipos' | 'bracket'
 
 const TABS: { id: Tab; label: string; icon: string; iconActive: string }[] = [
   {
@@ -39,6 +40,12 @@ const TABS: { id: Tab; label: string; icon: string; iconActive: string }[] = [
     label: 'Equipos',
     icon: 'material-symbols:shield-outline',
     iconActive: 'material-symbols:shield',
+  },
+  {
+    id: 'bracket',
+    label: 'Bracket',
+    icon: 'material-symbols:account-tree-outline',
+    iconActive: 'material-symbols:account-tree',
   },
 ]
 
@@ -147,7 +154,7 @@ export default function AppShell({
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const t = params.get('tab')
-    if (t === 'grupos' || t === 'equipos') {
+    if (t === 'grupos' || t === 'equipos' || t === 'bracket') {
       window.setTimeout(() => setTab(t as Tab), 0)
     }
   }, [])
@@ -377,13 +384,17 @@ export default function AppShell({
               </div>
             )}
           </div>
-        ) : (
+        ) : tab === 'equipos' ? (
           <div key="equipos" className="tab-panel">
             <TeamsGrid
               teams={teams}
               favoriteId={favorite?.id ?? null}
               onToggleFavorite={handleToggleFavorite}
             />
+          </div>
+        ) : (
+          <div key="bracket" className="tab-panel">
+            <KnockoutBracket matches={matches} timeZone={timeZone} />
           </div>
         )}
       </main>
