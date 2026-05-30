@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mundial 2026 — World Cup Companion App
 
-## Getting Started
+PWA móvil para seguir el FIFA World Cup 2026. Diseño Victory Noir (dark glassmorphism + gold). Sin backend propio — 100% datos públicos.
 
-First, run the development server:
+**Live:** [worldcup-kappa.vercel.app](https://worldcup-kappa.vercel.app)  
+**Autor:** [carlosgallardo.dev](https://carlosgallardo.dev)
+
+---
+
+## Features
+
+| Feature | Descripción |
+|---|---|
+| 📅 Partidos | Calendario completo con filtro por jornada, hora en tu timezone |
+| ⭐ Mi Equipo | Fija tu selección favorita con próximo partido y countdown en vivo |
+| 🏆 Grupos | Tabla de posiciones de los 12 grupos |
+| 🛡️ Equipos | Planteles completos (Wikipedia + ESPN), perfil de cada jugador |
+| 🌿 Bracket | Árbol visual de Octavos → Final (disponible desde julio 2026) |
+| 📤 Share Card | Comparte cualquier partido como imagen — share sheet nativo en móvil |
+| 📲 PWA | Instalable en iOS y Android como app nativa |
+
+---
+
+## Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **Styling:** Tailwind v4 + CSS Variables (Victory Noir design system)
+- **Datos:** ESPN API pública — partidos, equipos, standings
+- **Planteles:** Wikipedia "Current squad" → ESPN roster fallback
+- **Imágenes compartidas:** `next/og` (Satori) — Edge-rendered PNG
+- **Analytics:** Vercel Analytics
+- **Deploy:** Vercel (auto-deploy en push a main)
+
+---
+
+## Desarrollo local
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # localhost:3000
+npm run build      # build producción
+npm run lint       # eslint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+No requiere API keys — todo usa endpoints públicos de ESPN.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Arquitectura rápida
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+  app/
+    page.tsx              # Server component — fetches ESPN data
+    api/
+      matches/            # ESPN scoreboard → Match[]
+      standings/          # ESPN standings → Standing[]
+      teams/              # ESPN teams + Wikipedia squads
+      og/match/           # Satori OG image para share cards
+  components/
+    AppShell.tsx          # Shell con tabs, favorito, timezone
+    MatchList/Card.tsx    # Lista y tarjeta de partidos
+    TeamsGrid.tsx         # Grid de selecciones con ⭐ favorito
+    TeamDrawer.tsx        # Drawer fullscreen con plantel (createPortal)
+    KnockoutBracket.tsx   # Bracket QF→Final con líneas CSS
+    FavoriteTeamCard.tsx  # Card pinned del equipo favorito
+    ShareButton.tsx       # Botón compartir → navigator.share / download
+  hooks/
+    useFavoriteTeam.ts    # useSyncExternalStore + localStorage
+  lib/
+    espn-api.ts           # Wrapper ESPN API
+    wikipedia-squads.ts   # Parser de planteles Wikipedia
+```
