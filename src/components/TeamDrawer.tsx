@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useSyncExternalStore } from 'react'
+import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Team, TeamDetail, Player } from '@/types/football'
@@ -163,6 +164,8 @@ export default function TeamDrawer({ team, onClose }: Props) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [posFilter, setPosFilter] = useState<string>('ALL')
+  // createPortal needs document.body — server snapshot = false, client = true
+  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false)
 
   const handleClose = useCallback(() => onClose(), [onClose])
 
@@ -214,7 +217,9 @@ export default function TeamDrawer({ team, onClose }: Props) {
     ? positionsWithPlayers
     : positionsWithPlayers.filter((p) => p === posFilter)
 
-  return (
+  if (!mounted) return null
+
+  return createPortal(
     <>
       {/* Backdrop — desktop only (drawer is full-screen on mobile) */}
       <div
@@ -388,6 +393,7 @@ export default function TeamDrawer({ team, onClose }: Props) {
           </p>
         </div>
       </div>
-    </>
+    </>,
+    document.body,
   )
 }
