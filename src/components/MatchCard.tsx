@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { Match } from '@/types/football'
 import { formatTime, isToday } from '@/lib/format-date'
+import ShareButton from './ShareButton'
 
 const GROUP_LABEL_COLOR: Record<string, string> = {
   GROUP_A: 'var(--kinpaku)',
@@ -152,6 +153,11 @@ export default function MatchCard({ match, timeZone }: Props) {
             {match.awayTeam.shortName}
           </span>
         </div>
+      </div>
+
+      {/* Footer — share */}
+      <div className="flex justify-end mt-3 pt-2.5" style={{ borderTop: '1px solid var(--hairline)' }}>
+        <ShareButton match={match} timeZone={timeZone} />
       </div>
     </article>
   )

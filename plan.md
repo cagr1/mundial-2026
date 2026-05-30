@@ -26,11 +26,11 @@
 ---
 
 ### B. Share Card — compartir partido como imagen
-- [ ] 🧠 Instalar `html2canvas` o usar Satori (Vercel OG) para generar imagen
-- [ ] 🧠 Añadir botón "Compartir" en cada MatchCard
-- [ ] 🧠 La imagen generada incluye: escudos de ambos equipos, nombres, fecha/hora en timezone del usuario, marcador si el partido ya jugó, diseño Victory Noir (fondo oscuro + gold)
-- [ ] 🧠 En móvil: usar `navigator.share({ files: [imageFile] })` para abrir el share sheet nativo (WhatsApp, Instagram, etc.)
-- [ ] 🧠 En desktop: descargar la imagen como PNG
+- [x] 🧠 Usar Satori (next/og ImageResponse) — sin instalar paquetes extra
+- [x] 🧠 Añadir botón "Compartir" en cada MatchCard (footer con separador)
+- [x] 🧠 La imagen generada incluye: escudos de ambos equipos, nombres, fecha/hora en timezone del usuario, marcador si el partido ya jugó, diseño Victory Noir (fondo oscuro + gold)
+- [x] 🧠 En móvil: usar `navigator.share({ files: [imageFile] })` para abrir el share sheet nativo (WhatsApp, Instagram, etc.)
+- [x] 🧠 En desktop: descargar la imagen como PNG
 - [ ] ⚡ Probar en iOS Safari y Android Chrome que el share sheet se abre correctamente
 - [ ] ⚡ Verificar que la imagen se ve bien en preview de WhatsApp
 
