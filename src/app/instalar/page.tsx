@@ -116,14 +116,16 @@ export default function InstalarPage() {
     >
       {/* Header */}
       <header
-        className="sticky top-0 z-40 flex items-center gap-3 px-4 py-3"
+        className="sticky top-0 z-40"
         style={{
-          background: 'rgba(11, 11, 10, 0.9)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
+          background: 'rgba(11, 11, 10, 0.97)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
           borderBottom: '1px solid var(--glass-border)',
+          paddingTop: 'env(safe-area-inset-top)',
         }}
       >
+      <div className="flex items-center gap-3 px-4 py-3">
         <Link
           href="/"
           className="flex items-center gap-1.5 eyebrow transition-colors"
@@ -133,6 +135,7 @@ export default function InstalarPage() {
           <Icon icon="material-symbols:arrow-back" width={18} height={18} />
           Volver
         </Link>
+      </div>
       </header>
 
       {/* Content */}

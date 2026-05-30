@@ -160,21 +160,24 @@ export default function PlayerDetail({
 
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
       <header
-        className="sticky top-0 z-40 flex items-center justify-between px-4 h-14"
+        className="sticky top-0 z-40"
         style={{
-          background: 'rgba(22, 19, 12, 0.88)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
+          background: 'rgba(11, 11, 10, 0.97)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
           borderBottom: '1px solid var(--glass-border)',
+          paddingTop: 'env(safe-area-inset-top)',
         }}
       >
-        <BackButton href={backHref} />
-        <span
-          className="font-extrabold tracking-tighter uppercase text-sm"
-          style={{ color: 'var(--kinpaku)', fontFamily: 'var(--font-hanken)' }}
-        >
-          World Cup 2026
-        </span>
+        <div className="flex items-center justify-between px-4 h-14">
+          <BackButton href={backHref} />
+          <span
+            className="font-extrabold tracking-tighter uppercase text-sm"
+            style={{ color: 'var(--kinpaku)', fontFamily: 'var(--font-hanken)' }}
+          >
+            World Cup 2026
+          </span>
+        </div>
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
