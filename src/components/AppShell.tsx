@@ -397,6 +397,19 @@ export default function AppShell({
             <KnockoutBracket matches={matches} timeZone={timeZone} />
           </div>
         )}
+
+        {/* Mobile-only credit — desktop uses the footer */}
+        <div className="sm:hidden mt-10 text-center">
+          <a
+            href="https://carlosgallardo.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="eyebrow"
+            style={{ color: 'var(--text-disabled)', textDecoration: 'none', letterSpacing: '0.08em' }}
+          >
+            by Carlos Gallardo
+          </a>
+        </div>
       </main>
 
       {/* ── Footer (desktop only) ───────────────────────────────────────── */}
@@ -404,12 +417,30 @@ export default function AppShell({
         className="hidden sm:block py-4 text-center"
         style={{ borderTop: '1px solid var(--glass-border)' }}
       >
-        <p
-          className="eyebrow"
-          style={{ letterSpacing: '0.1em', color: 'var(--text-disabled)' }}
-        >
-          Datos: <span translate="no">football-data.org</span> · Horarios en zona horaria local
-        </p>
+        <div className="flex items-center justify-center gap-4">
+          <p
+            className="eyebrow"
+            style={{ letterSpacing: '0.08em', color: 'var(--text-disabled)' }}
+          >
+            Datos: ESPN API · Horarios en zona horaria local
+          </p>
+          <span style={{ color: 'var(--hairline-gold)' }}>·</span>
+          <a
+            href="https://carlosgallardo.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="eyebrow transition-colors"
+            style={{
+              color: 'var(--text-disabled)',
+              textDecoration: 'none',
+              letterSpacing: '0.08em',
+            }}
+            onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = 'var(--kinpaku)')}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-disabled)')}
+          >
+            by Carlos Gallardo
+          </a>
+        </div>
       </footer>
 
       {/* ── Bottom nav (mobile only) ────────────────────────────────────── */}
