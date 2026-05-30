@@ -1,62 +1,30 @@
 # Mundial 2026 Promo App Plan
 
-## 🔴 PRIORIDADES — Próxima sesión
+## ✅ FEATURES COMPLETAS — Sesión 2026-05-30
 
-- [x] 🧠 Fix React error #418 (hydration mismatch).
-- [x] 🧠 Reemplazar banner instalación por `/instalar`.
-- [x] 🧠 Migrar a ESPN API pública (partidos, equipos, standings). football-data.org eliminado de todas las rutas principales.
+### A. "Mi Equipo" ✅
+- [x] Botón ⭐ toggle en TeamsGrid, localStorage, card pinned con countdown, último resultado fallback
 
----
+### B. Share Card ✅
+- [x] Satori OG route, navigator.share nativo en móvil, descarga PNG en desktop, diseño Victory Noir
 
-## 🆕 NUEVAS FEATURES — Backlog aprobado (sesión 2026-05-30)
+### C. Bracket Visual ✅
+- [x] Tab Bracket, árbol QF→SF→Final CSS, estado vacío con placeholder dimmed hasta julio 2026
 
-### A. "Mi Equipo" — favorito con partido próximo pinned
-- [x] 🧠 Añadir botón ⭐ en cada tarjeta del TeamsGrid (toggle favorito)
-- [x] 🧠 Guardar/leer favorito en localStorage (`favoriteTeam: { id, name, crest, tla }`)
-- [x] 🧠 En AppShell/home: si hay favorito guardado, mostrar card destacado encima de la lista de partidos con: escudo, nombre, próximo partido, countdown hasta el partido
-- [x] 🧠 Si el equipo favorito no tiene partido próximo, mostrar último resultado
-- [ ] ⚡ Verificar que persiste al cerrar y reabrir la app (localStorage)
-- [ ] ⚡ Verificar que el card no rompe layout en móvil
+### D. Polish PWA (iOS Standalone) ✅
+- [x] viewport-fit=cover → env(safe-area-inset-*) funciona en modo app
+- [x] Safe-area-inset-top en: AppShell header, TeamDrawer header, PlayerDetail header, /instalar header
+- [x] Bottom nav nativo: 65px altura, iconos 28px, pill gold activo, fondo 0.98 opaco
+- [x] TeamDrawer via createPortal → z-index correcto sobre bottom nav en iOS
+- [x] SW bumpeado a v4 → fuerza re-instalación en PWAs ya instaladas
 
-**Notas técnicas:**
-- Solo localStorage — cero backend, cero costo
-- El partido próximo se filtra del array de matches que ya se carga en home
-- Si no hay partido próximo (fase de grupos terminó, knockout no empezó) mostrar el próximo partido del torneo del equipo favorito
-
----
-
-### B. Share Card — compartir partido como imagen
-- [x] 🧠 Usar Satori (next/og ImageResponse) — sin instalar paquetes extra
-- [x] 🧠 Añadir botón "Compartir" en cada MatchCard (footer con separador)
-- [x] 🧠 La imagen generada incluye: escudos de ambos equipos, nombres, fecha/hora en timezone del usuario, marcador si el partido ya jugó, diseño Victory Noir (fondo oscuro + gold)
-- [x] 🧠 En móvil: usar `navigator.share({ files: [imageFile] })` para abrir el share sheet nativo (WhatsApp, Instagram, etc.)
-- [x] 🧠 En desktop: descargar la imagen como PNG
-- [ ] ⚡ Probar en iOS Safari y Android Chrome que el share sheet se abre correctamente
-- [ ] ⚡ Verificar que la imagen se ve bien en preview de WhatsApp
-
-**Notas técnicas:**
-- `navigator.share` con `files` requiere HTTPS (ya cubierto por Vercel)
-- Satori genera la imagen en un Edge Function sin librerías pesadas en el bundle del cliente
-- html2canvas es más simple pero renderiza el DOM — riesgo de fuentes/estilos no alineados
-- Recomendado: Satori + OG route (`/api/og/match?homeTeam=...&awayTeam=...&score=...`)
+### E. Marketing & Distribución ✅
+- [x] Vercel Analytics instalado
+- [x] Créditos "by Carlos Gallardo → carlosgallardo.dev" (footer desktop + mobile)
+- [x] README.md reescrito, FOR_NEXT_LLM.md actualizado
+- [x] MARKETING.md completo con estrategia, calendario y guía técnica
 
 ---
-
-### C. Bracket Visual de Eliminatorias
-- [x] 🧠 Crear tab "Bracket" en AppShell (siempre visible, con estado vacío hasta julio 2026)
-- [x] 🧠 Construir componente `KnockoutBracket.tsx`: árbol flexbox QF → SF → Final → Campeón con líneas gold CSS
-- [x] 🧠 Consumir partidos de fase knockout desde matches array (filtra stages knockout)
-- [x] 🧠 Cada nodo del bracket: escudo + nombre del equipo, score si ya jugó, "Por definir" si aún no hay clasificado
-- [x] 🧠 Diseño Victory Noir: líneas gold conectando los partidos, fondo glass-card; estado dimmed en placeholder
-- [x] 🧠 R32/R16: se muestran como listas de partidos (2-col grid); árbol empieza en QF
-- [ ] ⚡ Verificar scroll horizontal en móvil (el bracket no cabe en una pantalla vertical)
-- [ ] ⚡ Verificar que equipos con nombres largos no rompen los nodos
-
-**Notas técnicas:**
-- Los datos de knockout empiezan ~julio 2026 cuando termine la fase de grupos
-- Mientras tanto el tab puede mostrarse deshabilitado o con un mensaje "Disponible en Fase Knockout"
-- El bracket del Mundial tiene formato de 32 equipos en Octavos (no hay "grupo" en knockout)
-- Referencia visual: sofascore.com → cualquier torneo con eliminación directa
 
 ### Estado actual del proyecto (sesión 2026-05-29)
 
