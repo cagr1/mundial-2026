@@ -36,6 +36,9 @@ export const viewport: Viewport = {
   themeColor: "#0b0b0a",
   width: "device-width",
   initialScale: 1,
+  // viewport-fit=cover is required so env(safe-area-inset-*) returns real values
+  // in standalone PWA mode with statusBarStyle "black-translucent"
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
