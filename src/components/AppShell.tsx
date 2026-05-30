@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useSyncExternalStore } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Icon } from '@iconify/react'
-import TimezoneSelect from './TimezoneSelect'
 import MatchList from './MatchList'
 import GroupStandings from './GroupStandings'
 import TeamsGrid from './TeamsGrid'
@@ -208,10 +207,11 @@ export default function AppShell({
       <header
         className="fixed top-0 left-0 right-0 z-40"
         style={{
-          background: 'rgba(22, 19, 12, 0.85)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
+          background: 'rgba(11, 11, 10, 0.97)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
           borderBottom: '1px solid var(--glass-border)',
+          paddingTop: 'env(safe-area-inset-top)',
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -268,27 +268,24 @@ export default function AppShell({
                   onClick={handleInstallClick}
                   aria-label="Instalar app"
                   title="Instalar app"
-                  className="w-8 h-8 flex items-center justify-center transition-colors"
+                  className="flex items-center gap-1.5 transition-all eyebrow"
                   style={{
-                    color: 'var(--text-muted)',
+                    background: 'oklch(84% 0.19 80.46 / 0.15)',
+                    border: '1px solid var(--hairline-gold)',
+                    color: 'var(--kinpaku)',
                     borderRadius: 'var(--r-sm)',
-                    border: '1px solid var(--glass-border)',
-                    background: 'transparent',
-                  }}
-                  onMouseEnter={(e) => {
-                    ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--kinpaku)'
-                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--hairline-gold)'
-                  }}
-                  onMouseLeave={(e) => {
-                    ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)'
-                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--glass-border)'
+                    padding: '6px 10px',
+                    fontFamily: 'var(--font-hanken)',
+                    fontWeight: 700,
+                    fontSize: '0.7rem',
+                    letterSpacing: '0.06em',
                   }}
                 >
-                  <Icon icon="material-symbols:install-mobile" width={18} height={18} />
+                  <Icon icon="material-symbols:download-for-offline" width={17} height={17} />
+                  <span className="hidden sm:inline">Instalar</span>
                 </button>
               )}
               <CalendarButton />
-              <TimezoneSelect value={timeZone} onChange={setTimeZone} />
             </div>
           </div>
 
@@ -326,8 +323,8 @@ export default function AppShell({
       </header>
 
       {/* ── Spacer under fixed header ───────────────────────────────────── */}
-      {/* mobile: 56px header; desktop: 56px + 44px tabs */}
-      <div className="h-14 sm:h-[100px] flex-shrink-0" />
+      <div className="hidden sm:block flex-shrink-0" style={{ height: '100px' }} />
+      <div className="sm:hidden flex-shrink-0" style={{ height: 'calc(56px + env(safe-area-inset-top, 0px))' }} />
 
       {/* ── Countdown (Partidos tab only, before tournament) ────────────── */}
       {tab === 'partidos' && liveCount === 0 && (
@@ -337,7 +334,7 @@ export default function AppShell({
       )}
 
       {/* ── Main content ────────────────────────────────────────────────── */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 pb-28 sm:pb-8">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 pb-32 sm:pb-8">
         {tab === 'partidos' ? (
           <div key="partidos" className="tab-panel">
             {favorite && (
@@ -447,9 +444,9 @@ export default function AppShell({
       <nav
         className="sm:hidden fixed bottom-0 left-0 right-0 z-40 flex"
         style={{
-          background: 'rgba(22, 19, 12, 0.95)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
+          background: 'rgba(11, 11, 10, 0.98)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
           borderTop: '1px solid var(--glass-border)',
           paddingBottom: 'env(safe-area-inset-bottom)',
         }}
@@ -465,22 +462,44 @@ export default function AppShell({
               onClick={() => handleTabChange(t.id)}
               aria-selected={isActive}
               aria-label={t.label}
-              className="flex-1 flex flex-col items-center justify-center gap-1 py-2.5 transition-colors focus-visible:outline-none"
+              className="flex-1 flex flex-col items-center justify-center relative focus-visible:outline-none"
               style={{
-                color: isActive ? 'var(--kinpaku)' : 'var(--text-muted)',
+                color: isActive ? 'var(--kinpaku)' : 'var(--text-disabled)',
+                paddingTop: 12,
+                paddingBottom: 10,
+                gap: 5,
+                transition: 'color 150ms',
               }}
             >
+              {/* Active indicator — gold pill at top edge */}
+              {isActive && (
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: 32,
+                    height: 3,
+                    background: 'var(--kinpaku)',
+                    borderRadius: '0 0 4px 4px',
+                  }}
+                />
+              )}
               <Icon
                 icon={isActive ? t.iconActive : t.icon}
-                width={24}
-                height={24}
+                width={28}
+                height={28}
               />
               <span
-                className="eyebrow"
                 style={{
-                  fontSize: '0.58rem',
-                  letterSpacing: '0.08em',
+                  fontSize: '10px',
+                  letterSpacing: '0.04em',
+                  fontFamily: 'var(--font-hanken)',
+                  fontWeight: isActive ? 700 : 400,
                   color: 'inherit',
+                  lineHeight: 1,
                 }}
               >
                 {t.label}

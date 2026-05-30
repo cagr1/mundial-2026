@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { Icon } from '@iconify/react'
 
 export default function CalendarButton() {
   const [open, setOpen] = useState(false)
@@ -24,7 +25,7 @@ export default function CalendarButton() {
         }}
         aria-label="Agregar partidos al calendario"
       >
-        <span aria-hidden="true">📅</span>
+        <Icon icon="material-symbols:calendar-add-on" width={16} height={16} aria-hidden="true" />
         <span className="hidden sm:inline">Calendario</span>
       </button>
 
@@ -81,7 +82,7 @@ export default function CalendarButton() {
                   textDecoration: 'none',
                 }}
               >
-                <span className="text-xl" aria-hidden="true">📲</span>
+                <Icon icon="material-symbols:mobile-friendly" width={22} height={22} aria-hidden="true" style={{ flexShrink: 0 }} />
                 <div>
                   <p className="text-sm font-bold" style={{ fontFamily: 'var(--font-hanken)' }}>Suscribirse (recomendado)</p>
                   <p style={{ fontSize: '0.7rem', fontFamily: 'var(--font-hanken)', opacity: 0.75 }}>
@@ -103,7 +104,7 @@ export default function CalendarButton() {
                   textDecoration: 'none',
                 }}
               >
-                <span className="text-xl" aria-hidden="true">📆</span>
+                <Icon icon="material-symbols:calendar-month" width={22} height={22} aria-hidden="true" style={{ flexShrink: 0, color: 'var(--text-warm)' }} />
                 <div>
                   <p className="text-sm font-semibold" style={{ color: 'var(--text-warm)', fontFamily: 'var(--font-hanken)' }}>Google Calendar</p>
                   <p className="eyebrow" style={{ color: 'var(--text-disabled)', fontSize: '0.62rem' }}>Agregar desde Google</p>
@@ -122,7 +123,7 @@ export default function CalendarButton() {
                   textDecoration: 'none',
                 }}
               >
-                <span className="text-xl" aria-hidden="true">⬇️</span>
+                <Icon icon="material-symbols:file-download" width={22} height={22} aria-hidden="true" style={{ flexShrink: 0, color: 'var(--text-warm)' }} />
                 <div>
                   <p className="text-sm font-semibold" style={{ color: 'var(--text-warm)', fontFamily: 'var(--font-hanken)' }}>Descargar .ics</p>
                   <p className="eyebrow" style={{ color: 'var(--text-disabled)', fontSize: '0.62rem' }}>Outlook · Apple Calendar · otros</p>
