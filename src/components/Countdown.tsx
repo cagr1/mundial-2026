@@ -32,10 +32,11 @@ function Unit({ value, label }: { value: number; label: string }) {
       <div
         className="tabnum text-3xl sm:text-4xl font-bold leading-none"
         style={{ color: 'var(--kinpaku)', fontFamily: 'var(--font-albert)', minWidth: '2ch', textAlign: 'center' }}
+        suppressHydrationWarning
       >
         {String(value).padStart(2, '0')}
       </div>
-      <span className="eyebrow" style={{ fontSize: '0.6rem', color: 'var(--text-disabled)' }}>
+      <span className="eyebrow" style={{ fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
         {label}
       </span>
     </div>

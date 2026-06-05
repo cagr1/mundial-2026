@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useCallback, useSyncExternalStore } from 'react'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Icon } from '@iconify/react'
 import MatchList from './MatchList'
@@ -11,8 +10,11 @@ import Countdown from './Countdown'
 import CalendarButton from './CalendarButton'
 import FavoriteTeamCard from './FavoriteTeamCard'
 import KnockoutBracket from './KnockoutBracket'
+import DateCarousel from './DateCarousel'
+import StatsBento from './StatsBento'
 import { useFavoriteTeam } from '@/hooks/useFavoriteTeam'
 import { Match, Standing, Team } from '@/types/football'
+import { formatDateKey } from '@/lib/format-date'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
@@ -56,46 +58,13 @@ interface Props {
   firstMatchDate: string
 }
 
-function MatchdayFilter({
-  matchdays,
-  selected,
-  onSelect,
-}: {
-  matchdays: number[]
-  selected: number | null
-  onSelect: (md: number | null) => void
-}) {
-  const base =
-    'flex-shrink-0 eyebrow px-3 py-1.5 border transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--kinpaku)]'
-  const active =
-    'text-[var(--lacquer-deep)] bg-[var(--kinpaku)] border-[var(--kinpaku)]'
-  const idle =
-    'text-[var(--text-muted)] bg-transparent border-[var(--glass-border)] hover:border-[var(--hairline-gold)] hover:text-[var(--text-warm)]'
-
-  return (
-    <div
-      className="flex items-center gap-1.5 overflow-x-auto pb-0.5"
-      style={{ scrollbarWidth: 'none' }}
-    >
-      <button
-        onClick={() => onSelect(null)}
-        className={`${base} ${selected === null ? active : idle}`}
-        style={{ borderRadius: 'var(--r-sm)' }}
-      >
-        Todos
-      </button>
-      {matchdays.map((md) => (
-        <button
-          key={md}
-          onClick={() => onSelect(md)}
-          className={`${base} ${selected === md ? active : idle}`}
-          style={{ borderRadius: 'var(--r-sm)' }}
-        >
-          J{md}
-        </button>
-      ))}
-    </div>
-  )
+const STAGE_PHASE_LABELS: Record<string, string> = {
+  GROUP_STAGE: 'FASE DE GRUPOS',
+  LAST_16: 'OCTAVOS DE FINAL',
+  QUARTER_FINALS: 'CUARTOS DE FINAL',
+  SEMI_FINALS: 'SEMIFINALES',
+  THIRD_PLACE: 'TERCER PUESTO',
+  FINAL: 'GRAN FINAL',
 }
 
 export default function AppShell({
@@ -124,7 +93,7 @@ export default function AppShell({
     window.history.replaceState(null, '', qs ? `/?${qs}` : '/')
   }, [])
   const [timeZone, setTimeZone] = useState('UTC')
-  const [selectedMatchday, setSelectedMatchday] = useState<number | null>(null)
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [deferredInstall, setDeferredInstall] = useState<BeforeInstallPromptEvent | null>(null)
   const [installAccepted, setInstallAccepted] = useState(false)
   const router = useRouter()
@@ -189,15 +158,23 @@ export default function AppShell({
     }
   }, [deferredInstall, router])
 
-  const matchdays = Array.from(
-    new Set(
-      matches.map((m) => m.matchday).filter((md): md is number => md != null),
-    ),
-  ).sort((a, b) => a - b)
+  // Unique match dates sorted chronologically (depends on timeZone for tz-correct bucketing)
+  const matchDates = Array.from(
+    new Set(matches.map((m) => formatDateKey(m.utcDate, timeZone))),
+  ).sort()
+
+  // Phase label from the dominant stage in the upcoming matches
+  const phaseLabel = (() => {
+    const upcoming = matches.find(
+      (m) => m.status === 'TIMED' || m.status === 'SCHEDULED' || m.status === 'LIVE' || m.status === 'IN_PLAY',
+    )
+    const stage = upcoming?.stage ?? matches[0]?.stage ?? 'GROUP_STAGE'
+    return STAGE_PHASE_LABELS[stage] ?? 'FASE DE GRUPOS'
+  })()
 
   const filteredMatches =
-    selectedMatchday !== null
-      ? matches.filter((m) => m.matchday === selectedMatchday)
+    selectedDate !== null
+      ? matches.filter((m) => formatDateKey(m.utcDate, timeZone) === selectedDate)
       : matches
 
   return (
@@ -205,39 +182,27 @@ export default function AppShell({
 
       {/* ── Fixed top header ────────────────────────────────────────────── */}
       <header
-        className="fixed top-0 left-0 right-0 z-40"
+        className="ios-blur fixed top-0 left-0 right-0 z-40"
         style={{
-          background: 'rgba(11, 11, 10, 0.97)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
+          background: 'rgba(5, 20, 36, 0.88)',
           borderBottom: '1px solid var(--glass-border)',
           paddingTop: 'env(safe-area-inset-top)',
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="max-w-[500px] mx-auto px-4">
           <div className="flex items-center justify-between h-14 gap-3">
 
             {/* Brand */}
-            <div className="flex items-center gap-2.5 flex-shrink-0">
-              <style>{`
-                @keyframes nav-ball-spin {
-                  from { transform: rotate(0deg); }
-                  to   { transform: rotate(360deg); }
-                }
-              `}</style>
-              <div
-                className="relative flex-shrink-0"
-                style={{
-                  width: 28,
-                  height: 28,
-                  animation: 'nav-ball-spin 1.4s cubic-bezier(0.22, 1, 0.36, 1) both',
-                }}
-              >
-                <Image src="/brand-mark.svg" alt="" fill priority sizes="28px" />
-              </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Icon
+                icon="material-symbols:sports-soccer"
+                width={22}
+                height={22}
+                style={{ color: 'var(--kinpaku)', flexShrink: 0 }}
+              />
               <span
-                className="font-extrabold tracking-tighter uppercase leading-none"
-                style={{ color: 'var(--kinpaku)', fontSize: '1rem', fontFamily: 'var(--font-hanken)' }}
+                className="font-extrabold tracking-tight uppercase leading-none"
+                style={{ color: 'var(--kinpaku)', fontSize: '0.95rem', letterSpacing: '0.06em' }}
               >
                 World Cup 2026
               </span>
@@ -268,75 +233,36 @@ export default function AppShell({
                   onClick={handleInstallClick}
                   aria-label="Instalar app"
                   title="Instalar app"
-                  className="flex items-center gap-1.5 transition-all eyebrow"
+                  className="flex items-center justify-center soft-haptic focus-visible:outline-none"
                   style={{
-                    background: 'oklch(84% 0.19 80.46 / 0.15)',
-                    border: '1px solid var(--hairline-gold)',
+                    background: 'transparent',
+                    border: 'none',
                     color: 'var(--kinpaku)',
-                    borderRadius: 'var(--r-sm)',
-                    padding: '6px 10px',
-                    fontFamily: 'var(--font-hanken)',
-                    fontWeight: 700,
-                    fontSize: '0.7rem',
-                    letterSpacing: '0.06em',
+                    padding: 4,
                   }}
                 >
-                  <Icon icon="material-symbols:download-for-offline" width={17} height={17} />
-                  <span className="hidden sm:inline">Instalar</span>
+                  <Icon icon="material-symbols:download-for-offline" width={24} height={24} />
                 </button>
               )}
               <CalendarButton />
             </div>
           </div>
 
-          {/* Desktop tab row — hidden on mobile (bottom nav takes over) */}
-          <div className="hidden sm:flex gap-0" role="tablist">
-            {TABS.map((t) => {
-              const isActive = tab === t.id
-              return (
-                <button
-                  key={t.id}
-                  role="tab"
-                  onClick={() => handleTabChange(t.id)}
-                  aria-selected={isActive}
-                  className="flex items-center gap-1.5 px-4 py-2.5 -mb-px border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--kinpaku)]"
-                  style={{
-                    fontFamily: 'var(--font-hanken)',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    letterSpacing: '0.04em',
-                    borderBottomColor: isActive ? 'var(--kinpaku)' : 'transparent',
-                    color: isActive ? 'var(--kinpaku)' : 'var(--text-faint)',
-                  }}
-                >
-                  <Icon
-                    icon={isActive ? t.iconActive : t.icon}
-                    width={16}
-                    height={16}
-                  />
-                  {t.label}
-                </button>
-              )
-            })}
-          </div>
         </div>
       </header>
 
       {/* ── Spacer under fixed header ───────────────────────────────────── */}
-      <div className="hidden sm:block flex-shrink-0" style={{ height: '100px' }} />
-      <div className="sm:hidden flex-shrink-0" style={{ height: 'calc(56px + env(safe-area-inset-top, 0px))' }} />
-
-      {/* ── Countdown (Partidos tab only, before tournament) ────────────── */}
-      {tab === 'partidos' && liveCount === 0 && (
-        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 pt-5">
-          <Countdown targetDate={firstMatchDate} />
-        </div>
-      )}
+      <div className="flex-shrink-0" style={{ height: 'calc(56px + env(safe-area-inset-top, 0px))' }} />
 
       {/* ── Main content ────────────────────────────────────────────────── */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 pb-32 sm:pb-8">
+      <main className="flex-1 max-w-[500px] mx-auto w-full px-4 py-6 pb-32">
         {tab === 'partidos' ? (
           <div key="partidos" className="tab-panel">
+            {liveCount === 0 && (
+              <div className="mb-5">
+                <Countdown targetDate={firstMatchDate} />
+              </div>
+            )}
             {favorite && (
               <FavoriteTeamCard
                 team={favorite}
@@ -345,14 +271,15 @@ export default function AppShell({
                 onRemove={() => saveFavorite(null)}
               />
             )}
-            <div className="mb-5">
-              <MatchdayFilter
-                matchdays={matchdays}
-                selected={selectedMatchday}
-                onSelect={setSelectedMatchday}
-              />
-            </div>
+            <DateCarousel
+              dates={matchDates}
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              timeZone={timeZone}
+              phaseLabel={phaseLabel}
+            />
             <MatchList matches={filteredMatches} timeZone={timeZone} />
+            <StatsBento />
           </div>
         ) : tab === 'grupos' ? (
           <div key="grupos" className="tab-panel">
@@ -395,8 +322,7 @@ export default function AppShell({
           </div>
         )}
 
-        {/* Mobile-only credit — desktop uses the footer */}
-        <div className="sm:hidden mt-10 text-center">
+        <div className="mt-10 text-center">
           <a
             href="https://carlosgallardo.dev"
             target="_blank"
@@ -409,44 +335,11 @@ export default function AppShell({
         </div>
       </main>
 
-      {/* ── Footer (desktop only) ───────────────────────────────────────── */}
-      <footer
-        className="hidden sm:block py-4 text-center"
-        style={{ borderTop: '1px solid var(--glass-border)' }}
-      >
-        <div className="flex items-center justify-center gap-4">
-          <p
-            className="eyebrow"
-            style={{ letterSpacing: '0.08em', color: 'var(--text-disabled)' }}
-          >
-            Datos: ESPN API · Horarios en zona horaria local
-          </p>
-          <span style={{ color: 'var(--hairline-gold)' }}>·</span>
-          <a
-            href="https://carlosgallardo.dev"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="eyebrow transition-colors"
-            style={{
-              color: 'var(--text-disabled)',
-              textDecoration: 'none',
-              letterSpacing: '0.08em',
-            }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = 'var(--kinpaku)')}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-disabled)')}
-          >
-            by Carlos Gallardo
-          </a>
-        </div>
-      </footer>
-
-      {/* ── Bottom nav (mobile only) ────────────────────────────────────── */}
+      {/* ── Bottom nav ─────────────────────────────────────────────────── */}
       <nav
-        className="sm:hidden fixed bottom-0 left-0 right-0 z-40 flex"
+        className="ios-blur fixed bottom-0 left-0 right-0 z-40 flex"
         style={{
-          background: 'rgba(11, 11, 10, 0.98)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
+          background: 'rgba(5, 20, 36, 0.88)',
           borderTop: '1px solid var(--glass-border)',
           paddingBottom: 'env(safe-area-inset-bottom)',
         }}
@@ -462,41 +355,24 @@ export default function AppShell({
               onClick={() => handleTabChange(t.id)}
               aria-selected={isActive}
               aria-label={t.label}
-              className="flex-1 flex flex-col items-center justify-center relative focus-visible:outline-none"
+              className="flex-1 flex flex-col items-center justify-center soft-haptic focus-visible:outline-none"
               style={{
                 color: isActive ? 'var(--kinpaku)' : 'var(--text-disabled)',
-                paddingTop: 12,
-                paddingBottom: 10,
-                gap: 5,
+                paddingTop: 10,
+                paddingBottom: 8,
+                gap: 3,
                 transition: 'color 150ms',
               }}
             >
-              {/* Active indicator — gold pill at top edge */}
-              {isActive && (
-                <div
-                  aria-hidden="true"
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: 32,
-                    height: 3,
-                    background: 'var(--kinpaku)',
-                    borderRadius: '0 0 4px 4px',
-                  }}
-                />
-              )}
               <Icon
                 icon={isActive ? t.iconActive : t.icon}
-                width={28}
-                height={28}
+                width={26}
+                height={26}
               />
               <span
                 style={{
                   fontSize: '10px',
                   letterSpacing: '0.04em',
-                  fontFamily: 'var(--font-hanken)',
                   fontWeight: isActive ? 700 : 400,
                   color: 'inherit',
                   lineHeight: 1,
@@ -504,6 +380,17 @@ export default function AppShell({
               >
                 {t.label}
               </span>
+              {/* iOS dot indicator below active label */}
+              <div
+                aria-hidden="true"
+                style={{
+                  width: 4,
+                  height: 4,
+                  borderRadius: '50%',
+                  background: isActive ? 'var(--kinpaku)' : 'transparent',
+                  transition: 'background 150ms',
+                }}
+              />
             </button>
           )
         })}

@@ -1,7 +1,50 @@
-import Image from 'next/image'
+'use client'
+
+import { Icon } from '@iconify/react'
 import { Match } from '@/types/football'
 import { formatTime, isToday } from '@/lib/format-date'
-import ShareButton from './ShareButton'
+
+// ─── TLA → emojione-v1 flag name ─────────────────────────────────────────────
+const TLA_FLAG: Record<string, string> = {
+  // CONCACAF
+  MEX: 'mexico', USA: 'united-states', CAN: 'canada',
+  PAN: 'panama', CRC: 'costa-rica', HON: 'honduras',
+  SLV: 'el-salvador', GTM: 'guatemala', JAM: 'jamaica',
+  TRI: 'trinidad-and-tobago', HAI: 'haiti', CUB: 'cuba',
+  NCA: 'nicaragua', GUY: 'guyana', SUR: 'suriname',
+  // CONMEBOL
+  ARG: 'argentina', BRA: 'brazil', COL: 'colombia',
+  ECU: 'ecuador', URU: 'uruguay', CHI: 'chile',
+  BOL: 'bolivia', PAR: 'paraguay', PER: 'peru', VEN: 'venezuela',
+  // Europe
+  FRA: 'france', GER: 'germany', ESP: 'spain', POR: 'portugal',
+  NED: 'netherlands', BEL: 'belgium', ENG: 'united-kingdom',
+  ITA: 'italy', CRO: 'croatia', SUI: 'switzerland',
+  DEN: 'denmark', NOR: 'norway', SWE: 'sweden',
+  POL: 'poland', CZE: 'czechia', SVK: 'slovakia',
+  HUN: 'hungary', ROU: 'romania', SRB: 'serbia',
+  UKR: 'ukraine', TUR: 'turkey', GRE: 'greece',
+  ISL: 'iceland', SCO: 'scotland', WAL: 'wales',
+  IRL: 'ireland', AUT: 'austria', SVN: 'slovenia',
+  ALB: 'albania', GEO: 'georgia', MKD: 'north-macedonia',
+  MNE: 'montenegro', BIH: 'bosnia-and-herzegovina',
+  // Africa
+  MAR: 'morocco', SEN: 'senegal', CMR: 'cameroon',
+  GHA: 'ghana', NGA: 'nigeria', NGR: 'nigeria',
+  EGY: 'egypt', RSA: 'south-africa', ALG: 'algeria',
+  TUN: 'tunisia', CIV: 'cote-divoire', GUI: 'guinea',
+  MLI: 'mali', BFA: 'burkina-faso', ZIM: 'zimbabwe',
+  MOZ: 'mozambique', TAN: 'tanzania', UGA: 'uganda',
+  // Asia
+  KOR: 'south-korea', JPN: 'japan', IRN: 'iran',
+  SAU: 'saudi-arabia', QAT: 'qatar', AUS: 'australia',
+  CHN: 'china', IRQ: 'iraq', JOR: 'jordan',
+  UAE: 'united-arab-emirates', IDN: 'indonesia',
+  UZB: 'uzbekistan', TKM: 'turkmenistan', KUW: 'kuwait',
+  OMN: 'oman', BHR: 'bahrain', IND: 'india',
+  // Oceania
+  NZL: 'new-zealand', FIJ: 'fiji',
+}
 
 const GROUP_LABEL_COLOR: Record<string, string> = {
   GROUP_A: 'var(--kinpaku)',
@@ -21,80 +64,102 @@ const GROUP_LABEL_COLOR: Record<string, string> = {
 const LIVE_STATUSES = new Set(['LIVE', 'IN_PLAY', 'PAUSED'])
 const DONE_STATUSES = new Set(['FINISHED', 'AWARDED'])
 
-function TeamCrest({ crest, name }: { crest: string; name: string }) {
-  if (!crest) {
+function TeamFlag({ tla, name }: { tla: string; name: string }) {
+  const flagName = TLA_FLAG[tla?.toUpperCase()]
+
+  if (flagName) {
     return (
       <div
-        className="w-12 h-12 rounded flex items-center justify-center flex-shrink-0"
-        style={{ background: 'var(--graphite)', border: '1px solid var(--glass-border)' }}
+        style={{
+          width: 56,
+          height: 56,
+          borderRadius: '50%',
+          overflow: 'hidden',
+          flexShrink: 0,
+          border: '2px solid var(--graphite)',
+          background: 'var(--graphite)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
       >
-        <span className="eyebrow text-[10px]" style={{ color: 'var(--text-faint)' }}>
-          {(name ?? '?').slice(0, 3).toUpperCase()}
-        </span>
+        <Icon
+          icon={`emojione-v1:flag-for-${flagName}`}
+          style={{ width: 72, height: 72, display: 'block', flexShrink: 0 }}
+        />
       </div>
     )
   }
+
+  // Fallback for unknown TLA
   return (
-    <div className="relative w-12 h-12 flex-shrink-0">
-      <Image src={crest} alt={name} fill unoptimized className="object-contain drop-shadow-lg" sizes="48px" />
+    <div
+      style={{
+        width: 56,
+        height: 56,
+        borderRadius: '50%',
+        flexShrink: 0,
+        border: '2px solid var(--graphite-2)',
+        background: 'var(--graphite)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <span style={{ color: 'var(--text-faint)', fontSize: 11, fontWeight: 600, letterSpacing: '0.06em' }}>
+        {(tla ?? name ?? '?').slice(0, 3).toUpperCase()}
+      </span>
     </div>
   )
 }
 
-function ScoreOrTime({ match, timeZone }: { match: Match; timeZone: string }) {
+function CenterBlock({ match, timeZone }: { match: Match; timeZone: string }) {
   const isLive = LIVE_STATUSES.has(match.status)
   const isDone = DONE_STATUSES.has(match.status)
 
   if (isLive || isDone) {
     const home = match.score.fullTime.home ?? 0
     const away = match.score.fullTime.away ?? 0
+
     return (
-      <div className="flex flex-col items-center gap-1.5 min-w-[90px]">
+      <div
+        className="flex flex-col items-center justify-center gap-1"
+        style={{ background: 'var(--graphite)', borderRadius: 12, minWidth: 80, padding: '8px 16px' }}
+      >
         {isLive ? (
           <div className="flex items-center gap-1.5">
-            <span
-              className="live-dot w-1.5 h-1.5 rounded-full block"
-              style={{ background: 'var(--patina)' }}
-              aria-hidden="true"
-            />
-            <span className="eyebrow" style={{ color: 'var(--patina)', letterSpacing: '0.14em' }}>
-              {match.status === 'PAUSED' ? 'HT' : 'Live'}
+            <span className="live-dot w-1.5 h-1.5 rounded-full block" style={{ background: 'var(--patina)' }} aria-hidden="true" />
+            <span style={{ color: 'var(--patina)', fontSize: 10, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+              {match.status === 'PAUSED' ? 'HT' : 'LIVE'}
             </span>
           </div>
         ) : (
-          <span className="eyebrow">Final</span>
+          <span style={{ color: 'var(--text-faint)', fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            Final
+          </span>
         )}
-        <div
-          className="tabnum font-extrabold tracking-tight"
-          style={{
-            fontFamily: 'var(--font-hanken)',
-            fontSize: '2.25rem',
-            lineHeight: 1,
-            color: 'var(--champagne)',
-          }}
-        >
+        <div style={{ fontSize: 22, fontWeight: 700, lineHeight: 1, color: 'var(--champagne)', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
           {home}
-          <span style={{ color: 'var(--kinpaku-rich)', margin: '0 8px', fontWeight: 400 }}>–</span>
+          <span style={{ color: 'var(--kinpaku-rich)', fontWeight: 400, margin: '0 6px' }}>–</span>
           {away}
         </div>
       </div>
     )
   }
 
+  const statusLabel =
+    match.status === 'TIMED' || match.status === 'SCHEDULED' ? 'PRÓXIMO' : match.status.replace(/_/g, ' ')
+
   return (
-    <div className="flex flex-col items-center gap-1.5 min-w-[90px]">
-      <span className="eyebrow">Hora</span>
-      <span
-        className="tabnum font-bold"
-        style={{
-          color: 'var(--kinpaku)',
-          fontFamily: 'var(--font-hanken)',
-          fontSize: '1.5rem',
-          lineHeight: 1,
-        }}
-        suppressHydrationWarning
-      >
-        {formatTime(match.utcDate, timeZone)}
+    <div
+      className="flex flex-col items-center justify-center gap-1"
+      style={{ background: 'var(--graphite)', borderRadius: 12, minWidth: 80, padding: '8px 16px' }}
+    >
+      <span style={{ color: 'var(--kinpaku)', fontSize: 22, fontWeight: 600, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+        VS
+      </span>
+      <span style={{ color: 'var(--text-faint)', fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', marginTop: 2 }}>
+        {statusLabel}
       </span>
     </div>
   )
@@ -109,55 +174,50 @@ export default function MatchCard({ match, timeZone }: Props) {
   const isLive = LIVE_STATUSES.has(match.status)
   const today = isToday(match.utcDate, timeZone)
   const groupKey = match.group ?? ''
-  const groupLabel = groupKey.replace('GROUP_', 'Grupo ')
+  const groupLabel = groupKey ? groupKey.replace('GROUP_', 'GRUPO ') : match.stage.replace(/_/g, ' ')
   const labelColor = GROUP_LABEL_COLOR[groupKey] ?? 'var(--text-muted)'
 
   return (
     <article
-      className={`match-card p-4 sm:p-5 ${isLive ? 'is-live' : ''} ${today && !isLive ? 'is-today' : ''}`}
+      className={`match-card ${isLive ? 'is-live' : ''} ${today && !isLive ? 'is-today' : ''}`}
+      style={{ background: 'var(--raised-lacquer)', borderRadius: 16, padding: 16, cursor: 'pointer', userSelect: 'none' }}
+      onMouseDown={(e) => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.97)' }}
+      onMouseUp={(e) => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)' }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)' }}
+      onTouchStart={(e) => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.97)' }}
+      onTouchEnd={(e) => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)' }}
     >
-      {/* Header */}
+      {/* Top row: group badge + time */}
       <div className="flex items-center justify-between gap-2 mb-4">
-        {groupKey ? (
-          <span className="eyebrow" style={{ color: labelColor }}>
-            {groupLabel}
-          </span>
-        ) : (
-          <span className="eyebrow">{match.stage.replace(/_/g, ' ')}</span>
-        )}
-        <span className="eyebrow tabnum" style={{ letterSpacing: '0.12em' }}>
-          J{match.matchday}
+        <span style={{
+          color: labelColor, fontSize: 10, fontWeight: 700, letterSpacing: '0.14em',
+          textTransform: 'uppercase', background: 'var(--graphite)',
+          borderRadius: 999, padding: '3px 10px', lineHeight: 1.6,
+        }}>
+          {groupLabel}
+        </span>
+        <span style={{ color: 'var(--text-faint)', fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', fontVariantNumeric: 'tabular-nums' }} suppressHydrationWarning>
+          {formatTime(match.utcDate, timeZone)} local
         </span>
       </div>
 
-      {/* Teams + score */}
-      <div className="flex items-center justify-between gap-2">
+      {/* Main row: home — center — away */}
+      <div className="flex items-center justify-between gap-3">
         <div className="flex flex-col items-center gap-2 flex-1 min-w-0">
-          <TeamCrest crest={match.homeTeam.crest} name={match.homeTeam.name} />
-          <span
-            className="text-xs font-semibold text-center leading-tight truncate w-full"
-            style={{ color: 'var(--text-warm)' }}
-          >
+          <TeamFlag tla={match.homeTeam.tla} name={match.homeTeam.name} />
+          <span className="text-center leading-tight truncate w-full" style={{ color: 'var(--text-warm)', fontSize: 15, fontWeight: 600 }}>
             {match.homeTeam.shortName}
           </span>
         </div>
 
-        <ScoreOrTime match={match} timeZone={timeZone} />
+        <CenterBlock match={match} timeZone={timeZone} />
 
         <div className="flex flex-col items-center gap-2 flex-1 min-w-0">
-          <TeamCrest crest={match.awayTeam.crest} name={match.awayTeam.name} />
-          <span
-            className="text-xs font-semibold text-center leading-tight truncate w-full"
-            style={{ color: 'var(--text-warm)' }}
-          >
+          <TeamFlag tla={match.awayTeam.tla} name={match.awayTeam.name} />
+          <span className="text-center leading-tight truncate w-full" style={{ color: 'var(--text-warm)', fontSize: 15, fontWeight: 600 }}>
             {match.awayTeam.shortName}
           </span>
         </div>
-      </div>
-
-      {/* Footer — share */}
-      <div className="flex justify-end mt-3 pt-2.5" style={{ borderTop: '1px solid var(--hairline)' }}>
-        <ShareButton match={match} timeZone={timeZone} />
       </div>
     </article>
   )

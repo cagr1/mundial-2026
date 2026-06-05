@@ -19,46 +19,44 @@ function TeamCard({
 }) {
   return (
     <div
-      className="glass-card group relative transition-all duration-200"
+      className="soft-haptic relative"
       style={{
-        borderRadius: 'var(--r-lg)',
-        borderColor: isFavorite ? 'rgba(247, 207, 101, 0.45)' : undefined,
-      }}
-      onMouseEnter={(e) => {
-        const el = e.currentTarget
-        el.style.borderColor = 'rgba(247, 207, 101, 0.35)'
-        el.style.boxShadow = `inset 0 0 12px var(--stadium-glow)`
-      }}
-      onMouseLeave={(e) => {
-        const el = e.currentTarget
-        el.style.borderColor = isFavorite ? 'rgba(247, 207, 101, 0.45)' : ''
-        el.style.boxShadow = isFavorite ? `inset 0 0 10px var(--stadium-glow)` : ''
+        background: 'var(--lacquer)',
+        border: `1px solid ${isFavorite ? 'rgba(255, 209, 101, 0.45)' : 'var(--glass-border)'}`,
+        borderRadius: 12,
+        padding: 12,
       }}
     >
       <button
         onClick={onSelect}
-        className="flex items-center gap-3 p-3.5 w-full text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--kinpaku)]"
-        style={{ borderRadius: 'var(--r-lg)' }}
+        className="flex items-center gap-3 w-full text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--kinpaku)]"
         aria-label={`Ver plantel de ${team.name}`}
       >
-        {/* Crest */}
-        <div className="flex-shrink-0">
+        {/* Flag */}
+        <div
+          className="flex-shrink-0 overflow-hidden rounded-sm shadow-sm"
+          style={{
+            width: 48,
+            height: 32,
+            border: '1px solid rgba(255,255,255,0.05)',
+          }}
+        >
           {team.crest ? (
-            <div className="relative w-10 h-10 transition-transform duration-150 group-hover:scale-110">
+            <div className="relative w-full h-full">
               <Image
                 src={team.crest}
                 alt={team.name}
                 fill
                 unoptimized
                 loading="lazy"
-                className="object-contain"
-                sizes="40px"
+                className="object-cover"
+                sizes="48px"
               />
             </div>
           ) : (
             <div
-              className="w-10 h-10 flex items-center justify-center transition-transform duration-150 group-hover:scale-110"
-              style={{ background: 'var(--graphite)', borderRadius: 'var(--r-sm)' }}
+              className="w-full h-full flex items-center justify-center"
+              style={{ background: 'var(--graphite)' }}
             >
               <span className="eyebrow text-[9px]" style={{ color: 'var(--text-faint)' }}>
                 {team.tla}
@@ -70,35 +68,29 @@ function TeamCard({
         {/* Info */}
         <div className="min-w-0 flex-1">
           <p
-            className="text-sm font-semibold leading-tight truncate"
-            style={{ color: 'var(--champagne)' }}
+            className="truncate font-semibold leading-tight"
+            style={{ fontSize: 15, color: 'var(--text-warm)' }}
           >
             {team.shortName ?? team.name}
           </p>
           <p
             className="eyebrow mt-0.5 truncate"
-            style={{ fontSize: '0.58rem', color: 'var(--text-disabled)' }}
+            style={{ fontSize: '0.58rem', color: 'var(--text-faint)' }}
           >
             {team.tla}
           </p>
         </div>
-
-        {/* Arrow */}
-        <Icon
-          icon="material-symbols:chevron-right"
-          width={16}
-          height={16}
-          className="flex-shrink-0 opacity-0 group-hover:opacity-60 transition-opacity"
-          style={{ color: 'var(--kinpaku)' }}
-        />
       </button>
 
       {/* Favorite star — absolute top-right */}
       <button
         onClick={onToggleFavorite}
         aria-label={isFavorite ? `Quitar ${team.name} de favoritos` : `Marcar ${team.name} como favorito`}
-        className="absolute top-1.5 right-1.5 p-1 transition-all duration-150 focus-visible:outline-none"
-        style={{ borderRadius: 'var(--r-sm)', color: isFavorite ? 'var(--kinpaku)' : 'var(--text-disabled)' }}
+        className="absolute top-1.5 right-1.5 p-1 transition-colors duration-150 focus-visible:outline-none"
+        style={{
+          borderRadius: 'var(--r-sm)',
+          color: isFavorite ? 'var(--kinpaku)' : 'var(--text-disabled)',
+        }}
         onMouseEnter={(e) => {
           if (!isFavorite)
             (e.currentTarget as HTMLButtonElement).style.color = 'var(--kinpaku-rich)'
@@ -227,9 +219,9 @@ export default function TeamsGrid({ teams, favoriteId, onToggleFavorite }: Teams
           onChange={(e) => setQuery(e.target.value)}
           className="w-full pl-9 pr-4 py-2.5 text-sm transition-colors focus:outline-none"
           style={{
-            background: 'var(--glass-bg)',
+            background: 'var(--graphite)',
             border: '1px solid var(--glass-border)',
-            borderRadius: 'var(--r-lg)',
+            borderRadius: 'var(--r-md)',
             color: 'var(--text-warm)',
             fontFamily: 'var(--font-hanken)',
           }}

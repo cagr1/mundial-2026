@@ -1,10 +1,19 @@
 import { Match } from '@/types/football'
-import { groupMatchesByDay, formatDayHeading, isToday } from '@/lib/format-date'
+import { groupMatchesByDay, isToday } from '@/lib/format-date'
 import MatchCard from './MatchCard'
 
 interface Props {
   matches: Match[]
   timeZone: string
+}
+
+function formatDayLabel(utcDate: string, timeZone: string): { day: string; date: string } {
+  const d = new Date(utcDate)
+  const day = new Intl.DateTimeFormat('es', { weekday: 'short', timeZone }).format(d).toUpperCase()
+  const date = new Intl.DateTimeFormat('es', { day: 'numeric', month: 'short', timeZone })
+    .format(d)
+    .toUpperCase()
+  return { day, date }
 }
 
 export default function MatchList({ matches, timeZone }: Props) {
@@ -14,52 +23,97 @@ export default function MatchList({ matches, timeZone }: Props) {
     return (
       <div className="py-12 text-center">
         <p className="eyebrow" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>
-          No hay partidos disponibles en este momento
+          No hay partidos disponibles
         </p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-8">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
       {Array.from(grouped.entries()).map(([dateKey, dayMatches]) => {
         const today = isToday(dayMatches[0].utcDate, timeZone)
+        const { day, date } = formatDayLabel(dayMatches[0].utcDate, timeZone)
 
         return (
           <section key={dateKey}>
-            {/* Day heading */}
-            <div className="flex items-center gap-3 mb-4">
-              <h2
-                className="eyebrow capitalize"
+            {/* Day heading — compact app-style pill */}
+            <div className="flex items-center gap-3 mb-3" suppressHydrationWarning>
+              <div
                 style={{
-                  color: today ? 'var(--kinpaku)' : 'var(--text-muted)',
-                  letterSpacing: '0.12em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '4px 10px',
+                  borderRadius: 'var(--r-lg)',
+                  background: today ? 'oklch(84% 0.19 80.46 / 0.12)' : 'var(--graphite)',
+                  border: `1px solid ${today ? 'var(--hairline-gold)' : 'var(--hairline)'}`,
+                  flexShrink: 0,
                 }}
-                suppressHydrationWarning
               >
-                {formatDayHeading(dayMatches[0].utcDate, timeZone)}
-              </h2>
-              {today ? (
                 <span
-                  className="eyebrow px-2 py-0.5 border"
                   style={{
-                    color: 'var(--kinpaku)',
-                    background: 'oklch(84% 0.19 80.46 / 0.08)',
-                    borderColor: 'var(--hairline-gold)',
-                    borderRadius: 'var(--r-xs)',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    letterSpacing: '0.06em',
+                    color: today ? 'var(--kinpaku)' : 'var(--text-faint)',
+                    lineHeight: 1,
                   }}
                 >
-                  Hoy
+                  {day}
                 </span>
-              ) : null}
+                <span
+                  style={{
+                    width: 1,
+                    height: 10,
+                    background: today ? 'var(--hairline-gold)' : 'var(--hairline)',
+                    borderRadius: 1,
+                  }}
+                  aria-hidden="true"
+                />
+                <span
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: today ? 700 : 500,
+                    letterSpacing: '0.04em',
+                    color: today ? 'var(--kinpaku)' : 'var(--text-muted)',
+                    lineHeight: 1,
+                  }}
+                >
+                  {date}
+                </span>
+                {today && (
+                  <span
+                    style={{
+                      width: 5,
+                      height: 5,
+                      borderRadius: '50%',
+                      background: 'var(--kinpaku)',
+                      display: 'inline-block',
+                      flexShrink: 0,
+                    }}
+                    aria-hidden="true"
+                  />
+                )}
+              </div>
+
               <div className="flex-1 h-px" style={{ background: 'var(--hairline)' }} />
-              <span className="eyebrow tabnum" style={{ color: 'var(--text-disabled)' }}>
-                {dayMatches.length}
+
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 500,
+                  color: 'var(--text-disabled)',
+                  fontVariantNumeric: 'tabular-nums',
+                  flexShrink: 0,
+                }}
+              >
+                {dayMatches.length} partidos
               </span>
             </div>
 
-            {/* Match grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {/* Match list — single column, no grid */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {dayMatches.map((match) => (
                 <MatchCard key={match.id} match={match} timeZone={timeZone} />
               ))}

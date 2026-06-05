@@ -16,17 +16,16 @@ export default function CalendarButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 eyebrow px-3 py-1.5 border transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--kinpaku)]"
+        className="flex items-center justify-center soft-haptic focus-visible:outline-none"
         style={{
           color: 'var(--kinpaku)',
-          borderColor: 'var(--hairline-gold)',
-          background: 'oklch(84% 0.19 80.46 / 0.07)',
-          borderRadius: 'var(--r-sm)',
+          background: 'transparent',
+          border: 'none',
+          padding: 4,
         }}
         aria-label="Agregar partidos al calendario"
       >
-        <Icon icon="material-symbols:calendar-add-on" width={16} height={16} aria-hidden="true" />
-        <span className="hidden sm:inline">Calendario</span>
+        <Icon icon="material-symbols:calendar-add-on" width={24} height={24} aria-hidden="true" />
       </button>
 
       {open && createPortal(

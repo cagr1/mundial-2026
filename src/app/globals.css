@@ -1,55 +1,58 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-hanken);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains);
 }
 
-/* ─── Victory Noir Token System ─────────────────────────────────────────── */
+/* ─── Elite Pitch Token System ───────────────────────────────────────────── */
 :root {
-  /* Surfaces — Deep Void base */
-  --lacquer-deep:   #0B0B0A;
-  --lacquer:        #16130c;
-  --raised-lacquer: #231f18;
-  --graphite:       #2d2a22;
-  --graphite-2:     #38342c;
+  /* Surfaces — Deep Navy "Night-Time Championship" */
+  --lacquer-deep:   #051424;   /* background */
+  --lacquer:        #0d1c2d;   /* surface-container-low */
+  --raised-lacquer: #122131;   /* surface-container */
+  --graphite:       #1c2b3c;   /* surface-container-high */
+  --graphite-2:     #273647;   /* surface-container-highest */
 
   /* Glass layer */
-  --glass-bg:       rgba(35, 31, 24, 0.6);
-  --glass-border:   rgba(161, 161, 170, 0.2);
-  --glass-top:      rgba(247, 207, 101, 0.08);
+  --glass-bg:       rgba(12, 27, 45, 0.65);
+  --glass-border:   rgba(79, 70, 51, 0.25);
+  --glass-top:      rgba(255, 209, 101, 0.07);
 
-  /* Trophy Gold ramp */
-  --kinpaku:        #f7cf65;
-  --kinpaku-pale:   #ffdf93;
-  --kinpaku-rich:   #d9b34d;
-  --kinpaku-deep:   #594400;
-  --hairline:       rgba(161, 161, 170, 0.18);
-  --hairline-gold:  rgba(247, 207, 101, 0.25);
+  /* Trophy Gold — primary */
+  --kinpaku:        #ffd165;
+  --kinpaku-pale:   #ffdf9a;
+  --kinpaku-rich:   #f7be1d;
+  --kinpaku-deep:   #3f2e00;
+  --hairline:       rgba(79, 70, 51, 0.22);
+  --hairline-gold:  rgba(255, 209, 101, 0.28);
 
   /* Stadium glow */
-  --stadium-glow:   rgba(217, 179, 77, 0.12);
+  --stadium-glow:   rgba(255, 209, 101, 0.10);
 
-  /* Patina (live states) */
-  --patina:         oklch(70% 0.12 188);
-  --patina-pale:    oklch(82% 0.07 188);
-  --patina-deep:    oklch(49% 0.08 188);
+  /* Live / tertiary — blue accent */
+  --patina:         #adddff;
+  --patina-pale:    #c7e7ff;
+  --patina-deep:    #005072;
 
   /* Warning */
-  --vermilion:      oklch(58% 0.15 35);
+  --vermilion:      #ffb4ab;
 
-  /* Text — Victory Noir palette */
-  --champagne:      #eae1d6;
-  --text-warm:      #eae1d6;
-  --text-muted:     #A1A1AA;
-  --text-faint:     #6b6b6b;
-  --text-disabled:  #4a4a4a;
+  /* Text */
+  --champagne:      #d4e4fa;
+  --text-warm:      #d4e4fa;
+  --text-muted:     #d3c5ac;
+  --text-faint:     #9b8f79;
+  --text-disabled:  #4f4633;
 
-  /* Radii — tight architectural feel */
-  --r-xs: 2px;
-  --r-sm: 4px;
-  --r-md: 6px;
-  --r-lg: 8px;
+  /* Radii — squircle philosophy from Elite Pitch */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 16px;
+
+  /* Font aliases for backward compat */
+  --font-hanken: var(--font-inter);
 }
 
 html {
@@ -60,17 +63,29 @@ html {
 body {
   background-color: var(--lacquer-deep);
   color: var(--text-warm);
-  font-family: var(--font-hanken), 'Hanken Grotesk', sans-serif;
+  font-family: var(--font-inter), 'Inter', sans-serif;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ─── iOS blur utility ──────────────────────────────────────────────────── */
+.ios-blur {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* ─── Soft haptic press feedback ────────────────────────────────────────── */
+.soft-haptic:active {
+  transform: scale(0.97);
+  transition: transform 0.1s ease;
+}
+
 /* ─── Glassmorphism card ────────────────────────────────────────────────── */
 .glass-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--glass-border);
   border-top-color: var(--glass-top);
   border-left-color: var(--glass-top);
@@ -94,35 +109,36 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── Eyebrow / mono label ──────────────────────────────────────────────── */
+/* ─── Eyebrow / caps label ──────────────────────────────────────────────── */
 .eyebrow {
-  font-family: var(--font-jetbrains), 'JetBrains Mono', monospace;
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
+  font-family: var(--font-inter), 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 /* ─── Match card ────────────────────────────────────────────────────────── */
 .match-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: var(--raised-lacquer);
   border: 1px solid var(--glass-border);
-  border-radius: var(--r-lg);
-  transition: border-color 180ms ease, box-shadow 180ms ease;
+  border-radius: 16px;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 100ms ease;
+}
+.match-card:active {
+  transform: scale(0.97);
 }
 .match-card:hover {
   border-color: var(--hairline-gold);
-  box-shadow: inset 0 0 12px var(--stadium-glow);
+  box-shadow: 0 0 0 1px rgba(255,209,101,0.1);
 }
 .match-card.is-live {
-  border-color: oklch(70% 0.12 188 / 0.5);
-  box-shadow: 0 0 28px oklch(70% 0.12 188 / 0.08);
+  border-color: rgba(173, 221, 255, 0.4);
+  box-shadow: 0 0 20px rgba(173, 221, 255, 0.06);
 }
 .match-card.is-today:not(.is-live) {
-  border-color: rgba(247, 207, 101, 0.2);
+  border-color: rgba(255, 209, 101, 0.2);
 }
 
 /* ─── Patina live pulse ─────────────────────────────────────────────────── */
@@ -137,7 +153,7 @@ body {
 
 /* ─── Gold gradient text ────────────────────────────────────────────────── */
 .gold-text {
-  background: linear-gradient(135deg, #f7cf65 0%, #d9b34d 100%);
+  background: linear-gradient(135deg, #ffd165 0%, #f7be1d 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -149,11 +165,16 @@ body {
 ::-webkit-scrollbar-thumb   { background: var(--glass-border); border-radius: 9999px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--hairline-gold); }
 
+/* ─── Hide scrollbar utility ────────────────────────────────────────────── */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* ─── Reduced motion ────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
   ::view-transition-new(root) { animation: none; }
-  .tab-panel  { animation: none; }
-  .live-dot   { animation: none; }
-  .match-card { transition: none; }
+  .tab-panel   { animation: none; }
+  .live-dot    { animation: none; }
+  .match-card  { transition: none; }
+  .soft-haptic:active { transform: none; }
 }

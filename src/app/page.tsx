@@ -3,6 +3,10 @@ import { Suspense } from 'react'
 export const dynamic = 'force-dynamic'
 import { getESPNMatches, getESPNStandings, getESPNTeams } from '@/lib/espn-api'
 import AppShell from '@/components/AppShell'
+import VariantA from '@/components/variants/VariantA'
+import VariantB from '@/components/variants/VariantB'
+import VariantC from '@/components/variants/VariantC'
+import PrototypeSwitcher from '@/components/PrototypeSwitcher'
 
 function AppSkeleton() {
   return (
@@ -24,7 +28,7 @@ function AppSkeleton() {
   )
 }
 
-async function AppData() {
+async function AppData({ variant }: { variant: string }) {
   const [matchesResult, standingsResult, teamsResult] = await Promise.allSettled([
     getESPNMatches(),
     getESPNStandings(),
@@ -43,6 +47,12 @@ async function AppData() {
     return m.utcDate < earliest ? m.utcDate : earliest
   }, matches[0]?.utcDate ?? '')
 
+  const sharedProps = { matches, standings, teams, liveCount, firstMatchDate }
+
+  if (variant === 'A') return <><VariantA {...sharedProps} /><Suspense><PrototypeSwitcher current="A" /></Suspense></>
+  if (variant === 'B') return <><VariantB {...sharedProps} /><Suspense><PrototypeSwitcher current="B" /></Suspense></>
+  if (variant === 'C') return <><VariantC {...sharedProps} /><Suspense><PrototypeSwitcher current="C" /></Suspense></>
+
   return (
     <AppShell
       matches={matches}
@@ -54,10 +64,17 @@ async function AppData() {
   )
 }
 
-export default function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const { variant = '' } = await searchParams
+  const v = Array.isArray(variant) ? variant[0] : variant
+
   return (
     <Suspense fallback={<AppSkeleton />}>
-      <AppData />
+      <AppData variant={v} />
     </Suspense>
   )
 }

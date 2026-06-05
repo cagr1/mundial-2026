@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import { Icon } from '@iconify/react'
 import { Match } from '@/types/football'
@@ -33,6 +34,25 @@ const LIVE = new Set(['LIVE', 'IN_PLAY', 'PAUSED'])
 const NODE_W = 152
 const NODE_H = 68
 
+function TeamCrest({ crest, tla }: { crest: string; tla: string }) {
+  const [imgError, setImgError] = useState(false)
+  if (!crest || imgError) {
+    return (
+      <div
+        className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center"
+        style={{ background: 'var(--graphite-2)', border: '1px solid var(--hairline)' }}
+      >
+        <Icon icon="material-symbols:shield-outline" width={11} height={11} style={{ color: 'var(--text-disabled)' }} />
+      </div>
+    )
+  }
+  return (
+    <div className="relative flex-shrink-0" style={{ width: 20, height: 20 }}>
+      <Image src={crest} alt={tla} fill unoptimized className="object-contain" sizes="20px" onError={() => setImgError(true)} />
+    </div>
+  )
+}
+
 function TeamRow({ crest, name, tla, score, winner }: {
   crest: string
   name: string
@@ -40,7 +60,10 @@ function TeamRow({ crest, name, tla, score, winner }: {
   score: number | null
   winner: boolean | null
 }) {
-  const isTbd = !name || name.toLowerCase().includes('tbd') || name.toLowerCase().includes('winner') || name.toLowerCase().includes('ganador')
+  // Detect placeholder teams: no name, short group codes like "1A","2B", or qualifier patterns
+  const isTbd = !name ||
+    /^(\d+[a-z]|[a-z]\d+|rd\d*|qf|sf|tbd)/i.test(name.trim()) ||
+    /winner|ganador|semifin|quarter|runner|loser/i.test(name)
 
   return (
     <div
@@ -50,35 +73,17 @@ function TeamRow({ crest, name, tla, score, winner }: {
         background: winner === true ? 'oklch(84% 0.19 80.46 / 0.08)' : 'transparent',
       }}
     >
-      {isTbd ? (
-        <div
-          className="w-5 h-5 flex-shrink-0 rounded flex items-center justify-center"
-          style={{ background: 'var(--graphite)', border: '1px solid var(--hairline)' }}
-        >
-          <span style={{ fontSize: 7, color: 'var(--text-faint)' }}>?</span>
-        </div>
-      ) : crest ? (
-        <div className="relative flex-shrink-0" style={{ width: 20, height: 20 }}>
-          <Image src={crest} alt={tla} fill unoptimized className="object-contain" sizes="20px" />
-        </div>
-      ) : (
-        <div
-          className="w-5 h-5 flex-shrink-0 flex items-center justify-center rounded"
-          style={{ background: 'var(--graphite)' }}
-        >
-          <span style={{ fontSize: 6, color: 'var(--text-faint)' }}>{tla}</span>
-        </div>
-      )}
+      <TeamCrest crest={isTbd ? '' : crest} tla={tla} />
       <span
         className="flex-1 min-w-0 truncate text-xs font-semibold leading-none"
         style={{ color: isTbd ? 'var(--text-disabled)' : winner === true ? 'var(--kinpaku)' : 'var(--text-warm)' }}
       >
         {isTbd ? 'Por definir' : (name || tla)}
       </span>
-      {score !== null && (
+      {score !== null && !isTbd && (
         <span
           className="tabnum font-bold text-sm leading-none flex-shrink-0"
-          style={{ color: winner === true ? 'var(--kinpaku)' : 'var(--text-warm)', fontFamily: 'var(--font-hanken)' }}
+          style={{ color: winner === true ? 'var(--kinpaku)' : 'var(--text-warm)' }}
         >
           {score}
         </span>
@@ -215,7 +220,7 @@ function EntryLine({ top }: { top: number }) {
 // ─── Round list (for R32 and R16) ────────────────────────────────────────────
 function RoundList({ matches, timeZone }: { matches: Match[]; timeZone: string }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {matches.map((m) => (
         <MatchNode key={m.id} match={m} timeZone={timeZone} />
       ))}
@@ -360,9 +365,54 @@ function BracketTree({
   )
 }
 
+// ─── Phase tab bar ────────────────────────────────────────────────────────────
+function PhaseTabs({
+  stages,
+  active,
+  onSelect,
+}: {
+  stages: string[]
+  active: string
+  onSelect: (s: string) => void
+}) {
+  return (
+    <div
+      className="flex items-center gap-2 overflow-x-auto hide-scrollbar mb-5"
+      style={{ paddingBottom: 2 }}
+    >
+      {stages.map((s) => {
+        const isActive = active === s
+        return (
+          <button
+            key={s}
+            onClick={() => onSelect(s)}
+            className="flex-shrink-0 soft-haptic focus-visible:outline-none"
+            style={{
+              padding: '7px 16px',
+              borderRadius: 'var(--r-lg)',
+              border: `1px solid ${isActive ? 'var(--kinpaku)' : 'var(--hairline)'}`,
+              background: isActive ? 'oklch(84% 0.19 80.46 / 0.12)' : 'var(--graphite)',
+              color: isActive ? 'var(--kinpaku)' : 'var(--text-muted)',
+              fontSize: '12px',
+              fontWeight: 700,
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase',
+              transition: 'all 150ms',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {STAGE_LABELS[s] ?? s}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function KnockoutBracket({ matches, timeZone }: { matches: Match[]; timeZone: string }) {
-  const knockout = matches.filter((m) => STAGE_ORDER[m.stage] !== undefined)
+  const knockout = matches
+    .filter((m) => STAGE_ORDER[m.stage] !== undefined)
     .sort((a, b) => STAGE_ORDER[a.stage] - STAGE_ORDER[b.stage] || a.utcDate.localeCompare(b.utcDate))
 
   const byStage = (stage: string) => knockout.filter((m) => m.stage === stage)
@@ -375,13 +425,13 @@ export default function KnockoutBracket({ matches, timeZone }: { matches: Match[
   const finalMatch = byStage('FINAL')
 
   const hasData = knockout.length > 0
+  const activeStages = KNOCKOUT_STAGES.filter((s) => byStage(s).length > 0)
 
-  // Placeholder data for the "coming soon" visual
+  const [activePhase, setActivePhase] = useState<string>(activeStages[0] ?? 'ROUND_OF_32')
+
   const placeholderQf: (Match | null)[] = [null, null, null, null]
   const placeholderSf: (Match | null)[] = [null, null]
 
-  const activeStages = KNOCKOUT_STAGES.filter((s) => byStage(s).length > 0)
-  const hasEarlyRounds = r32.length > 0 || r16.length > 0
   const hasBracketData = qf.length > 0 || sf.length > 0 || finalMatch.length > 0
 
   return (
@@ -389,9 +439,8 @@ export default function KnockoutBracket({ matches, timeZone }: { matches: Match[
       {/* ── Empty / Coming soon state ────────────────────────────────── */}
       {!hasData && (
         <div>
-          {/* Coming soon message */}
           <div
-            className="flex items-center gap-3 mb-6 px-4 py-3"
+            className="flex items-center gap-3 mb-5 px-4 py-3"
             style={{
               background: 'oklch(84% 0.19 80.46 / 0.06)',
               border: '1px solid var(--hairline-gold)',
@@ -400,7 +449,7 @@ export default function KnockoutBracket({ matches, timeZone }: { matches: Match[
           >
             <Icon icon="material-symbols:lock-clock" width={20} height={20} style={{ color: 'var(--kinpaku)', flexShrink: 0 }} />
             <div>
-              <p className="text-sm font-semibold" style={{ color: 'var(--champagne)', fontFamily: 'var(--font-hanken)' }}>
+              <p className="text-sm font-semibold" style={{ color: 'var(--champagne)' }}>
                 Bracket disponible en Fase Knockout
               </p>
               <p className="eyebrow mt-0.5" style={{ color: 'var(--text-muted)', fontSize: '0.62rem' }}>
@@ -409,8 +458,33 @@ export default function KnockoutBracket({ matches, timeZone }: { matches: Match[
             </div>
           </div>
 
+          {/* Preview phase tabs */}
+          <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar mb-4">
+            {['ROUND_OF_32', 'LAST_16', 'QUARTER_FINALS', 'SEMI_FINALS', 'FINAL'].map((s) => (
+              <div
+                key={s}
+                style={{
+                  padding: '7px 16px',
+                  borderRadius: 'var(--r-lg)',
+                  border: '1px solid var(--hairline)',
+                  background: 'var(--graphite)',
+                  color: 'var(--text-disabled)',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  letterSpacing: '0.05em',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                  opacity: 0.4,
+                  flexShrink: 0,
+                }}
+              >
+                {STAGE_LABELS[s]}
+              </div>
+            ))}
+          </div>
+
           {/* Dimmed placeholder bracket */}
-          <div className="overflow-x-auto pb-4" style={{ scrollbarWidth: 'none' }}>
+          <div className="overflow-x-auto pb-4 hide-scrollbar">
             <div style={{ minWidth: 3 * NODE_W + 2 * CONN_W + 8 }}>
               <div className="flex items-center justify-between mb-3" style={{ width: 3 * NODE_W + 2 * CONN_W }}>
                 {['Cuartos', 'Semis', 'Final'].map((label) => (
@@ -419,13 +493,7 @@ export default function KnockoutBracket({ matches, timeZone }: { matches: Match[
                   </span>
                 ))}
               </div>
-              <BracketTree
-                qf={placeholderQf}
-                sf={placeholderSf}
-                final={null}
-                timeZone={timeZone}
-                dim={true}
-              />
+              <BracketTree qf={placeholderQf} sf={placeholderSf} final={null} timeZone={timeZone} dim={true} />
             </div>
           </div>
         </div>
@@ -434,57 +502,19 @@ export default function KnockoutBracket({ matches, timeZone }: { matches: Match[
       {/* ── Active bracket ───────────────────────────────────────────── */}
       {hasData && (
         <div>
-          {/* Available stages pills */}
-          {activeStages.length > 0 && (
-            <div className="flex items-center gap-1.5 flex-wrap mb-4">
-              {activeStages.map((s) => (
-                <span
-                  key={s}
-                  className="eyebrow px-2.5 py-1"
-                  style={{
-                    color: 'var(--kinpaku)',
-                    background: 'oklch(84% 0.19 80.46 / 0.08)',
-                    border: '1px solid var(--hairline-gold)',
-                    borderRadius: 'var(--r-sm)',
-                    fontSize: '0.6rem',
-                    letterSpacing: '0.1em',
-                  }}
-                >
-                  {STAGE_LABELS[s] ?? s}
-                </span>
-              ))}
-            </div>
-          )}
+          {/* Phase tabs */}
+          <PhaseTabs stages={activeStages} active={activePhase} onSelect={setActivePhase} />
 
-          {/* R32 list */}
-          {r32.length > 0 && (
-            <section className="mb-6">
-              <h3 className="eyebrow mb-3" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>
-                Octavos de Final · {r32.length} partidos
-              </h3>
+          {/* Content for selected phase */}
+          <div className="tab-panel">
+            {(activePhase === 'ROUND_OF_32') && r32.length > 0 && (
               <RoundList matches={r32} timeZone={timeZone} />
-            </section>
-          )}
-
-          {/* R16 list */}
-          {r16.length > 0 && (
-            <section className="mb-6">
-              <h3 className="eyebrow mb-3" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>
-                Dieciséis · {r16.length} partidos
-              </h3>
+            )}
+            {(activePhase === 'LAST_16') && r16.length > 0 && (
               <RoundList matches={r16} timeZone={timeZone} />
-            </section>
-          )}
-
-          {/* Visual bracket: QF → SF → Final */}
-          {hasBracketData && (
-            <section className="mb-6">
-              {hasEarlyRounds && (
-                <h3 className="eyebrow mb-3" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>
-                  Cuartos de Final en adelante
-                </h3>
-              )}
-              <div className="overflow-x-auto pb-4" style={{ scrollbarWidth: 'none' }}>
+            )}
+            {(activePhase === 'QUARTER_FINALS' || activePhase === 'SEMI_FINALS' || activePhase === 'FINAL') && hasBracketData && (
+              <div className="overflow-x-auto pb-4 hide-scrollbar">
                 <div style={{ minWidth: 3 * NODE_W + 2 * CONN_W + 8 }}>
                   <div className="flex items-center mb-3" style={{ gap: CONN_W }}>
                     {[
@@ -495,13 +525,7 @@ export default function KnockoutBracket({ matches, timeZone }: { matches: Match[
                       <span
                         key={label}
                         className="eyebrow"
-                        style={{
-                          color: 'var(--text-faint)',
-                          width: NODE_W,
-                          textAlign: 'center',
-                          letterSpacing: '0.1em',
-                          flexShrink: 0,
-                        }}
+                        style={{ color: 'var(--text-faint)', width: NODE_W, textAlign: 'center', letterSpacing: '0.1em', flexShrink: 0 }}
                       >
                         {label}
                       </span>
@@ -516,15 +540,18 @@ export default function KnockoutBracket({ matches, timeZone }: { matches: Match[
                   />
                 </div>
               </div>
-            </section>
-          )}
+            )}
+          </div>
 
-          {/* 3rd place */}
+          {/* 3rd place — always shown when available */}
           {thirdPlace.length > 0 && (
-            <section className="mb-6">
-              <h3 className="eyebrow mb-3" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>
-                Tercer Puesto
-              </h3>
+            <section className="mt-6">
+              <div className="flex items-center gap-2 mb-3">
+                <div style={{ width: 3, height: 16, background: 'var(--kinpaku)', borderRadius: 2, flexShrink: 0 }} aria-hidden="true" />
+                <span className="eyebrow" style={{ color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
+                  Tercer Puesto
+                </span>
+              </div>
               <div style={{ maxWidth: NODE_W * 2 + 16 }}>
                 <MatchNode match={thirdPlace[0]} timeZone={timeZone} />
               </div>
