@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useSyncExternalStore } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Icon } from '@iconify/react'
+import { useTranslations } from 'next-intl'
 import MatchList from './MatchList'
 import GroupStandings from './GroupStandings'
 import GroupDrawer from './GroupDrawer'
@@ -25,33 +26,6 @@ interface BeforeInstallPromptEvent extends Event {
 
 type Tab = 'partidos' | 'grupos' | 'equipos' | 'bracket'
 
-const TABS: { id: Tab; label: string; icon: string; iconActive: string }[] = [
-  {
-    id: 'partidos',
-    label: 'Partidos',
-    icon: 'material-symbols:calendar-month-outline',
-    iconActive: 'material-symbols:calendar-month',
-  },
-  {
-    id: 'grupos',
-    label: 'Grupos',
-    icon: 'material-symbols:grid-view-outline',
-    iconActive: 'material-symbols:grid-view',
-  },
-  {
-    id: 'equipos',
-    label: 'Equipos',
-    icon: 'material-symbols:shield-outline',
-    iconActive: 'material-symbols:shield',
-  },
-  {
-    id: 'bracket',
-    label: 'Bracket',
-    icon: 'material-symbols:account-tree-outline',
-    iconActive: 'material-symbols:account-tree',
-  },
-]
-
 interface Props {
   matches: Match[]
   standings: Standing[]
@@ -60,29 +34,32 @@ interface Props {
   firstMatchDate: string
 }
 
-const STAGE_PHASE_LABELS: Record<string, string> = {
-  GROUP_STAGE: 'FASE DE GRUPOS',
-  LAST_16: 'OCTAVOS DE FINAL',
-  QUARTER_FINALS: 'CUARTOS DE FINAL',
-  SEMI_FINALS: 'SEMIFINALES',
-  THIRD_PLACE: 'TERCER PUESTO',
-  FINAL: 'GRAN FINAL',
-}
+export default function AppShell({ matches, standings, teams, liveCount, firstMatchDate }: Props) {
+  const t = useTranslations('nav')
+  const tStage = useTranslations('stage')
+  const tMatch = useTranslations('match')
 
-export default function AppShell({
-  matches,
-  standings,
-  teams,
-  liveCount,
-  firstMatchDate,
-}: Props) {
+  const TABS: { id: Tab; label: string; icon: string; iconActive: string }[] = [
+    { id: 'partidos', label: t('partidos'), icon: 'material-symbols:calendar-month-outline', iconActive: 'material-symbols:calendar-month' },
+    { id: 'grupos',   label: t('grupos'),   icon: 'material-symbols:grid-view-outline',      iconActive: 'material-symbols:grid-view' },
+    { id: 'equipos',  label: t('equipos'),  icon: 'material-symbols:shield-outline',          iconActive: 'material-symbols:shield' },
+    { id: 'bracket',  label: t('bracket'),  icon: 'material-symbols:account-tree-outline',    iconActive: 'material-symbols:account-tree' },
+  ]
+
+  const STAGE_PHASE_LABELS: Record<string, string> = {
+    GROUP_STAGE:    tStage('GROUP_STAGE'),
+    LAST_16:        tStage('LAST_16'),
+    QUARTER_FINALS: tStage('QUARTER_FINALS'),
+    SEMI_FINALS:    tStage('SEMI_FINALS'),
+    THIRD_PLACE:    tStage('THIRD_PLACE'),
+    FINAL:          tStage('FINAL'),
+  }
+
   const [tab, setTab] = useState<Tab>('partidos')
   const { favorite, saveFavorite } = useFavoriteTeam()
 
   const handleToggleFavorite = useCallback(
-    (team: Team) => {
-      saveFavorite(favorite?.id === team.id ? null : team)
-    },
+    (team: Team) => saveFavorite(favorite?.id === team.id ? null : team),
     [favorite, saveFavorite],
   )
 
@@ -94,6 +71,7 @@ export default function AppShell({
     const qs = params.toString()
     window.history.replaceState(null, '', qs ? `/?${qs}` : '/')
   }, [])
+
   const [timeZone, setTimeZone] = useState('UTC')
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedGroup, setSelectedGroup] = useState<Standing | null>(null)
@@ -102,7 +80,6 @@ export default function AppShell({
   const [showIntro, setShowIntro] = useState(true)
   const router = useRouter()
 
-  // Detect iOS Safari on client — server snapshot returns false, no hydration mismatch
   const isIOSSafari = useSyncExternalStore(
     () => () => {},
     () => {
@@ -117,17 +94,13 @@ export default function AppShell({
     () => false,
   )
 
-  // showInstall: derived — no setState in effect body
-  const showInstall =
-    !installAccepted &&
-    (deferredInstall !== null || isIOSSafari)
+  const showInstall = !installAccepted && (deferredInstall !== null || isIOSSafari)
 
-  // Restore tab from URL on mount (e.g., after pressing back from a player page)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    const t = params.get('tab')
-    if (t === 'grupos' || t === 'equipos' || t === 'bracket') {
-      window.setTimeout(() => setTab(t as Tab), 0)
+    const tabParam = params.get('tab')
+    if (tabParam === 'grupos' || tabParam === 'equipos' || tabParam === 'bracket') {
+      window.setTimeout(() => setTab(tabParam as Tab), 0)
     }
   }, [])
 
@@ -147,11 +120,7 @@ export default function AppShell({
       window.matchMedia('(display-mode: standalone)').matches ||
       (navigator as { standalone?: boolean }).standalone === true
     if (alreadyInstalled) return
-
-    const handler = (e: Event) => {
-      e.preventDefault()
-      setDeferredInstall(e as BeforeInstallPromptEvent)
-    }
+    const handler = (e: Event) => { e.preventDefault(); setDeferredInstall(e as BeforeInstallPromptEvent) }
     window.addEventListener('beforeinstallprompt', handler)
     return () => window.removeEventListener('beforeinstallprompt', handler)
   }, [])
@@ -167,18 +136,16 @@ export default function AppShell({
     }
   }, [deferredInstall, router])
 
-  // Unique match dates sorted chronologically (depends on timeZone for tz-correct bucketing)
   const matchDates = Array.from(
     new Set(matches.map((m) => formatDateKey(m.utcDate, timeZone))),
   ).sort()
 
-  // Phase label from the dominant stage in the upcoming matches
   const phaseLabel = (() => {
     const upcoming = matches.find(
       (m) => m.status === 'TIMED' || m.status === 'SCHEDULED' || m.status === 'LIVE' || m.status === 'IN_PLAY',
     )
     const stage = upcoming?.stage ?? matches[0]?.stage ?? 'GROUP_STAGE'
-    return STAGE_PHASE_LABELS[stage] ?? 'FASE DE GRUPOS'
+    return STAGE_PHASE_LABELS[stage] ?? tStage('GROUP_STAGE')
   })()
 
   const filteredMatches =
@@ -191,118 +158,55 @@ export default function AppShell({
       {showIntro && (
         <div className="launch-intro" aria-hidden="true">
           <div className="launch-intro-card">
-            <Image
-              src="/app-logo.png"
-              alt=""
-              width={150}
-              height={150}
-              priority
-              className="launch-logo"
-            />
+            <Image src="/app-logo.png" alt="" width={150} height={150} priority className="launch-logo" />
           </div>
         </div>
       )}
 
-      {/* ── Fixed top header ────────────────────────────────────────────── */}
       <header
         className="ios-blur fixed top-0 left-0 right-0 z-40"
-        style={{
-          background: 'rgba(5, 20, 36, 0.88)',
-          borderBottom: '1px solid var(--glass-border)',
-          paddingTop: 'env(safe-area-inset-top)',
-        }}
+        style={{ background: 'rgba(5, 20, 36, 0.88)', borderBottom: '1px solid var(--glass-border)', paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="max-w-[500px] mx-auto px-4">
           <div className="flex items-center justify-between h-14 gap-3">
-
-            {/* Brand */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              <Image
-                src="/app-logo.png"
-                alt="WC 26"
-                width={38}
-                height={38}
-                priority
-                className="app-header-logo"
-              />
-              <span
-                className="font-extrabold tracking-tight uppercase leading-none"
-                style={{ color: 'var(--kinpaku)', fontSize: '0.95rem', letterSpacing: '0.06em' }}
-              >
+              <Image src="/app-logo.png" alt="WC 26" width={38} height={38} priority className="app-header-logo" />
+              <span className="font-extrabold tracking-tight uppercase leading-none"
+                style={{ color: 'var(--kinpaku)', fontSize: '0.95rem', letterSpacing: '0.06em' }}>
                 WC 26
               </span>
               {liveCount > 0 && (
-                <div
-                  className="flex items-center gap-1.5 px-2 py-0.5 eyebrow"
-                  style={{
-                    color: 'var(--patina)',
-                    border: '1px solid oklch(70% 0.12 188 / 0.35)',
-                    background: 'oklch(70% 0.12 188 / 0.08)',
-                    borderRadius: 'var(--r-sm)',
-                  }}
-                >
-                  <span
-                    className="live-dot w-1.5 h-1.5 rounded-full block"
-                    style={{ background: 'var(--patina)' }}
-                    aria-hidden="true"
-                  />
+                <div className="flex items-center gap-1.5 px-2 py-0.5 eyebrow"
+                  style={{ color: 'var(--patina)', border: '1px solid oklch(70% 0.12 188 / 0.35)', background: 'oklch(70% 0.12 188 / 0.08)', borderRadius: 'var(--r-sm)' }}>
+                  <span className="live-dot w-1.5 h-1.5 rounded-full block" style={{ background: 'var(--patina)' }} aria-hidden="true" />
                   {liveCount} live
                 </div>
               )}
             </div>
-
-            {/* Right controls */}
             <div className="flex items-center gap-2">
               {showInstall && (
-                <button
-                  onClick={handleInstallClick}
-                  aria-label="Instalar app"
-                  title="Instalar app"
+                <button onClick={handleInstallClick} aria-label={t('ariaInstall')} title={t('ariaInstall')}
                   className="flex items-center justify-center soft-haptic focus-visible:outline-none"
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'var(--kinpaku)',
-                    padding: 4,
-                  }}
-                >
+                  style={{ background: 'transparent', border: 'none', color: 'var(--kinpaku)', padding: 4 }}>
                   <Icon icon="material-symbols:download-for-offline" width={24} height={24} />
                 </button>
               )}
               <CalendarButton />
             </div>
           </div>
-
         </div>
       </header>
 
-      {/* ── Spacer under fixed header ───────────────────────────────────── */}
       <div className="flex-shrink-0" style={{ height: 'calc(56px + env(safe-area-inset-top, 0px))' }} />
 
-      {/* ── Main content ────────────────────────────────────────────────── */}
       <main className="flex-1 max-w-[500px] mx-auto w-full px-4 py-6 pb-32">
         {tab === 'partidos' ? (
           <div key="partidos" className="tab-panel">
-            {liveCount === 0 && (
-              <div className="mb-5">
-                <Countdown targetDate={firstMatchDate} />
-              </div>
-            )}
+            {liveCount === 0 && <div className="mb-5"><Countdown targetDate={firstMatchDate} /></div>}
             {favorite && (
-              <FavoriteTeamCard
-                team={favorite}
-                matches={matches}
-                timeZone={timeZone}
-                onRemove={() => saveFavorite(null)}
-              />
+              <FavoriteTeamCard team={favorite} matches={matches} timeZone={timeZone} onRemove={() => saveFavorite(null)} />
             )}
-            <DateCarousel
-              dates={matchDates}
-              selected={selectedDate}
-              onSelect={setSelectedDate}
-              timeZone={timeZone}
-              phaseLabel={phaseLabel}
-            />
+            <DateCarousel dates={matchDates} selected={selectedDate} onSelect={setSelectedDate} timeZone={timeZone} phaseLabel={phaseLabel} />
             <MatchList matches={filteredMatches} timeZone={timeZone} />
             <StatsBento />
           </div>
@@ -310,11 +214,8 @@ export default function AppShell({
           <div key="grupos" className="tab-panel">
             {standings.length > 0 ? (
               <>
-                <p
-                  className="eyebrow mb-5"
-                  style={{ color: 'var(--text-faint)' }}
-                >
-                  Los 2 primeros de cada grupo avanzan a la siguiente fase
+                <p className="eyebrow mb-5" style={{ color: 'var(--text-faint)' }}>
+                  {tMatch('groupsAdvance')}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                   {standings.map((s) => (
@@ -324,24 +225,15 @@ export default function AppShell({
               </>
             ) : (
               <div className="py-12 text-center">
-                <p
-                  className="eyebrow"
-                  style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}
-                >
-                  Grupos no disponibles en este momento
+                <p className="eyebrow" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>
+                  {tMatch('groupsUnavailable')}
                 </p>
               </div>
             )}
           </div>
         ) : tab === 'equipos' ? (
           <div key="equipos" className="tab-panel">
-            <TeamsGrid
-              teams={teams}
-              favoriteId={favorite?.id ?? null}
-              onToggleFavorite={handleToggleFavorite}
-              allMatches={matches}
-              timeZone={timeZone}
-            />
+            <TeamsGrid teams={teams} favoriteId={favorite?.id ?? null} onToggleFavorite={handleToggleFavorite} allMatches={matches} timeZone={timeZone} />
           </div>
         ) : (
           <div key="bracket" className="tab-panel">
@@ -350,85 +242,40 @@ export default function AppShell({
         )}
 
         <div className="mt-10 text-center">
-          <a
-            href="https://carlosgallardo.dev"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="eyebrow"
-            style={{ color: 'var(--text-disabled)', textDecoration: 'none', letterSpacing: '0.08em' }}
-          >
+          <a href="https://carlosgallardo.dev" target="_blank" rel="noopener noreferrer" className="eyebrow"
+            style={{ color: 'var(--text-disabled)', textDecoration: 'none', letterSpacing: '0.08em' }}>
             by Carlos Gallardo
           </a>
         </div>
       </main>
 
-      {/* ── Group drawer ────────────────────────────────────────────────── */}
       {selectedGroup && (
-        <GroupDrawer
-          key={selectedGroup.group}
-          standing={selectedGroup}
-          matches={matches}
-          timeZone={timeZone}
-          onClose={() => setSelectedGroup(null)}
-        />
+        <GroupDrawer key={selectedGroup.group} standing={selectedGroup} matches={matches} timeZone={timeZone} onClose={() => setSelectedGroup(null)} />
       )}
 
-      {/* ── Bottom nav ─────────────────────────────────────────────────── */}
       <nav
         className="ios-blur fixed bottom-0 left-0 right-0 z-40 flex"
-        style={{
-          background: 'rgba(5, 20, 36, 0.88)',
-          borderTop: '1px solid var(--glass-border)',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-        }}
+        style={{ background: 'rgba(5, 20, 36, 0.88)', borderTop: '1px solid var(--glass-border)', paddingBottom: 'env(safe-area-inset-bottom)' }}
         role="tablist"
-        aria-label="Navegación principal"
+        aria-label={t('ariaMain')}
       >
-        {TABS.map((t) => {
-          const isActive = tab === t.id
+        {TABS.map((tabItem) => {
+          const isActive = tab === tabItem.id
           return (
             <button
-              key={t.id}
+              key={tabItem.id}
               role="tab"
-              onClick={() => handleTabChange(t.id)}
+              onClick={() => handleTabChange(tabItem.id)}
               aria-selected={isActive}
-              aria-label={t.label}
+              aria-label={tabItem.label}
               className="flex-1 flex flex-col items-center justify-center soft-haptic focus-visible:outline-none"
-              style={{
-                color: isActive ? 'var(--kinpaku)' : 'var(--text-disabled)',
-                paddingTop: 10,
-                paddingBottom: 8,
-                gap: 3,
-                transition: 'color 150ms',
-              }}
+              style={{ color: isActive ? 'var(--kinpaku)' : 'var(--text-disabled)', paddingTop: 10, paddingBottom: 8, gap: 3, transition: 'color 150ms' }}
             >
-              <Icon
-                icon={isActive ? t.iconActive : t.icon}
-                width={26}
-                height={26}
-              />
-              <span
-                style={{
-                  fontSize: '10px',
-                  letterSpacing: '0.04em',
-                  fontWeight: isActive ? 700 : 400,
-                  color: 'inherit',
-                  lineHeight: 1,
-                }}
-              >
-                {t.label}
+              <Icon icon={isActive ? tabItem.iconActive : tabItem.icon} width={26} height={26} />
+              <span style={{ fontSize: '10px', letterSpacing: '0.04em', fontWeight: isActive ? 700 : 400, color: 'inherit', lineHeight: 1 }}>
+                {tabItem.label}
               </span>
-              {/* iOS dot indicator below active label */}
-              <div
-                aria-hidden="true"
-                style={{
-                  width: 4,
-                  height: 4,
-                  borderRadius: '50%',
-                  background: isActive ? 'var(--kinpaku)' : 'transparent',
-                  transition: 'background 150ms',
-                }}
-              />
+              <div aria-hidden="true" style={{ width: 4, height: 4, borderRadius: '50%', background: isActive ? 'var(--kinpaku)' : 'transparent', transition: 'background 150ms' }} />
             </button>
           )
         })}

@@ -1,0 +1,169 @@
+'use client'
+
+import { useState, useEffect, useSyncExternalStore } from 'react'
+import Link from 'next/link'
+import { Icon } from '@iconify/react'
+import { useTranslations } from 'next-intl'
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
+}
+
+function isAlreadyInstalled(): boolean {
+  if (window.matchMedia('(display-mode: standalone)').matches) return true
+  if ((navigator as { standalone?: boolean }).standalone) return true
+  return false
+}
+
+function Step({ n, children }: { n: number; children: React.ReactNode }) {
+  return (
+    <div className="flex gap-3 items-start">
+      <span
+        className="eyebrow flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full"
+        style={{ background: 'var(--kinpaku)', color: 'var(--lacquer-deep)', fontSize: '0.65rem' }}
+      >
+        {n}
+      </span>
+      <p style={{ color: 'var(--text-warm)', fontSize: '0.9rem', lineHeight: 1.6 }}>{children}</p>
+    </div>
+  )
+}
+
+function PlatformCard({ icon, title, steps, action }: {
+  icon: string; title: string; steps: React.ReactNode[]; action?: React.ReactNode
+}) {
+  return (
+    <div className="glass-card rounded-lg p-5 flex flex-col gap-4" style={{ borderRadius: 'var(--r-lg)' }}>
+      <div className="flex items-center gap-2.5">
+        <Icon icon={icon} width={22} height={22} style={{ color: 'var(--kinpaku)' }} />
+        <h2 style={{ fontFamily: 'var(--font-inter)', fontWeight: 700, fontSize: '0.95rem', color: 'var(--champagne)' }}>
+          {title}
+        </h2>
+      </div>
+      <div className="flex flex-col gap-3">
+        {steps.map((step, i) => <Step key={i} n={i + 1}>{step}</Step>)}
+      </div>
+      {action && <div className="pt-1">{action}</div>}
+    </div>
+  )
+}
+
+const noop = () => () => {}
+
+export default function InstalarPage() {
+  const t = useTranslations('install')
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
+  const [manualInstalled, setManualInstalled] = useState(false)
+  const [installing, setInstalling] = useState(false)
+
+  const alreadyInstalled = useSyncExternalStore(noop, isAlreadyInstalled, () => false)
+  const installed = alreadyInstalled || manualInstalled
+
+  useEffect(() => {
+    if (alreadyInstalled) return
+    const handler = (e: Event) => { e.preventDefault(); setDeferredPrompt(e as BeforeInstallPromptEvent) }
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [alreadyInstalled])
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) return
+    setInstalling(true)
+    await deferredPrompt.prompt()
+    const { outcome } = await deferredPrompt.userChoice
+    if (outcome === 'accepted') setManualInstalled(true)
+    setInstalling(false)
+    setDeferredPrompt(null)
+  }
+
+  return (
+    <div className="min-h-dvh flex flex-col" style={{ background: 'var(--lacquer-deep)' }}>
+      <header
+        className="sticky top-0 z-40"
+        style={{
+          background: 'rgba(11, 11, 10, 0.97)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderBottom: '1px solid var(--glass-border)',
+          paddingTop: 'env(safe-area-inset-top)',
+        }}
+      >
+        <div className="flex items-center gap-3 px-4 py-3">
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 eyebrow transition-colors"
+            style={{ color: 'var(--text-muted)' }}
+            aria-label={t('backAria')}
+          >
+            <Icon icon="material-symbols:arrow-back" width={18} height={18} />
+            {t('back')}
+          </Link>
+        </div>
+      </header>
+
+      <main className="flex-1 max-w-lg mx-auto w-full px-4 py-8 flex flex-col gap-6">
+        <div className="flex flex-col gap-1.5">
+          <p className="eyebrow" style={{ color: 'var(--kinpaku)' }}>{t('eyebrow')}</p>
+          <h1 style={{ fontFamily: 'var(--font-inter)', fontWeight: 800, fontSize: '1.6rem', lineHeight: 1.15, color: 'var(--champagne)' }}>
+            {t('title')}
+          </h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.6 }}>{t('description')}</p>
+        </div>
+
+        {installed && (
+          <div
+            className="flex items-center gap-3 p-4 rounded-lg"
+            style={{ background: 'oklch(70% 0.12 188 / 0.12)', border: '1px solid oklch(70% 0.12 188 / 0.35)', borderRadius: 'var(--r-lg)' }}
+          >
+            <Icon icon="material-symbols:check-circle" width={20} height={20} style={{ color: 'var(--patina)', flexShrink: 0 }} />
+            <p style={{ color: 'var(--patina)', fontSize: '0.9rem' }}>{t('alreadyInstalled')}</p>
+          </div>
+        )}
+
+        {deferredPrompt && (
+          <PlatformCard
+            icon="material-symbols:android"
+            title={t('androidTitle')}
+            steps={[t('androidStep1'), t('androidStep2')]}
+            action={
+              <button
+                onClick={handleInstall}
+                disabled={installing}
+                className="w-full py-2.5 eyebrow font-bold transition-opacity"
+                style={{
+                  background: 'var(--kinpaku)', color: 'var(--lacquer-deep)',
+                  borderRadius: 'var(--r-md)', border: 'none',
+                  opacity: installing ? 0.6 : 1, cursor: installing ? 'wait' : 'pointer',
+                }}
+              >
+                {installing ? t('installing') : t('addToHome')}
+              </button>
+            }
+          />
+        )}
+
+        <PlatformCard
+          icon="material-symbols:phone-iphone"
+          title={t('iosTitle')}
+          steps={[
+            <>{t('iosStep1')}</>,
+            <>{t('iosStep2')} <Icon icon="material-symbols:ios-share" width={14} height={14} style={{ display: 'inline', verticalAlign: 'middle' }} /></>,
+            <>{t('iosStep3')}</>,
+            <>{t('iosStep4')}</>,
+          ]}
+        />
+
+        <PlatformCard
+          icon="material-symbols:computer"
+          title={t('desktopTitle')}
+          steps={[
+            <>{t('desktopStep1')} <Icon icon="material-symbols:install-desktop" width={14} height={14} style={{ display: 'inline', verticalAlign: 'middle' }} /></>,
+            <>{t('desktopStep2')}</>,
+            t('desktopStep3'),
+          ]}
+        />
+      </main>
+    </div>
+  )
+}

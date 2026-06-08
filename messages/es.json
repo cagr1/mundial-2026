@@ -1,0 +1,121 @@
+{
+  "nav": {
+    "partidos": "Partidos",
+    "grupos": "Grupos",
+    "equipos": "Equipos",
+    "bracket": "Llaves",
+    "ariaMain": "Navegación principal",
+    "ariaInstall": "Instalar app"
+  },
+  "stage": {
+    "GROUP_STAGE": "FASE DE GRUPOS",
+    "LAST_16": "OCTAVOS DE FINAL",
+    "QUARTER_FINALS": "CUARTOS DE FINAL",
+    "SEMI_FINALS": "SEMIFINALES",
+    "THIRD_PLACE": "TERCER PUESTO",
+    "FINAL": "GRAN FINAL"
+  },
+  "match": {
+    "live": "LIVE",
+    "ht": "HT",
+    "final": "Final",
+    "upcoming": "PRÓXIMO",
+    "ft": "FT",
+    "groupsAdvance": "Los 2 primeros de cada grupo avanzan a la siguiente fase",
+    "groupsUnavailable": "Grupos no disponibles en este momento",
+    "localTime": "local"
+  },
+  "bracket": {
+    "ROUND_OF_32": "Octavos",
+    "LAST_16": "Dieciséis",
+    "QUARTER_FINALS": "Cuartos",
+    "SEMI_FINALS": "Semis",
+    "THIRD_PLACE": "3er Puesto",
+    "FINAL": "Final",
+    "tbd": "Por definir",
+    "champion": "CAMPEÓN",
+    "available": "Llaves disponibles en Fase Knockout",
+    "availableSince": "Disponible desde ~Julio 2026 · Actualización automática",
+    "thirdPlace": "Tercer Puesto",
+    "colQF": "Cuartos",
+    "colSF": "Semis",
+    "colFinal": "Final"
+  },
+  "team": {
+    "Goalkeeper": "Porteros",
+    "Defence": "Defensas",
+    "Midfield": "Mediocampistas",
+    "Offence": "Delanteros",
+    "tabMatches": "Partidos",
+    "tabSquad": "Equipo",
+    "noMatches": "No hay partidos disponibles",
+    "squadUnavailable": "Plantel no disponible",
+    "squadUnavailableDesc": "No pudimos cargar jugadores para esta selección en este momento.",
+    "playerTip": "toca cada jugador para ver detalles",
+    "close": "Cerrar",
+    "all": "Todos",
+    "years": "años",
+    "liveNow": "EN VIVO",
+    "dt": "DT",
+    "tap": "toca"
+  },
+  "groups": {
+    "qualificationRound": "QUALIFICATION ROUND",
+    "team": "EQUIPO",
+    "standings": "TABLA DE POSICIONES",
+    "fixtures": "PARTIDOS DEL GRUPO",
+    "ariaDetails": "Ver detalles {group}"
+  },
+  "countdown": {
+    "days": "días",
+    "hours": "horas",
+    "minutes": "min",
+    "seconds": "seg",
+    "firstMatch": "Primer partido"
+  },
+  "favorite": {
+    "title": "Mi Equipo",
+    "remove": "Quitar",
+    "removeAria": "Quitar equipo favorito",
+    "live": "En juego",
+    "next": "Próximo partido",
+    "last": "Último resultado",
+    "noMatches": "Sin partidos disponibles aún"
+  },
+  "install": {
+    "back": "Volver",
+    "backAria": "Volver a inicio",
+    "eyebrow": "Mundial 2026",
+    "title": "Instala la app",
+    "description": "Accede a partidos, grupos y horarios directamente desde tu pantalla de inicio.",
+    "alreadyInstalled": "La app ya está instalada en tu dispositivo.",
+    "installing": "Instalando…",
+    "addToHome": "Añadir a pantalla de inicio",
+    "androidTitle": "Android · Chrome",
+    "androidStep1": "Tu navegador ha detectado que esta app es instalable.",
+    "androidStep2": "Toca el botón de abajo para añadirla a tu pantalla de inicio.",
+    "iosTitle": "iPhone · iPad (Safari)",
+    "iosStep1": "Abre esta página en Safari (no Chrome ni Firefox).",
+    "iosStep2": "Toca el botón Compartir en la barra inferior.",
+    "iosStep3": "Desliza hacia abajo y elige \"Añadir a pantalla de inicio\".",
+    "iosStep4": "Toca Añadir para confirmar.",
+    "desktopTitle": "Computadora · Chrome / Edge",
+    "desktopStep1": "Busca el ícono de instalar en la barra de direcciones (extremo derecho).",
+    "desktopStep2": "Haz clic y confirma con Instalar.",
+    "desktopStep3": "La app se abrirá en su propia ventana sin la barra del navegador."
+  },
+  "carousel": {
+    "today": "Hoy"
+  },
+  "stats": {
+    "stadiums": "ESTADIOS",
+    "teams": "EQUIPOS"
+  },
+  "player": {
+    "notFound": "Jugador no encontrado",
+    "Goalkeeper": "Portero",
+    "Defence": "Defensa",
+    "Midfield": "Mediocampista",
+    "Offence": "Delantero"
+  }
+}

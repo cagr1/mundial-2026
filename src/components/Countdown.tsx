@@ -1,18 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 
-interface Props {
-  targetDate: string // ISO UTC
-}
+interface Props { targetDate: string }
 
-interface TimeLeft {
-  days: number
-  hours: number
-  minutes: number
-  seconds: number
-  started: boolean
-}
+interface TimeLeft { days: number; hours: number; minutes: number; seconds: number; started: boolean }
 
 function calcTimeLeft(target: string): TimeLeft {
   const diff = new Date(target).getTime() - Date.now()
@@ -29,11 +22,9 @@ function calcTimeLeft(target: string): TimeLeft {
 function Unit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center gap-1">
-      <div
-        className="tabnum text-3xl sm:text-4xl font-bold leading-none"
-        style={{ color: 'var(--kinpaku)', fontFamily: 'var(--font-albert)', minWidth: '2ch', textAlign: 'center' }}
-        suppressHydrationWarning
-      >
+      <div className="tabnum text-3xl sm:text-4xl font-bold leading-none"
+        style={{ color: 'var(--kinpaku)', minWidth: '2ch', textAlign: 'center' }}
+        suppressHydrationWarning>
         {String(value).padStart(2, '0')}
       </div>
       <span className="eyebrow" style={{ fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
@@ -44,6 +35,7 @@ function Unit({ value, label }: { value: number; label: string }) {
 }
 
 export default function Countdown({ targetDate }: Props) {
+  const t = useTranslations('countdown')
   const [time, setTime] = useState<TimeLeft>(() => calcTimeLeft(targetDate))
 
   useEffect(() => {
@@ -55,45 +47,22 @@ export default function Countdown({ targetDate }: Props) {
   if (time.started) return null
 
   return (
-    <div
-      className="mx-4 sm:mx-6 mb-6 flex items-center gap-4 sm:gap-6 px-5 py-4 overflow-hidden"
-      style={{
-        background: 'var(--raised-lacquer)',
-        border: '1px solid var(--hairline-gold)',
-        borderRadius: 'var(--r-lg)',
-        maxWidth: '100%',
-      }}
-    >
-      {/* Left label */}
+    <div className="mx-4 sm:mx-6 mb-6 flex items-center gap-4 sm:gap-6 px-5 py-4 overflow-hidden"
+      style={{ background: 'var(--raised-lacquer)', border: '1px solid var(--hairline-gold)', borderRadius: 'var(--r-lg)', maxWidth: '100%' }}>
       <div className="flex-shrink-0 hidden sm:block">
-        <p className="eyebrow" style={{ color: 'var(--kinpaku)', letterSpacing: '0.14em' }}>
-          Primer partido
-        </p>
-        <p className="eyebrow mt-1" style={{ color: 'var(--text-disabled)', letterSpacing: '0.08em' }}>
-          MEX vs RSA · 11 Jun
-        </p>
+        <p className="eyebrow" style={{ color: 'var(--kinpaku)', letterSpacing: '0.14em' }}>{t('firstMatch')}</p>
+        <p className="eyebrow mt-1" style={{ color: 'var(--text-disabled)', letterSpacing: '0.08em' }}>MEX vs RSA · 11 Jun</p>
       </div>
-
-      {/* Divider */}
       <div className="w-px h-10 hidden sm:block" style={{ background: 'var(--hairline-gold)' }} />
-
-      {/* Units */}
       <div className="flex items-center gap-3 sm:gap-5">
-        <Unit value={time.days} label="días" />
+        <Unit value={time.days}    label={t('days')} />
         <span className="text-lg font-bold" style={{ color: 'var(--kinpaku-deep)', marginBottom: '16px' }}>:</span>
-        <Unit value={time.hours} label="horas" />
+        <Unit value={time.hours}   label={t('hours')} />
         <span className="text-lg font-bold" style={{ color: 'var(--kinpaku-deep)', marginBottom: '16px' }}>:</span>
-        <Unit value={time.minutes} label="min" />
+        <Unit value={time.minutes} label={t('minutes')} />
         <span className="text-lg font-bold" style={{ color: 'var(--kinpaku-deep)', marginBottom: '16px' }}>:</span>
-        <Unit value={time.seconds} label="seg" />
+        <Unit value={time.seconds} label={t('seconds')} />
       </div>
-
-      {/* Right kinpaku seam decoration */}
-      <div
-        className="absolute right-0 top-0 bottom-0 w-1 hidden sm:block"
-        style={{ background: 'linear-gradient(to bottom, var(--kinpaku), var(--kinpaku-deep), var(--kinpaku))', opacity: 0.4 }}
-        aria-hidden="true"
-      />
     </div>
   )
 }

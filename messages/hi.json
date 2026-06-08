@@ -1,0 +1,121 @@
+{
+  "nav": {
+    "partidos": "मैच",
+    "grupos": "ग्रुप",
+    "equipos": "टीम",
+    "bracket": "नॉकआउट",
+    "ariaMain": "मुख्य नेविगेशन",
+    "ariaInstall": "ऐप इंस्टॉल करें"
+  },
+  "stage": {
+    "GROUP_STAGE": "ग्रुप स्टेज",
+    "LAST_16": "राउंड ऑफ 16",
+    "QUARTER_FINALS": "क्वार्टर फाइनल",
+    "SEMI_FINALS": "सेमीफाइनल",
+    "THIRD_PLACE": "तीसरे स्थान का मैच",
+    "FINAL": "महा फाइनल"
+  },
+  "match": {
+    "live": "लाइव",
+    "ht": "HT",
+    "final": "समाप्त",
+    "upcoming": "आगामी",
+    "ft": "FT",
+    "groupsAdvance": "प्रत्येक ग्रुप से शीर्ष 2 टीमें अगले राउंड में जाती हैं",
+    "groupsUnavailable": "अभी ग्रुप उपलब्ध नहीं हैं",
+    "localTime": "स्थानीय"
+  },
+  "bracket": {
+    "ROUND_OF_32": "राउंड ऑफ 32",
+    "LAST_16": "राउंड ऑफ 16",
+    "QUARTER_FINALS": "क्वार्टर",
+    "SEMI_FINALS": "सेमी",
+    "THIRD_PLACE": "तीसरा स्थान",
+    "FINAL": "फाइनल",
+    "tbd": "तय होगा",
+    "champion": "चैंपियन",
+    "available": "नॉकआउट चरण में ब्रैकेट उपलब्ध होगा",
+    "availableSince": "~जुलाई 2026 से उपलब्ध · स्वतः अपडेट",
+    "thirdPlace": "तीसरे स्थान का मैच",
+    "colQF": "क्वार्टर",
+    "colSF": "सेमी",
+    "colFinal": "फाइनल"
+  },
+  "team": {
+    "Goalkeeper": "गोलकीपर",
+    "Defence": "डिफेंडर",
+    "Midfield": "मिडफील्डर",
+    "Offence": "फॉरवर्ड",
+    "tabMatches": "मैच",
+    "tabSquad": "टीम",
+    "noMatches": "कोई मैच उपलब्ध नहीं",
+    "squadUnavailable": "स्क्वाड उपलब्ध नहीं",
+    "squadUnavailableDesc": "अभी इस टीम के खिलाड़ी लोड नहीं हो सके।",
+    "playerTip": "विवरण के लिए खिलाड़ी पर टैप करें",
+    "close": "बंद करें",
+    "all": "सभी",
+    "years": "वर्ष",
+    "liveNow": "लाइव",
+    "dt": "कोच",
+    "tap": "टैप करें"
+  },
+  "groups": {
+    "qualificationRound": "क्वालिफिकेशन राउंड",
+    "team": "टीम",
+    "standings": "अंक तालिका",
+    "fixtures": "ग्रुप फिक्स्चर",
+    "ariaDetails": "{group} विवरण देखें"
+  },
+  "countdown": {
+    "days": "दिन",
+    "hours": "घंटे",
+    "minutes": "मिनट",
+    "seconds": "सेकंड",
+    "firstMatch": "पहला मैच"
+  },
+  "favorite": {
+    "title": "मेरी टीम",
+    "remove": "हटाएं",
+    "removeAria": "पसंदीदा टीम हटाएं",
+    "live": "खेल रहा है",
+    "next": "अगला मैच",
+    "last": "पिछला परिणाम",
+    "noMatches": "अभी कोई मैच नहीं"
+  },
+  "install": {
+    "back": "वापस",
+    "backAria": "होम पर वापस जाएं",
+    "eyebrow": "विश्व कप 2026",
+    "title": "ऐप इंस्टॉल करें",
+    "description": "अपनी होम स्क्रीन से सीधे मैच, ग्रुप और शेड्यूल देखें।",
+    "alreadyInstalled": "ऐप पहले से आपके डिवाइस पर इंस्टॉल है।",
+    "installing": "इंस्टॉल हो रहा है…",
+    "addToHome": "होम स्क्रीन में जोड़ें",
+    "androidTitle": "Android · Chrome",
+    "androidStep1": "आपके ब्राउज़र ने पता लगाया है कि यह ऐप इंस्टॉल करने योग्य है।",
+    "androidStep2": "इसे होम स्क्रीन में जोड़ने के लिए नीचे दिया बटन दबाएं।",
+    "iosTitle": "iPhone · iPad (Safari)",
+    "iosStep1": "इस पेज को Safari में खोलें (Chrome या Firefox में नहीं)।",
+    "iosStep2": "नीचे की बार में Share बटन दबाएं।",
+    "iosStep3": "नीचे स्क्रॉल करें और \"होम स्क्रीन में जोड़ें\" चुनें।",
+    "iosStep4": "पुष्टि के लिए Add दबाएं।",
+    "desktopTitle": "डेस्कटॉप · Chrome / Edge",
+    "desktopStep1": "एड्रेस बार के दाईं ओर इंस्टॉल आइकन देखें।",
+    "desktopStep2": "उस पर क्लिक करें और Install से पुष्टि करें।",
+    "desktopStep3": "ऐप बिना ब्राउज़र बार के अपनी विंडो में खुलेगा।"
+  },
+  "carousel": {
+    "today": "आज"
+  },
+  "stats": {
+    "stadiums": "स्टेडियम",
+    "teams": "टीम"
+  },
+  "player": {
+    "notFound": "खिलाड़ी नहीं मिला",
+    "Goalkeeper": "गोलकीपर",
+    "Defence": "डिफेंडर",
+    "Midfield": "मिडफील्डर",
+    "Offence": "फॉरवर्ड"
+  }
+}

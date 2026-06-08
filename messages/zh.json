@@ -1,0 +1,121 @@
+{
+  "nav": {
+    "partidos": "赛程",
+    "grupos": "小组",
+    "equipos": "球队",
+    "bracket": "淘汰赛",
+    "ariaMain": "主导航",
+    "ariaInstall": "安装应用"
+  },
+  "stage": {
+    "GROUP_STAGE": "小组赛阶段",
+    "LAST_16": "十六强",
+    "QUARTER_FINALS": "四分之一决赛",
+    "SEMI_FINALS": "半决赛",
+    "THIRD_PLACE": "三四名决赛",
+    "FINAL": "总决赛"
+  },
+  "match": {
+    "live": "直播",
+    "ht": "中场",
+    "final": "完场",
+    "upcoming": "即将开始",
+    "ft": "完场",
+    "groupsAdvance": "每组前2名晋级下一阶段",
+    "groupsUnavailable": "暂无小组数据",
+    "localTime": "本地时间"
+  },
+  "bracket": {
+    "ROUND_OF_32": "三十二强",
+    "LAST_16": "十六强",
+    "QUARTER_FINALS": "四分之一",
+    "SEMI_FINALS": "半决赛",
+    "THIRD_PLACE": "三四名",
+    "FINAL": "决赛",
+    "tbd": "待定",
+    "champion": "冠军",
+    "available": "淘汰赛阶段后显示对阵图",
+    "availableSince": "约2026年7月起开放 · 自动更新",
+    "thirdPlace": "三四名决赛",
+    "colQF": "四分之一",
+    "colSF": "半决赛",
+    "colFinal": "决赛"
+  },
+  "team": {
+    "Goalkeeper": "门将",
+    "Defence": "后卫",
+    "Midfield": "中场",
+    "Offence": "前锋",
+    "tabMatches": "赛程",
+    "tabSquad": "阵容",
+    "noMatches": "暂无比赛",
+    "squadUnavailable": "阵容不可用",
+    "squadUnavailableDesc": "目前无法加载该队球员信息。",
+    "playerTip": "点击球员查看详情",
+    "close": "关闭",
+    "all": "全部",
+    "years": "岁",
+    "liveNow": "直播",
+    "dt": "主教练",
+    "tap": "点击"
+  },
+  "groups": {
+    "qualificationRound": "资格赛轮次",
+    "team": "球队",
+    "standings": "积分榜",
+    "fixtures": "小组赛程",
+    "ariaDetails": "查看{group}详情"
+  },
+  "countdown": {
+    "days": "天",
+    "hours": "时",
+    "minutes": "分",
+    "seconds": "秒",
+    "firstMatch": "首场比赛"
+  },
+  "favorite": {
+    "title": "我的球队",
+    "remove": "移除",
+    "removeAria": "移除收藏球队",
+    "live": "进行中",
+    "next": "下一场比赛",
+    "last": "最近战绩",
+    "noMatches": "暂无比赛安排"
+  },
+  "install": {
+    "back": "返回",
+    "backAria": "返回首页",
+    "eyebrow": "2026世界杯",
+    "title": "安装应用",
+    "description": "直接从主屏幕访问比赛、小组和赛程。",
+    "alreadyInstalled": "应用已安装在您的设备上。",
+    "installing": "安装中…",
+    "addToHome": "添加到主屏幕",
+    "androidTitle": "Android · Chrome",
+    "androidStep1": "您的浏览器已检测到此应用可安装。",
+    "androidStep2": "点击下方按钮将其添加到主屏幕。",
+    "iosTitle": "iPhone · iPad（Safari）",
+    "iosStep1": "在 Safari 中打开此页面（非 Chrome 或 Firefox）。",
+    "iosStep2": "点击底部栏中的分享按钮。",
+    "iosStep3": "向下滑动并选择「添加到主屏幕」。",
+    "iosStep4": "点击添加以确认。",
+    "desktopTitle": "电脑 · Chrome / Edge",
+    "desktopStep1": "在地址栏右侧查找安装图标。",
+    "desktopStep2": "点击并确认安装。",
+    "desktopStep3": "应用将在无浏览器栏的独立窗口中打开。"
+  },
+  "carousel": {
+    "today": "今天"
+  },
+  "stats": {
+    "stadiums": "球场",
+    "teams": "球队"
+  },
+  "player": {
+    "notFound": "未找到球员",
+    "Goalkeeper": "门将",
+    "Defence": "后卫",
+    "Midfield": "中场",
+    "Offence": "前锋"
+  }
+}

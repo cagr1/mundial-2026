@@ -1,0 +1,121 @@
+{
+  "nav": {
+    "partidos": "Matches",
+    "grupos": "Groups",
+    "equipos": "Teams",
+    "bracket": "Bracket",
+    "ariaMain": "Main navigation",
+    "ariaInstall": "Install app"
+  },
+  "stage": {
+    "GROUP_STAGE": "GROUP STAGE",
+    "LAST_16": "ROUND OF 16",
+    "QUARTER_FINALS": "QUARTERFINALS",
+    "SEMI_FINALS": "SEMIFINALS",
+    "THIRD_PLACE": "THIRD PLACE",
+    "FINAL": "GRAND FINAL"
+  },
+  "match": {
+    "live": "LIVE",
+    "ht": "HT",
+    "final": "Full Time",
+    "upcoming": "UPCOMING",
+    "ft": "FT",
+    "groupsAdvance": "Top 2 from each group advance to the next round",
+    "groupsUnavailable": "Groups not available at this time",
+    "localTime": "local"
+  },
+  "bracket": {
+    "ROUND_OF_32": "Round of 32",
+    "LAST_16": "Round of 16",
+    "QUARTER_FINALS": "Quarters",
+    "SEMI_FINALS": "Semis",
+    "THIRD_PLACE": "3rd Place",
+    "FINAL": "Final",
+    "tbd": "TBD",
+    "champion": "CHAMPION",
+    "available": "Bracket available in Knockout Stage",
+    "availableSince": "Available from ~July 2026 · Auto-updated",
+    "thirdPlace": "Third Place",
+    "colQF": "Quarters",
+    "colSF": "Semis",
+    "colFinal": "Final"
+  },
+  "team": {
+    "Goalkeeper": "Goalkeepers",
+    "Defence": "Defenders",
+    "Midfield": "Midfielders",
+    "Offence": "Forwards",
+    "tabMatches": "Matches",
+    "tabSquad": "Squad",
+    "noMatches": "No matches available",
+    "squadUnavailable": "Squad unavailable",
+    "squadUnavailableDesc": "We couldn't load players for this team at this time.",
+    "playerTip": "tap each player for details",
+    "close": "Close",
+    "all": "All",
+    "years": "yrs",
+    "liveNow": "LIVE",
+    "dt": "Coach",
+    "tap": "tap"
+  },
+  "groups": {
+    "qualificationRound": "QUALIFICATION ROUND",
+    "team": "TEAM",
+    "standings": "STANDINGS",
+    "fixtures": "GROUP FIXTURES",
+    "ariaDetails": "View details {group}"
+  },
+  "countdown": {
+    "days": "days",
+    "hours": "hrs",
+    "minutes": "min",
+    "seconds": "sec",
+    "firstMatch": "First match"
+  },
+  "favorite": {
+    "title": "My Team",
+    "remove": "Remove",
+    "removeAria": "Remove favorite team",
+    "live": "In play",
+    "next": "Next match",
+    "last": "Last result",
+    "noMatches": "No matches available yet"
+  },
+  "install": {
+    "back": "Back",
+    "backAria": "Back to home",
+    "eyebrow": "World Cup 2026",
+    "title": "Install the app",
+    "description": "Access matches, groups and schedules directly from your home screen.",
+    "alreadyInstalled": "The app is already installed on your device.",
+    "installing": "Installing…",
+    "addToHome": "Add to home screen",
+    "androidTitle": "Android · Chrome",
+    "androidStep1": "Your browser has detected that this app is installable.",
+    "androidStep2": "Tap the button below to add it to your home screen.",
+    "iosTitle": "iPhone · iPad (Safari)",
+    "iosStep1": "Open this page in Safari (not Chrome or Firefox).",
+    "iosStep2": "Tap the Share button in the bottom bar.",
+    "iosStep3": "Scroll down and choose \"Add to Home Screen\".",
+    "iosStep4": "Tap Add to confirm.",
+    "desktopTitle": "Desktop · Chrome / Edge",
+    "desktopStep1": "Look for the install icon in the address bar (far right).",
+    "desktopStep2": "Click it and confirm with Install.",
+    "desktopStep3": "The app will open in its own window without the browser bar."
+  },
+  "carousel": {
+    "today": "Today"
+  },
+  "stats": {
+    "stadiums": "STADIUMS",
+    "teams": "TEAMS"
+  },
+  "player": {
+    "notFound": "Player not found",
+    "Goalkeeper": "Goalkeeper",
+    "Defence": "Defender",
+    "Midfield": "Midfielder",
+    "Offence": "Forward"
+  }
+}

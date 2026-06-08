@@ -1,30 +1,6 @@
+import { getTranslations } from 'next-intl/server'
 import { flagEmoji, calcAge } from '@/lib/flags'
 import PlayerDetail from '@/components/PlayerDetail'
-
-interface PersonData {
-  id: number
-  name: string
-  dateOfBirth: string
-  nationality: string
-  section: string
-  position: string | null
-  shirtNumber: number | null
-  currentTeam?: { name: string; tla: string; crest: string; venue?: string }
-}
-
-interface SportsDbPlayer {
-  strThumb?: string
-  strCutout?: string
-  strHeight?: string
-  strWeight?: string
-  strBirthLocation?: string
-  strDescriptionEN?: string
-}
-
-interface WikipediaSummary {
-  extract?: string
-  thumbnail?: { source?: string }
-}
 
 const SECTION_COLOR: Record<string, string> = {
   Goalkeeper: 'var(--kinpaku)',
@@ -32,11 +8,20 @@ const SECTION_COLOR: Record<string, string> = {
   Midfield:   'oklch(74% 0.13 290)',
   Offence:    'var(--vermilion)',
 }
-const SECTION_LABEL: Record<string, string> = {
-  Goalkeeper: 'Portero',
-  Defence:    'Defensa',
-  Midfield:   'Mediocampista',
-  Offence:    'Delantero',
+
+interface PersonData {
+  id: number; name: string; dateOfBirth: string; nationality: string
+  section: string; position: string | null; shirtNumber: number | null
+  currentTeam?: { name: string; tla: string; crest: string; venue?: string }
+}
+
+interface SportsDbPlayer {
+  strThumb?: string; strCutout?: string; strHeight?: string
+  strWeight?: string; strBirthLocation?: string; strDescriptionEN?: string
+}
+
+interface WikipediaSummary {
+  extract?: string; thumbnail?: { source?: string }
 }
 
 async function getPerson(id: string): Promise<PersonData | null> {
@@ -50,9 +35,7 @@ async function getPerson(id: string): Promise<PersonData | null> {
   } catch { return null }
 }
 
-function clean(v?: string | null): string | null {
-  const t = v?.trim(); return t || null
-}
+function clean(v?: string | null): string | null { const t = v?.trim(); return t || null }
 
 async function getSportsDb(name: string): Promise<SportsDbPlayer | null> {
   try {
@@ -81,20 +64,19 @@ export default async function PlayerPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string; locale: string }>
   searchParams: Promise<{ from?: string }>
 }) {
-  const { id } = await params
+  const { id, locale } = await params
   const sp = await searchParams
+  const t = await getTranslations('player')
   const backHref = sp.from ? `/?tab=equipos&equipo=${sp.from}` : null
   const person = await getPerson(id)
 
   if (!person) {
     return (
       <div className="min-h-dvh flex items-center justify-center" style={{ background: 'var(--lacquer-deep)' }}>
-        <div className="text-center space-y-3">
-          <p className="eyebrow" style={{ color: 'var(--text-muted)' }}>Jugador no encontrado</p>
-        </div>
+        <p className="eyebrow" style={{ color: 'var(--text-muted)' }}>{t('notFound')}</p>
       </div>
     )
   }
@@ -104,14 +86,12 @@ export default async function PlayerPage({
   const wiki = (!photoUrl || !sportsdb?.strDescriptionEN) ? await getWiki(person.name) : null
   const bio = clean(sportsdb?.strDescriptionEN) ?? clean(wiki?.extract)
   const finalPhoto = photoUrl ?? clean(wiki?.thumbnail?.source)
-  const photoSource = finalPhoto
-    ? (photoUrl ? 'TheSportsDB' : 'Wikipedia')
-    : null
+  const photoSource = finalPhoto ? (photoUrl ? 'TheSportsDB' : 'Wikipedia') : null
 
   const pos = person.section ?? person.position ?? 'Unknown'
   const age = person.dateOfBirth ? calcAge(person.dateOfBirth) : null
   const dob = person.dateOfBirth
-    ? new Intl.DateTimeFormat('es', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(person.dateOfBirth))
+    ? new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(person.dateOfBirth))
     : null
   const initials = person.name.split(' ').filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase()).join('')
 
@@ -120,7 +100,7 @@ export default async function PlayerPage({
       name={person.name}
       initials={initials}
       photoUrl={finalPhoto}
-      posLabel={SECTION_LABEL[pos] ?? pos}
+      posLabel={t(pos as 'Goalkeeper' | 'Defence' | 'Midfield' | 'Offence') ?? pos}
       posColor={SECTION_COLOR[pos] ?? 'var(--text-muted)'}
       shirtNumber={person.shirtNumber}
       nationality={person.nationality}
