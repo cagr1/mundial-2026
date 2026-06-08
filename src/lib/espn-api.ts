@@ -1,4 +1,4 @@
-import type { Match, MatchStatus, Team, Standing, StandingEntry } from '@/types/football'
+import type { Match, MatchStatus, Team, Standing, StandingEntry, Venue } from '@/types/football'
 
 const SITE = 'https://site.api.espn.com'
 const LEAGUE = 'fifa.world'
@@ -187,6 +187,11 @@ export async function getESPNMatches(): Promise<Match[]> {
       winner = homeScore > awayScore ? 'HOME_TEAM' : homeScore < awayScore ? 'AWAY_TEAM' : 'DRAW'
     }
 
+    const venueName: string = comp.venue?.fullName ?? ''
+    const venueCity: string = comp.venue?.address?.city ?? ''
+    const venue: Venue | undefined =
+      venueName ? { name: venueName, city: venueCity } : undefined
+
     matches.push({
       id: Number(event.id),
       utcDate,
@@ -202,6 +207,7 @@ export async function getESPNMatches(): Promise<Match[]> {
         fullTime: { home: homeScore, away: awayScore },
         halfTime: { home: null, away: null },
       },
+      venue,
     })
   }
 

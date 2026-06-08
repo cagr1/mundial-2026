@@ -1,5 +1,5 @@
 {
-  "name": "Mundial 2026",
+  "name": "WC 26",
   "short_name": "WC 26",
   "description": "Partidos y horarios del World Cup 2026",
   "start_url": "/",
@@ -27,9 +27,9 @@
       "purpose": "maskable"
     },
     {
-      "src": "/app-logo.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/app-logo.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
       "purpose": "any"
     }
   ]

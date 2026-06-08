@@ -148,6 +148,53 @@ body {
 }
 .live-dot { animation: patina-pulse 1.4s ease-in-out infinite; }
 
+/* Launch brand animation */
+.launch-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(255, 209, 101, 0.12), transparent 34%),
+    rgba(5, 20, 36, 0.96);
+  animation: launch-fade 1450ms ease both;
+  pointer-events: none;
+}
+
+.launch-intro-card {
+  position: relative;
+  width: 168px;
+  height: 168px;
+  display: grid;
+  place-items: center;
+}
+
+.launch-logo {
+  border-radius: 34px;
+  opacity: 0;
+  transform: scale(0.72);
+  filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.42));
+  animation: launch-logo-grow 1280ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.app-header-logo {
+  flex-shrink: 0;
+  border-radius: 10px;
+  filter: drop-shadow(0 0 10px rgba(255, 209, 101, 0.18));
+}
+
+@keyframes launch-logo-grow {
+  0% { opacity: 0; transform: scale(0.72); }
+  24%, 76% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.08); }
+}
+
+@keyframes launch-fade {
+  0%, 76% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* ─── Tabular numbers ───────────────────────────────────────────────────── */
 .tabnum { font-variant-numeric: tabular-nums; }
 
@@ -175,6 +222,9 @@ body {
   ::view-transition-new(root) { animation: none; }
   .tab-panel   { animation: none; }
   .live-dot    { animation: none; }
+  .launch-intro,
+  .launch-logo { animation: none; }
+  .launch-intro { display: none; }
   .match-card  { transition: none; }
   .soft-haptic:active { transform: none; }
 }

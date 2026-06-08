@@ -60,6 +60,11 @@ export type MatchStatus =
   | 'CANCELLED'
   | 'AWARDED'
 
+export interface Venue {
+  name: string
+  city: string
+}
+
 export interface Match {
   id: number
   utcDate: string
@@ -70,7 +75,15 @@ export interface Match {
   homeTeam: Team
   awayTeam: Team
   score: Score
+  venue?: Venue
 }
+
+export interface Prediction {
+  home: number
+  away: number
+}
+
+export type PredictionsMap = Record<number, Prediction>
 
 export interface MatchesResponse {
   resultSet: { count: number; first: string; last: string; played: number }

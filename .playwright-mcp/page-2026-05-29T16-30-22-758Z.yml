@@ -1,0 +1,208 @@
+- main [ref=e2]:
+  - generic [ref=e4]:
+    - link "CitasBot CitasBot" [ref=e5] [cursor=pointer]:
+      - /url: /
+      - img "CitasBot" [ref=e6]
+      - generic [ref=e7]: CitasBot
+    - navigation [ref=e8]:
+      - link "Cómo funciona" [ref=e9] [cursor=pointer]:
+        - /url: "#como-funciona"
+      - link "Características" [ref=e10] [cursor=pointer]:
+        - /url: "#features"
+      - link "Precios" [ref=e11] [cursor=pointer]:
+        - /url: "#precios"
+      - link "Contacto" [ref=e12] [cursor=pointer]:
+        - /url: "#contacto"
+    - generic [ref=e13]:
+      - button "Cambiar a tema oscuro" [ref=e14] [cursor=pointer]
+      - link "Iniciar sesión" [ref=e15] [cursor=pointer]:
+        - /url: https://citasbot-whatsapp.vercel.app/login
+      - link "Empezar gratis" [ref=e16] [cursor=pointer]:
+        - /url: "#precios"
+  - generic [ref=e18]:
+    - generic [ref=e19]:
+      - generic [ref=e20]: Gestión de citas por WhatsApp
+      - heading "Tus clientes ya tienen WhatsApp. Úsalo para llenar tu agenda." [level=1] [ref=e22]
+      - paragraph [ref=e23]: CitasBot gestiona citas, confirmaciones y recordatorios por WhatsApp — sin que tus clientes descarguen nada ni tú pierdas tiempo al teléfono.
+      - generic [ref=e24]:
+        - link "Empezar gratis" [ref=e25] [cursor=pointer]:
+          - /url: "#precios"
+        - link "Ver cómo funciona" [ref=e26] [cursor=pointer]:
+          - /url: "#como-funciona"
+          - text: Ver cómo funciona
+          - img [ref=e27]
+      - paragraph [ref=e29]: Sin tarjeta de crédito · Plan gratis disponible · Activo en minutos
+    - generic [ref=e31]:
+      - generic [ref=e34]:
+        - paragraph [ref=e35]: CitasBot
+        - paragraph [ref=e36]: En linea
+      - generic [ref=e38]:
+        - generic [ref=e42]:
+          - paragraph [ref=e43]: Hola, soy el asistente
+          - paragraph [ref=e44]: de Estética Luna.
+          - paragraph [ref=e45]: ¿Qué servicio necesitas?
+        - paragraph [ref=e50]: Corte de cabello
+        - generic [ref=e54]:
+          - paragraph [ref=e55]: Perfecto. ¿Qué día
+          - paragraph [ref=e56]: prefieres?
+        - paragraph [ref=e61]: Mañana a las 3pm
+        - generic [ref=e65]:
+          - paragraph [ref=e66]: ¡Listo! Tu cita está
+          - paragraph [ref=e67]: "confirmada:"
+          - paragraph [ref=e68]: Martes 3:00 PM
+          - paragraph [ref=e69]: Recibirás recordatorio
+  - generic [ref=e71]:
+    - generic [ref=e72]:
+      - paragraph [ref=e73]: Cómo funciona
+      - heading "En minutos tienes tu bot activo" [level=2] [ref=e74]
+      - paragraph [ref=e75]: Sin configuraciones complicadas. Sin soporte técnico de tu parte.
+    - generic [ref=e76]:
+      - generic [ref=e77]:
+        - paragraph [ref=e78]: "01"
+        - heading "Conecta tu WhatsApp" [level=3] [ref=e79]
+        - paragraph [ref=e80]: Vincula el número de tu negocio con Meta Cloud API. El proceso toma menos de 10 minutos y no requiere conocimientos técnicos.
+      - generic [ref=e81]:
+        - paragraph [ref=e82]: "02"
+        - heading "Configura servicios y horarios" [level=3] [ref=e83]
+        - paragraph [ref=e84]: "Define qué ofreces, cuándo y con quién. El dashboard es simple: crea servicios, asigna personal y establece tu disponibilidad."
+      - generic [ref=e85]:
+        - paragraph [ref=e86]: "03"
+        - heading "Tus clientes agendan solos" [level=3] [ref=e87]
+        - paragraph [ref=e88]: El bot atiende, agenda, confirma y recuerda — las 24 horas, los 7 días. Tú solo abres el dashboard y ves tu agenda llena.
+  - generic [ref=e90]:
+    - generic [ref=e91]:
+      - paragraph [ref=e92]: Funcionalidades
+      - heading "Diseñado para negocios con agenda" [level=2] [ref=e93]
+      - paragraph [ref=e94]: Sin apps adicionales para tus clientes. Sin integraciones complicadas para ti.
+    - generic [ref=e95]:
+      - article [ref=e96]:
+        - generic [ref=e97]:
+          - heading "Agendamiento automático" [level=3] [ref=e98]
+          - paragraph [ref=e99]: El bot conversa, entiende y agenda sin intervención humana. Disponible las 24 horas, todos los días.
+      - article [ref=e100]:
+        - generic [ref=e101]:
+          - heading "Recordatorios automáticos" [level=3] [ref=e102]
+          - paragraph [ref=e103]: Confirmaciones y recordatorios enviados por WhatsApp. Los negocios reducen ausencias entre un 40 y 60%.
+      - article [ref=e104]:
+        - generic [ref=e105]:
+          - heading "Dashboard centralizado" [level=3] [ref=e106]
+          - paragraph [ref=e107]: Citas, clientes y pagos en una sola vista. Funciona desde cualquier dispositivo, sin instalar nada.
+      - article [ref=e108]:
+        - generic [ref=e109]:
+          - heading "Múltiples usuarios y roles" [level=3] [ref=e110]
+          - paragraph [ref=e111]: "Invita a tu equipo con permisos diferenciados: administrador, recepcionista, profesional."
+      - article [ref=e112]:
+        - generic [ref=e113]:
+          - heading "Control de disponibilidad" [level=3] [ref=e114]
+          - paragraph [ref=e115]: Define horarios por servicio y profesional. El bot consulta la disponibilidad real antes de confirmar.
+      - article [ref=e116]:
+        - generic [ref=e117]:
+          - heading "Reportes del negocio" [level=3] [ref=e118]
+          - paragraph [ref=e119]: Servicios más solicitados, horas pico y tendencias. Decisiones basadas en datos reales.
+  - generic [ref=e121]:
+    - generic [ref=e122]:
+      - paragraph [ref=e123]: Precios
+      - heading "Planes para cada etapa" [level=2] [ref=e124]
+      - paragraph [ref=e125]: Empieza gratis. Escala solo cuando tu agenda lo exija.
+    - generic [ref=e127]:
+      - article [ref=e129]:
+        - paragraph [ref=e131]: Free
+        - generic [ref=e132]:
+          - generic [ref=e133]: $0
+          - generic [ref=e134]: /mes
+        - paragraph [ref=e135]: Para negocios que quieren empezar sin costo.
+        - list [ref=e137]:
+          - listitem [ref=e138]: 20 citas por mes
+          - listitem [ref=e140]: 60 mensajes WhatsApp
+          - listitem [ref=e142]: 1 usuario
+        - link "Empezar gratis" [ref=e144] [cursor=pointer]:
+          - /url: "#"
+      - article [ref=e146]:
+        - paragraph [ref=e148]: Starter
+        - generic [ref=e149]:
+          - generic [ref=e150]: $12
+          - generic [ref=e151]: /mes
+        - paragraph [ref=e152]: $120/año
+        - paragraph [ref=e153]: Para negocios que quieren crecer en serio.
+        - list [ref=e155]:
+          - listitem [ref=e156]: 80 citas por mes
+          - listitem [ref=e158]: 240 mensajes WhatsApp
+          - listitem [ref=e160]: 2 usuarios
+        - link "Elegir plan" [ref=e162] [cursor=pointer]:
+          - /url: "#"
+      - article [ref=e164]:
+        - generic [ref=e166]: Popular
+        - paragraph [ref=e167]: Pro
+        - generic [ref=e168]:
+          - generic [ref=e169]: $25
+          - generic [ref=e170]: /mes
+        - paragraph [ref=e171]: $250/año
+        - paragraph [ref=e172]: El más elegido por negocios en crecimiento.
+        - list [ref=e174]:
+          - listitem [ref=e175]: 250 citas por mes
+          - listitem [ref=e177]: 750 mensajes WhatsApp
+          - listitem [ref=e179]: 5 usuarios
+        - link "Elegir plan" [ref=e181] [cursor=pointer]:
+          - /url: "#"
+    - paragraph [ref=e182]: Todos los planes incluyen dashboard web, soporte por email y acceso a la API de WhatsApp.
+  - generic [ref=e185]:
+    - generic [ref=e186]:
+      - paragraph [ref=e187]: Contacto
+      - heading "¿Listo para automatizar tu agenda?" [level=2] [ref=e188]
+      - paragraph [ref=e189]: Cuéntanos sobre tu negocio y te ayudamos a configurar CitasBot en menos de 24 horas. Sin contrato, sin compromisos.
+      - generic [ref=e190]:
+        - paragraph [ref=e191]:
+          - text: También puedes escribirnos directamente a
+          - link "hello@citasbot.app" [ref=e192] [cursor=pointer]:
+            - /url: mailto:hello@citasbot.app
+        - paragraph [ref=e193]: Respondemos en menos de 24 horas en días hábiles.
+    - generic [ref=e195]:
+      - generic [ref=e196]:
+        - generic [ref=e197]: Nombre
+        - textbox "Nombre" [ref=e198]:
+          - /placeholder: Tu nombre o el de tu negocio
+      - generic [ref=e199]:
+        - generic [ref=e200]: Correo
+        - textbox "Correo" [ref=e201]:
+          - /placeholder: tu@correo.com
+      - generic [ref=e202]:
+        - generic [ref=e203]: Mensaje
+        - textbox "Mensaje" [ref=e204]:
+          - /placeholder: Cuéntanos sobre tu negocio y cuántas citas manejas al mes...
+      - button "Enviar mensaje" [ref=e205] [cursor=pointer]
+  - generic [ref=e207]:
+    - paragraph [ref=e208]: Empieza hoy
+    - heading "Tu agenda llena. Sin llamadas. Sin mensajes manuales." [level=2] [ref=e209]
+    - paragraph [ref=e210]: Conecta CitasBot a tu negocio esta semana y deja que tus clientes agenden solos desde WhatsApp — el canal que ya usan todos los días.
+    - generic [ref=e211]:
+      - link "Empezar gratis" [ref=e212] [cursor=pointer]:
+        - /url: "#precios"
+      - link "Ver planes" [ref=e213] [cursor=pointer]:
+        - /url: "#precios"
+    - paragraph [ref=e214]: Sin tarjeta de crédito · Plan gratis disponible · Cancela cuando quieras
+  - generic [ref=e216]:
+    - generic [ref=e217]:
+      - link "CitasBot CitasBot" [ref=e218] [cursor=pointer]:
+        - /url: /
+        - img "CitasBot" [ref=e219]
+        - generic [ref=e220]: CitasBot
+      - generic [ref=e221]:
+        - link "Features" [ref=e222] [cursor=pointer]:
+          - /url: "#features"
+        - link "Cómo funciona" [ref=e223] [cursor=pointer]:
+          - /url: "#como-funciona"
+        - link "Precios" [ref=e224] [cursor=pointer]:
+          - /url: "#precios"
+      - paragraph [ref=e225]: © 2026 CitasBot
+    - generic [ref=e226]:
+      - generic [ref=e227]:
+        - link "Política de privacidad" [ref=e228] [cursor=pointer]:
+          - /url: /privacy-policy.html
+        - link "Términos de servicio" [ref=e229] [cursor=pointer]:
+          - /url: /terms.html
+      - link "Propiedad de Carlos Gallardo" [ref=e230] [cursor=pointer]:
+        - /url: https://www.carlosgallardo.dev/
+  - link "Contactar por WhatsApp" [ref=e231] [cursor=pointer]:
+    - /url: https://wa.me/593984420987?text=Hola%2C%20me%20interesa%20saber%20m%C3%A1s%20sobre%20CitasBot%20para%20mi%20negocio.
+    - generic: Chatea con nosotros
+    - img [ref=e233]

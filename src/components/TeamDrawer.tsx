@@ -1,10 +1,14 @@
 'use client'
 
-import { useState, useEffect, useCallback, useSyncExternalStore } from 'react'
+import { useState, useEffect, useCallback, useMemo, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Team, TeamDetail, Player } from '@/types/football'
+import { Icon } from '@iconify/react'
+import { Team, TeamDetail, Player, Match } from '@/types/football'
+import { formatTime, formatDateKey } from '@/lib/format-date'
+
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const POSITION_ORDER = ['Goalkeeper', 'Defence', 'Midfield', 'Offence'] as const
 const POSITION_LABEL: Record<string, string> = {
@@ -26,18 +30,19 @@ const POSITION_ABBR: Record<string, string> = {
   Offence: 'FW',
 }
 
+const LIVE_S = new Set(['LIVE', 'IN_PLAY', 'PAUSED'])
+const DONE_S = new Set(['FINISHED', 'AWARDED'])
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
 function calcAge(dob: string): number {
-  const diff = Date.now() - new Date(dob).getTime()
-  return Math.floor(diff / (365.25 * 86_400_000))
+  return Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 86_400_000))
 }
 
-/** Always returns an internal app route — never a Wikipedia/external URL.
- *  Includes `from={teamId}` so the player page can link back to the drawer. */
 function playerInternalHref(player: Player, teamId: number): string {
   if (player.source === 'Wikipedia' && player.profileUrl) {
     const match = player.profileUrl.match(/\/wiki\/(.+)$/)
     if (match) {
-      // match[1] may already be percent-encoded by the Wikipedia HTML parser
       const slug = match[1]
       const sp = new URLSearchParams()
       if (player.position) sp.set('pos', player.position)
@@ -54,6 +59,90 @@ function playerInternalHref(player: Player, teamId: number): string {
   return `/jugador/${player.id}?from=${teamId}`
 }
 
+// ─── MatchRow (tab Partidos) ──────────────────────────────────────────────────
+
+function MatchRow({ match, teamId, timeZone }: { match: Match; teamId: number; timeZone: string }) {
+  const isLive = LIVE_S.has(match.status)
+  const isDone = DONE_S.has(match.status)
+  const isHome = match.homeTeam.id === teamId
+  const opponent = isHome ? match.awayTeam : match.homeTeam
+  const myScore = isHome ? match.score.fullTime.home : match.score.fullTime.away
+  const opScore = isHome ? match.score.fullTime.away : match.score.fullTime.home
+
+  let resultColor = 'var(--text-muted)'
+  if (isDone && myScore != null && opScore != null) {
+    if (myScore > opScore) resultColor = 'var(--patina)'
+    else if (myScore < opScore) resultColor = 'var(--vermilion)'
+    else resultColor = 'var(--kinpaku)'
+  }
+
+  const dateStr = new Intl.DateTimeFormat('es', {
+    weekday: 'short', day: 'numeric', month: 'short', timeZone,
+  }).format(new Date(match.utcDate))
+
+  return (
+    <div
+      className="flex items-center gap-3 px-4 py-3"
+      style={{
+        borderBottom: '1px solid var(--hairline)',
+        borderLeft: isLive ? '3px solid var(--patina)' : '3px solid transparent',
+      }}
+    >
+      {/* Date / status */}
+      <div className="shrink-0 w-20">
+        {isLive ? (
+          <span className="eyebrow flex items-center gap-1" style={{ color: 'var(--patina)' }}>
+            <span className="live-dot w-1.5 h-1.5 rounded-full block" style={{ background: 'var(--patina)' }} />
+            EN VIVO
+          </span>
+        ) : (
+          <>
+            <p className="eyebrow" style={{ color: 'var(--text-disabled)', fontSize: '0.58rem' }}>{dateStr}</p>
+            <p className="eyebrow tabnum mt-0.5" style={{ color: 'var(--text-muted)', fontSize: '0.65rem' }}>
+              {isDone ? 'Final' : formatTime(match.utcDate, timeZone)}
+            </p>
+          </>
+        )}
+      </div>
+
+      {/* Opponent crest + name */}
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        {opponent.crest ? (
+          <div className="relative shrink-0" style={{ width: 24, height: 24 }}>
+            <Image src={opponent.crest} alt={opponent.name} fill className="object-contain" sizes="24px" unoptimized />
+          </div>
+        ) : (
+          <div className="shrink-0 w-6 h-6 flex items-center justify-center" style={{ background: 'var(--graphite)', borderRadius: 4 }}>
+            <span style={{ fontSize: 8, color: 'var(--text-disabled)', fontWeight: 700 }}>{opponent.tla}</span>
+          </div>
+        )}
+        <div className="min-w-0">
+          <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-warm)' }}>
+            <span style={{ color: 'var(--text-disabled)', fontWeight: 400, marginRight: 4 }}>{isHome ? 'vs' : '@'}</span>
+            {opponent.shortName}
+          </p>
+          <p className="eyebrow truncate mt-0.5" style={{ color: 'var(--text-disabled)', fontSize: '0.58rem' }}>
+            {match.group ? match.group.replace('GROUP_', 'Grupo ') : match.stage.replace(/_/g, ' ')}
+          </p>
+        </div>
+      </div>
+
+      {/* Score or upcoming */}
+      {isDone || isLive ? (
+        <span className="tabnum text-base font-bold shrink-0" style={{ color: resultColor, minWidth: 36, textAlign: 'right' }}>
+          {myScore}–{opScore}
+        </span>
+      ) : (
+        <span className="eyebrow shrink-0 tabnum" style={{ color: 'var(--text-disabled)', fontSize: '0.65rem', minWidth: 36, textAlign: 'right' }}>
+          {formatTime(match.utcDate, timeZone)}
+        </span>
+      )}
+    </div>
+  )
+}
+
+// ─── PlayerCard (tab Equipo) ──────────────────────────────────────────────────
+
 function PlayerCard({ player, teamId }: { player: Player; teamId: number }) {
   const [flipped, setFlipped] = useState(false)
   const color = player.position ? POSITION_COLOR[player.position] : 'var(--text-muted)'
@@ -68,10 +157,7 @@ function PlayerCard({ player, teamId }: { player: Player; teamId: number }) {
     >
       <div
         className="absolute inset-0 transition-transform duration-500"
-        style={{
-          transformStyle: 'preserve-3d',
-          transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-        }}
+        style={{ transformStyle: 'preserve-3d', transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
       >
         {/* Front */}
         <div
@@ -85,23 +171,19 @@ function PlayerCard({ player, teamId }: { player: Player; teamId: number }) {
             borderLeft: `3px solid ${color}`,
           }}
         >
-          <div
-            className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-xs font-bold"
-            style={{ background: 'var(--graphite)', borderRadius: 'var(--r-xs)', color }}
-          >
+          <div className="shrink-0 w-7 h-7 flex items-center justify-center text-xs font-bold"
+            style={{ background: 'var(--graphite)', borderRadius: 'var(--r-xs)', color }}>
             {POSITION_ABBR[player.position ?? ''] ?? '?'}
           </div>
           <span className="text-sm font-medium flex-1 truncate" style={{ color: 'var(--text-warm)' }}>
             {player.name}
-            {player.club ? (
+            {player.club && (
               <span className="block eyebrow mt-0.5 truncate" style={{ color: 'var(--text-disabled)', fontSize: '0.56rem' }}>
                 {player.club}
               </span>
-            ) : null}
+            )}
           </span>
-          <span className="eyebrow flex-shrink-0" style={{ color: 'var(--text-disabled)', fontSize: '0.6rem' }}>
-            toca
-          </span>
+          <span className="eyebrow shrink-0" style={{ color: 'var(--text-disabled)', fontSize: '0.6rem' }}>toca</span>
         </div>
 
         {/* Back */}
@@ -118,31 +200,24 @@ function PlayerCard({ player, teamId }: { player: Player; teamId: number }) {
         >
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold truncate" style={{ color: 'var(--champagne)' }}>{player.name}</p>
-            <p className="eyebrow mt-0.5 truncate" style={{ color: 'var(--text-muted)' }}>
-              {player.club ?? player.nationality}
-            </p>
-            {(player.caps != null || player.goals != null) ? (
+            <p className="eyebrow mt-0.5 truncate" style={{ color: 'var(--text-muted)' }}>{player.club ?? player.nationality}</p>
+            {(player.caps != null || player.goals != null) && (
               <p className="eyebrow mt-0.5 tabnum" style={{ color: 'var(--text-disabled)', fontSize: '0.56rem' }}>
                 {player.caps ?? 0} PJ · {player.goals ?? 0} G
               </p>
-            ) : null}
+            )}
           </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {player.dateOfBirth ? (
+          <div className="flex items-center gap-2 shrink-0">
+            {player.dateOfBirth && (
               <div className="text-right">
                 <p className="tabnum text-2xl font-bold leading-none" style={{ color }}>{calcAge(player.dateOfBirth)}</p>
                 <p className="eyebrow" style={{ fontSize: '0.58rem', color: 'var(--text-disabled)' }}>años</p>
               </div>
-            ) : null}
+            )}
             <Link
               href={detailHref}
               className="eyebrow px-2 py-1 border"
-              style={{
-                color: 'var(--kinpaku)',
-                borderColor: 'var(--hairline-gold)',
-                borderRadius: 'var(--r-xs)',
-                textDecoration: 'none',
-              }}
+              style={{ color: 'var(--kinpaku)', borderColor: 'var(--hairline-gold)', borderRadius: 'var(--r-xs)', textDecoration: 'none' }}
               onClick={(e) => e.stopPropagation()}
             >
               →
@@ -154,29 +229,48 @@ function PlayerCard({ player, teamId }: { player: Player; teamId: number }) {
   )
 }
 
+// ─── Main component ───────────────────────────────────────────────────────────
+
 interface Props {
   team: Team
   onClose: () => void
+  allMatches?: Match[]
+  timeZone?: string
 }
 
-export default function TeamDrawer({ team, onClose }: Props) {
+type DrawerTab = 'partidos' | 'equipo'
+
+export default function TeamDrawer({ team, onClose, allMatches = [], timeZone = 'UTC' }: Props) {
+  const [drawerTab, setDrawerTab] = useState<DrawerTab>('partidos')
   const [detail, setDetail] = useState<TeamDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [posFilter, setPosFilter] = useState<string>('ALL')
-  // createPortal needs document.body — server snapshot = false, client = true
   const mounted = useSyncExternalStore(() => () => {}, () => true, () => false)
-
   const handleClose = useCallback(() => onClose(), [onClose])
+
+  // All matches for this team, sorted by date
+  const teamMatches = useMemo(
+    () => allMatches
+      .filter((m) => m.homeTeam.id === team.id || m.awayTeam.id === team.id)
+      .sort((a, b) => a.utcDate.localeCompare(b.utcDate)),
+    [allMatches, team.id],
+  )
+
+  // Group matches by date bucket for section headers
+  const matchesByDate = useMemo(() => {
+    const map = new Map<string, Match[]>()
+    for (const m of teamMatches) {
+      const key = formatDateKey(m.utcDate, timeZone)
+      map.set(key, [...(map.get(key) ?? []), m])
+    }
+    return map
+  }, [teamMatches, timeZone])
 
   useEffect(() => {
     const params = new URLSearchParams({
-      name: team.name,
-      shortName: team.shortName,
-      tla: team.tla,
-      crest: team.crest,
+      name: team.name, shortName: team.shortName, tla: team.tla, crest: team.crest,
     })
-
     fetch(`/api/teams/${team.id}?${params}`)
       .then((r) => r.json())
       .then((d: TeamDetail) => {
@@ -193,9 +287,7 @@ export default function TeamDrawer({ team, onClose }: Props) {
   }, [team])
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleClose()
-    }
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose() }
     document.addEventListener('keydown', handler)
     document.body.style.overflow = 'hidden'
     return () => {
@@ -205,13 +297,11 @@ export default function TeamDrawer({ team, onClose }: Props) {
   }, [handleClose])
 
   const squad = Array.isArray(detail?.squad) ? detail.squad : []
-
   const grouped = squad.reduce<Record<string, Player[]>>((acc, p) => {
     const pos = p.position ?? 'Unknown'
     acc[pos] = [...(acc[pos] ?? []), p]
     return acc
   }, {})
-
   const positionsWithPlayers = POSITION_ORDER.filter((pos) => (grouped[pos] ?? []).length > 0)
   const visiblePositions = posFilter === 'ALL'
     ? positionsWithPlayers
@@ -219,9 +309,14 @@ export default function TeamDrawer({ team, onClose }: Props) {
 
   if (!mounted) return null
 
+  const DRAWER_TABS: { id: DrawerTab; label: string }[] = [
+    { id: 'partidos', label: 'Partidos' },
+    { id: 'equipo', label: 'Equipo' },
+  ]
+
   return createPortal(
     <>
-      {/* Backdrop — desktop only (drawer is full-screen on mobile) */}
+      {/* Backdrop — desktop only */}
       <div
         className="hidden sm:block fixed inset-0 z-40"
         style={{ background: 'oklch(4% 0.004 95 / 0.85)' }}
@@ -229,174 +324,213 @@ export default function TeamDrawer({ team, onClose }: Props) {
         aria-hidden="true"
       />
 
-      {/* Drawer — full-screen on mobile, side panel on desktop */}
       <div
         className="fixed inset-0 z-50 flex flex-col overflow-hidden sm:right-auto sm:max-w-lg"
-        style={{
-          background: 'var(--lacquer)',
-          borderRight: '1px solid var(--hairline)',
-        }}
+        style={{ background: 'var(--lacquer)', borderRight: '1px solid var(--hairline)' }}
         role="dialog"
-        aria-label={`Plantel de ${team.name}`}
+        aria-label={team.name}
       >
-        {/* Header — compact, non-scrolling */}
+        {/* ── Header ──────────────────────────────────────────────────────── */}
         <div
-          className="flex-shrink-0"
-          style={{
-            borderBottom: '1px solid var(--hairline)',
-            paddingTop: 'env(safe-area-inset-top)',
-          }}
+          className="shrink-0"
+          style={{ paddingTop: 'env(safe-area-inset-top)', borderBottom: '1px solid var(--hairline)' }}
         >
-        <div className="flex items-center gap-3 px-5 py-3">
-          {team.crest ? (
-            <div className="relative w-9 h-9 flex-shrink-0">
-              <Image src={team.crest} alt={team.name} fill className="object-contain" sizes="36px" />
+          <div className="flex items-center gap-3 px-5 py-3">
+            {team.crest && (
+              <div className="relative w-9 h-9 shrink-0">
+                <Image src={team.crest} alt={team.name} fill className="object-contain" sizes="36px" />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <h2 className="text-base font-bold truncate" style={{ color: 'var(--champagne)' }}>
+                {team.name}
+              </h2>
+              {detail?.coach && (
+                <p className="eyebrow truncate" style={{ color: 'var(--text-disabled)', marginTop: 1 }}>
+                  DT · {detail.coach.name}
+                </p>
+              )}
             </div>
-          ) : null}
-          <div className="flex-1 min-w-0">
-            <h2 className="text-sm font-bold truncate" style={{ color: 'var(--champagne)', fontFamily: 'var(--font-albert)' }}>
-              {team.name}
-            </h2>
-            {detail && (
-              <p className="eyebrow" style={{ color: 'var(--text-disabled)', marginTop: '1px' }}>
-                {squad.length} jugadores · {detail.squadSource ?? 'football-data.org'}
-              </p>
-            )}
+            <button
+              onClick={handleClose}
+              className="shrink-0 w-8 h-8 flex items-center justify-center focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-(--kinpaku) transition-colors"
+              style={{ color: 'var(--text-muted)', borderRadius: 'var(--r-sm)' }}
+              aria-label="Cerrar"
+            >
+              ✕
+            </button>
           </div>
-          <button
-            onClick={handleClose}
-            className="flex-shrink-0 w-8 h-8 flex items-center justify-center focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--kinpaku)] transition-colors"
-            style={{ color: 'var(--text-muted)', borderRadius: 'var(--r-sm)' }}
-            aria-label="Cerrar"
-          >
-            ✕
-          </button>
-        </div>
-        </div>
 
-        {/* Coach — compact */}
-        {detail?.coach && (
-          <div className="px-5 py-2 flex-shrink-0" style={{ borderBottom: '1px solid var(--hairline)' }}>
-            <span className="eyebrow" style={{ color: 'var(--text-disabled)' }}>Técnico · </span>
-            <span className="text-xs font-medium" style={{ color: 'var(--text-warm)' }}>{detail.coach.name}</span>
-            {detail.coach.nationality && (
-              <span className="eyebrow ml-2" style={{ color: 'var(--text-disabled)' }}>{detail.coach.nationality}</span>
-            )}
-          </div>
-        )}
-
-        {/* Position filter pills — only after loading, only if there are players */}
-        {!loading && squad.length > 0 && (
-          <div
-            className="flex gap-2 px-5 py-2.5 flex-shrink-0 overflow-x-auto"
-            style={{ borderBottom: '1px solid var(--hairline)' }}
-          >
-            {(['ALL', ...positionsWithPlayers] as string[]).map((pos) => {
-              const isActive = posFilter === pos
-              const label = pos === 'ALL' ? 'Todos' : (POSITION_ABBR[pos] ?? pos)
-              const count = pos === 'ALL' ? squad.length : (grouped[pos] ?? []).length
+          {/* ── Segmented tab control ──────────────────────────────────────── */}
+          <div className="flex px-5 pb-0" role="tablist" aria-label="Secciones del equipo">
+            {DRAWER_TABS.map((t) => {
+              const isActive = drawerTab === t.id
               return (
                 <button
-                  key={pos}
-                  onClick={() => setPosFilter(pos)}
-                  className="eyebrow flex-shrink-0 flex items-center gap-1.5 transition-colors"
+                  key={t.id}
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setDrawerTab(t.id)}
+                  className="relative pb-2.5 pt-1 text-sm font-semibold transition-colors focus-visible:outline-none"
                   style={{
-                    padding: '4px 10px',
-                    background: isActive ? 'var(--kinpaku)' : 'transparent',
-                    color: isActive ? 'var(--lacquer-deep)' : 'var(--text-muted)',
-                    border: `1px solid ${isActive ? 'var(--kinpaku)' : 'var(--hairline)'}`,
-                    borderRadius: 'var(--r-sm)',
-                    fontWeight: isActive ? 700 : 500,
+                    color: isActive ? 'var(--champagne)' : 'var(--text-muted)',
+                    marginRight: 24,
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
                   }}
                 >
-                  {label}
+                  {t.label}
+                  {/* active underline */}
                   <span
-                    className="tabnum"
-                    style={{
-                      fontSize: '0.58rem',
-                      color: isActive ? 'var(--lacquer-deep)' : 'var(--text-disabled)',
-                      fontWeight: isActive ? 700 : 400,
-                    }}
-                  >
-                    {count}
-                  </span>
+                    className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full transition-all"
+                    style={{ background: isActive ? 'var(--kinpaku)' : 'transparent' }}
+                    aria-hidden="true"
+                  />
                 </button>
               )
             })}
           </div>
+        </div>
+
+        {/* ── Tab: Partidos ────────────────────────────────────────────────── */}
+        {drawerTab === 'partidos' && (
+          <div
+            className="overflow-y-auto flex-1 min-h-0"
+            style={{
+              overscrollBehavior: 'contain',
+              WebkitOverflowScrolling: 'touch',
+              paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
+            }}
+          >
+            {teamMatches.length === 0 ? (
+              <div className="py-16 text-center px-6">
+                <p className="eyebrow" style={{ color: 'var(--text-muted)' }}>
+                  No hay partidos disponibles
+                </p>
+              </div>
+            ) : (
+              <div style={{ background: 'var(--raised-lacquer)' }}>
+                {Array.from(matchesByDate.entries()).map(([dateKey, dayMatches]) => (
+                  <div key={dateKey}>
+                    {/* Date header */}
+                    <div className="px-4 py-2" style={{ background: 'var(--graphite)', borderBottom: '1px solid var(--hairline)' }}>
+                      <span className="eyebrow" style={{ color: 'var(--text-disabled)', fontSize: '0.6rem', letterSpacing: '0.1em' }}>
+                        {new Intl.DateTimeFormat('es', {
+                          weekday: 'long', day: 'numeric', month: 'long', timeZone,
+                        }).format(new Date(dateKey + 'T12:00:00'))}
+                      </span>
+                    </div>
+                    {dayMatches.map((m) => (
+                      <MatchRow key={m.id} match={m} teamId={team.id} timeZone={timeZone} />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
 
-        {/* Squad list — this is the ONLY scrolling region */}
-        <div
-          className="overflow-y-auto flex-1 min-h-0 px-4 pt-3 space-y-4"
-          style={{
-            overscrollBehavior: 'contain',
-            WebkitOverflowScrolling: 'touch',
-            paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
-          }}
-        >
-          {loading ? (
-            <div className="space-y-2 pt-1">
-              {[...Array(8)].map((_, i) => (
-                <div
-                  key={i}
-                  className="h-[88px] animate-pulse"
-                  style={{ background: 'var(--raised-lacquer)', borderRadius: 'var(--r-md)' }}
-                />
-              ))}
-            </div>
-          ) : squad.length ? (
-            visiblePositions.map((pos) => {
-              const players = grouped[pos] ?? []
-              if (!players.length) return null
-              return (
-                <section key={pos}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <div
-                      className="w-1 h-3 flex-shrink-0"
-                      style={{ background: POSITION_COLOR[pos], borderRadius: '1px' }}
-                      aria-hidden="true"
-                    />
-                    <h3 className="eyebrow" style={{ color: POSITION_COLOR[pos], letterSpacing: '0.14em' }}>
-                      {POSITION_LABEL[pos]}
-                    </h3>
-                    <span className="eyebrow tabnum" style={{ color: 'var(--text-disabled)' }}>{players.length}</span>
-                  </div>
-                  <div className="space-y-1.5">
-                    {players.map((p) => <PlayerCard key={p.id} player={p} teamId={team.id} />)}
-                  </div>
-                </section>
-              )
-            })
-          ) : (
+        {/* ── Tab: Equipo ──────────────────────────────────────────────────── */}
+        {drawerTab === 'equipo' && (
+          <>
+            {/* Position filter pills */}
+            {!loading && squad.length > 0 && (
+              <div
+                className="flex gap-2 px-5 py-2.5 shrink-0 overflow-x-auto"
+                style={{ borderBottom: '1px solid var(--hairline)' }}
+              >
+                {(['ALL', ...positionsWithPlayers] as string[]).map((pos) => {
+                  const isActive = posFilter === pos
+                  const label = pos === 'ALL' ? 'Todos' : (POSITION_ABBR[pos] ?? pos)
+                  const count = pos === 'ALL' ? squad.length : (grouped[pos] ?? []).length
+                  return (
+                    <button
+                      key={pos}
+                      onClick={() => setPosFilter(pos)}
+                      className="eyebrow shrink-0 flex items-center gap-1.5 transition-colors"
+                      style={{
+                        padding: '4px 10px',
+                        background: isActive ? 'var(--kinpaku)' : 'transparent',
+                        color: isActive ? 'var(--lacquer-deep)' : 'var(--text-muted)',
+                        border: `1px solid ${isActive ? 'var(--kinpaku)' : 'var(--hairline)'}`,
+                        borderRadius: 'var(--r-sm)',
+                        fontWeight: isActive ? 700 : 500,
+                      }}
+                    >
+                      {label}
+                      <span
+                        className="tabnum"
+                        style={{
+                          fontSize: '0.58rem',
+                          color: isActive ? 'var(--lacquer-deep)' : 'var(--text-disabled)',
+                          fontWeight: isActive ? 700 : 400,
+                        }}
+                      >
+                        {count}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+
+            {/* Squad list */}
             <div
-              className="px-4 py-5 text-center"
+              className="overflow-y-auto flex-1 min-h-0 px-4 pt-3 space-y-4"
               style={{
-                background: 'var(--raised-lacquer)',
-                border: '1px solid var(--hairline)',
-                borderRadius: 'var(--r-lg)',
+                overscrollBehavior: 'contain',
+                WebkitOverflowScrolling: 'touch',
+                paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
               }}
             >
-              <p className="eyebrow mb-2" style={{ color: 'var(--kinpaku)' }}>Plantel no disponible</p>
-              <p className="text-sm leading-6" style={{ color: 'var(--text-muted)' }}>
-                {error ?? 'No pudimos cargar jugadores para esta selección en este momento.'}
+              {loading ? (
+                <div className="space-y-2 pt-1">
+                  {[...Array(8)].map((_, i) => (
+                    <div key={i} className="h-22 animate-pulse"
+                      style={{ background: 'var(--raised-lacquer)', borderRadius: 'var(--r-md)' }} />
+                  ))}
+                </div>
+              ) : squad.length ? (
+                visiblePositions.map((pos) => {
+                  const players = grouped[pos] ?? []
+                  if (!players.length) return null
+                  return (
+                    <section key={pos}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-1 h-3 shrink-0"
+                          style={{ background: POSITION_COLOR[pos], borderRadius: '1px' }} aria-hidden="true" />
+                        <h3 className="eyebrow" style={{ color: POSITION_COLOR[pos], letterSpacing: '0.14em' }}>
+                          {POSITION_LABEL[pos]}
+                        </h3>
+                        <span className="eyebrow tabnum" style={{ color: 'var(--text-disabled)' }}>{players.length}</span>
+                      </div>
+                      <div className="space-y-1.5">
+                        {players.map((p) => <PlayerCard key={p.id} player={p} teamId={team.id} />)}
+                      </div>
+                    </section>
+                  )
+                })
+              ) : (
+                <div className="px-4 py-5 text-center"
+                  style={{ background: 'var(--raised-lacquer)', border: '1px solid var(--hairline)', borderRadius: 'var(--r-lg)' }}>
+                  <p className="eyebrow mb-2" style={{ color: 'var(--kinpaku)' }}>Plantel no disponible</p>
+                  <p className="text-sm leading-6" style={{ color: 'var(--text-muted)' }}>
+                    {error ?? 'No pudimos cargar jugadores para esta selección en este momento.'}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="px-5 pt-2.5 shrink-0"
+              style={{ borderTop: '1px solid var(--hairline)', paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0px))' }}>
+              <p className="eyebrow text-center" style={{ color: 'var(--text-disabled)' }}>
+                {detail?.squadSource ?? 'Wikipedia'} · toca cada jugador para ver detalles
               </p>
             </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div
-          className="px-5 pt-2.5 flex-shrink-0"
-          style={{
-            borderTop: '1px solid var(--hairline)',
-            paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0px))',
-          }}
-        >
-          <p className="eyebrow text-center" style={{ color: 'var(--text-disabled)' }}>
-            {detail?.squadSource ?? 'football-data.org'} · toca cada jugador para ver detalles
-          </p>
-        </div>
+          </>
+        )}
       </div>
     </>,
     document.body,

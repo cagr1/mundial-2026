@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { Icon } from '@iconify/react'
 import { Standing } from '@/types/football'
 
 const GROUP_ACCENT: Record<string, string> = {
@@ -18,9 +19,10 @@ const GROUP_ACCENT: Record<string, string> = {
 
 interface Props {
   standing: Standing
+  onSelect?: (standing: Standing) => void
 }
 
-export default function GroupStandings({ standing }: Props) {
+export default function GroupStandings({ standing, onSelect }: Props) {
   const label = standing.group.replace('GROUP_', 'Group ')
   const accent = GROUP_ACCENT[label] ?? 'var(--kinpaku)'
 
@@ -29,13 +31,16 @@ export default function GroupStandings({ standing }: Props) {
       className="glass-card overflow-hidden"
       style={{ borderRadius: 12 }}
     >
-      {/* Group header */}
-      <div
-        className="px-4 py-3 flex items-center gap-3"
-        style={{ borderBottom: '1px solid var(--glass-border)' }}
+      {/* Group header — tappable if onSelect provided */}
+      <button
+        className="w-full px-4 py-3 flex items-center gap-3 text-left"
+        style={{ borderBottom: '1px solid var(--glass-border)', background: 'transparent', cursor: onSelect ? 'pointer' : 'default' }}
+        onClick={() => onSelect?.(standing)}
+        aria-label={onSelect ? `Ver detalles ${label}` : undefined}
+        tabIndex={onSelect ? 0 : -1}
       >
         <div
-          className="w-1 h-5 flex-shrink-0 rounded-full"
+          className="w-1 h-5 shrink-0 rounded-full"
           style={{ background: accent }}
           aria-hidden="true"
         />
@@ -51,7 +56,10 @@ export default function GroupStandings({ standing }: Props) {
         >
           QUALIFICATION ROUND
         </span>
-      </div>
+        {onSelect && (
+          <Icon icon="material-symbols:chevron-right" width={18} height={18} style={{ color: 'var(--text-disabled)', flexShrink: 0 }} />
+        )}
+      </button>
 
       {/* Table */}
       <div className="overflow-x-auto">
@@ -87,7 +95,7 @@ export default function GroupStandings({ standing }: Props) {
               return (
                 <tr
                   key={entry.team.id}
-                  className="active:bg-[var(--graphite)]/20"
+                  className="active:bg-(--graphite)/20"
                   style={{
                     borderBottom:
                       i < standing.table.length - 1
@@ -116,7 +124,7 @@ export default function GroupStandings({ standing }: Props) {
                     <div className="flex items-center gap-2">
                       {entry.team.crest ? (
                         <div
-                          className="relative flex-shrink-0 overflow-hidden rounded-sm"
+                          className="relative shrink-0 overflow-hidden rounded-sm"
                           style={{ width: 24, height: 16 }}
                         >
                           <Image
@@ -130,7 +138,7 @@ export default function GroupStandings({ standing }: Props) {
                         </div>
                       ) : (
                         <div
-                          className="flex-shrink-0 rounded-sm"
+                          className="shrink-0 rounded-sm"
                           style={{ width: 24, height: 16, background: 'var(--graphite)' }}
                         />
                       )}

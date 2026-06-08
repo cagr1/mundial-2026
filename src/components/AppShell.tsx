@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useCallback, useSyncExternalStore } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Icon } from '@iconify/react'
 import MatchList from './MatchList'
 import GroupStandings from './GroupStandings'
+import GroupDrawer from './GroupDrawer'
 import TeamsGrid from './TeamsGrid'
 import Countdown from './Countdown'
 import CalendarButton from './CalendarButton'
@@ -94,8 +96,10 @@ export default function AppShell({
   }, [])
   const [timeZone, setTimeZone] = useState('UTC')
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [selectedGroup, setSelectedGroup] = useState<Standing | null>(null)
   const [deferredInstall, setDeferredInstall] = useState<BeforeInstallPromptEvent | null>(null)
   const [installAccepted, setInstallAccepted] = useState(false)
+  const [showIntro, setShowIntro] = useState(true)
   const router = useRouter()
 
   // Detect iOS Safari on client — server snapshot returns false, no hydration mismatch
@@ -130,6 +134,11 @@ export default function AppShell({
   useEffect(() => {
     const detected = Intl.DateTimeFormat().resolvedOptions().timeZone
     const timer = window.setTimeout(() => setTimeZone(detected), 0)
+    return () => window.clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setShowIntro(false), 1450)
     return () => window.clearTimeout(timer)
   }, [])
 
@@ -179,6 +188,20 @@ export default function AppShell({
 
   return (
     <div className="flex-1 flex flex-col">
+      {showIntro && (
+        <div className="launch-intro" aria-hidden="true">
+          <div className="launch-intro-card">
+            <Image
+              src="/app-logo.png"
+              alt=""
+              width={150}
+              height={150}
+              priority
+              className="launch-logo"
+            />
+          </div>
+        </div>
+      )}
 
       {/* ── Fixed top header ────────────────────────────────────────────── */}
       <header
@@ -194,17 +217,19 @@ export default function AppShell({
 
             {/* Brand */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              <Icon
-                icon="material-symbols:sports-soccer"
-                width={22}
-                height={22}
-                style={{ color: 'var(--kinpaku)', flexShrink: 0 }}
+              <Image
+                src="/app-logo.png"
+                alt="WC 26"
+                width={38}
+                height={38}
+                priority
+                className="app-header-logo"
               />
               <span
                 className="font-extrabold tracking-tight uppercase leading-none"
                 style={{ color: 'var(--kinpaku)', fontSize: '0.95rem', letterSpacing: '0.06em' }}
               >
-                World Cup 2026
+                WC 26
               </span>
               {liveCount > 0 && (
                 <div
@@ -293,7 +318,7 @@ export default function AppShell({
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                   {standings.map((s) => (
-                    <GroupStandings key={s.group} standing={s} />
+                    <GroupStandings key={s.group} standing={s} onSelect={setSelectedGroup} />
                   ))}
                 </div>
               </>
@@ -314,6 +339,8 @@ export default function AppShell({
               teams={teams}
               favoriteId={favorite?.id ?? null}
               onToggleFavorite={handleToggleFavorite}
+              allMatches={matches}
+              timeZone={timeZone}
             />
           </div>
         ) : (
@@ -334,6 +361,17 @@ export default function AppShell({
           </a>
         </div>
       </main>
+
+      {/* ── Group drawer ────────────────────────────────────────────────── */}
+      {selectedGroup && (
+        <GroupDrawer
+          key={selectedGroup.group}
+          standing={selectedGroup}
+          matches={matches}
+          timeZone={timeZone}
+          onClose={() => setSelectedGroup(null)}
+        />
+      )}
 
       {/* ── Bottom nav ─────────────────────────────────────────────────── */}
       <nav

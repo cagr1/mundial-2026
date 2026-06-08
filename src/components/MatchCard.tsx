@@ -219,6 +219,16 @@ export default function MatchCard({ match, timeZone }: Props) {
           </span>
         </div>
       </div>
+
+      {/* Venue */}
+      {match.venue && (
+        <div className="flex items-center justify-center gap-1 mt-3">
+          <Icon icon="material-symbols:stadium-outline" width={12} height={12} style={{ color: 'var(--text-disabled)', flexShrink: 0 }} />
+          <span style={{ color: 'var(--text-disabled)', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 500 }}>
+            {match.venue.name}{match.venue.city ? ` · ${match.venue.city}` : ''}
+          </span>
+        </div>
+      )}
     </article>
   )
 }

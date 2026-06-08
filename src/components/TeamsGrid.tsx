@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Icon } from '@iconify/react'
-import { Team } from '@/types/football'
+import { Team, Match } from '@/types/football'
 import TeamDrawer from './TeamDrawer'
 
 function TeamCard({
@@ -132,9 +132,11 @@ interface TeamsGridProps {
   teams: Team[]
   favoriteId?: number | null
   onToggleFavorite?: (team: Team) => void
+  allMatches?: Match[]
+  timeZone?: string
 }
 
-export default function TeamsGrid({ teams, favoriteId, onToggleFavorite }: TeamsGridProps) {
+export default function TeamsGrid({ teams, favoriteId, onToggleFavorite, allMatches = [], timeZone = 'UTC' }: TeamsGridProps) {
   const [selected, setSelected] = useState<Team | null>(null)
   const [query, setQuery] = useState('')
   const teamsRef = useRef(teams)
@@ -269,6 +271,8 @@ export default function TeamsGrid({ teams, favoriteId, onToggleFavorite }: Teams
             setSelected(null)
             updateTeamUrl(null)
           }}
+          allMatches={allMatches}
+          timeZone={timeZone}
         />
       ) : null}
     </>

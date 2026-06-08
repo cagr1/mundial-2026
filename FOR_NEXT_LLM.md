@@ -79,6 +79,17 @@ Clases utilitarias:
 
 ---
 
+## Regla visual obligatoria — debe verse como APP
+
+**Nunca apilar secciones distintas en un mismo panel de scroll.** Si un drawer o vista tiene más de un tipo de contenido (partidos + plantel, tabla + fixtures, etc.), usar tabs internos con un segmented control o tab bar propio. El usuario debe elegir qué ver, no scrollear mezclado.
+
+Ejemplo correcto: `TeamDrawer` tiene tabs "Partidos | Equipo" — cada tab ocupa todo el panel.  
+Ejemplo incorrecto: mostrar la lista de próximos partidos + el plantel apilados en el mismo scroll.
+
+Este principio aplica en **todos** los drawers, sheets y páginas de detalle del proyecto.
+
+---
+
 ## Trampas conocidas (leer antes de cambiar)
 
 1. **`useSyncExternalStore` + objetos**: el snapshot debe retornar la misma referencia si el dato no cambió. `JSON.parse` crea objetos nuevos cada vez → bucle infinito. Ver `useFavoriteTeam.ts` para el patrón correcto de caché.
