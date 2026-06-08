@@ -15,6 +15,7 @@ import FavoriteTeamCard from './FavoriteTeamCard'
 import KnockoutBracket from './KnockoutBracket'
 import DateCarousel from './DateCarousel'
 import StatsBento from './StatsBento'
+import LanguageSwitcher from './LanguageSwitcher'
 import { useFavoriteTeam } from '@/hooks/useFavoriteTeam'
 import { Match, Standing, Team } from '@/types/football'
 import { formatDateKey } from '@/lib/format-date'
@@ -184,6 +185,7 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
               )}
             </div>
             <div className="flex items-center gap-2">
+              <LanguageSwitcher />
               {showInstall && (
                 <button onClick={handleInstallClick} aria-label={t('ariaInstall')} title={t('ariaInstall')}
                   className="flex items-center justify-center soft-haptic focus-visible:outline-none"
