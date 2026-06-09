@@ -6,14 +6,17 @@ import { Match, Prediction } from '@/types/football'
 import { formatTime, isToday } from '@/lib/format-date'
 import PredictionBadge from './PredictionBadge'
 
-// FIFA TLA → ISO 3166-1 alpha-2 (flag-icons uses lowercase codes)
+// ESPN abbreviation → ISO 3166-1 alpha-2 (flag-icons usa lowercase)
+// ESPN no siempre usa códigos FIFA: Arabia Saudita es KSA, no SAU, etc.
+// Se incluyen variantes para cubrir posibles cambios de la API.
 const TLA_ISO2: Record<string, string> = {
   // CONCACAF
   MEX: 'mx', USA: 'us', CAN: 'ca',
-  PAN: 'pa', CRC: 'cr', HON: 'hn',
+  PAN: 'pa', CRC: 'cr', HON: 'hn', HND: 'hn',
   SLV: 'sv', GTM: 'gt', JAM: 'jm',
   TRI: 'tt', HAI: 'ht', CUB: 'cu',
   NCA: 'ni', GUY: 'gy', SUR: 'sr',
+  CUW: 'cw',                          // Curaçao (ESPN: CUW)
   // CONMEBOL
   ARG: 'ar', BRA: 'br', COL: 'co',
   ECU: 'ec', URU: 'uy', CHI: 'cl',
@@ -22,7 +25,7 @@ const TLA_ISO2: Record<string, string> = {
   FRA: 'fr', GER: 'de', ESP: 'es', POR: 'pt',
   NED: 'nl', BEL: 'be',
   ENG: 'gb-eng', SCO: 'gb-sct', WAL: 'gb-wls', NIR: 'gb-nir',
-  ITA: 'it', CRO: 'hr', SUI: 'ch',
+  ITA: 'it', CRO: 'hr', HRV: 'hr', SUI: 'ch', CHE: 'ch',
   DEN: 'dk', NOR: 'no', SWE: 'se',
   POL: 'pl', CZE: 'cz', SVK: 'sk',
   HUN: 'hu', ROU: 'ro', SRB: 'rs',
@@ -34,18 +37,30 @@ const TLA_ISO2: Record<string, string> = {
   // CAF
   MAR: 'ma', SEN: 'sn', CMR: 'cm',
   GHA: 'gh', NGA: 'ng', NGR: 'ng',
-  EGY: 'eg', RSA: 'za', ALG: 'dz',
+  EGY: 'eg', RSA: 'za', ZAF: 'za',
+  ALG: 'dz', DZA: 'dz',
   TUN: 'tn', CIV: 'ci', GUI: 'gn',
   MLI: 'ml', BFA: 'bf', ZIM: 'zw',
   MOZ: 'mz', TAN: 'tz', UGA: 'ug',
   ANG: 'ao', COD: 'cd', ETH: 'et',
+  CPV: 'cv',                          // Cabo Verde (ESPN: CPV)
+  GAB: 'ga', CGO: 'cg', TOG: 'tg',
+  BEN: 'bj', GNB: 'gw', SLE: 'sl',
+  LBR: 'lr', GNQ: 'gq', COM: 'km',
+  SSD: 'ss', SDN: 'sd', SOM: 'so',
+  RWA: 'rw', BDI: 'bi', ERI: 'er',
   // AFC
   KOR: 'kr', JPN: 'jp', IRN: 'ir',
-  SAU: 'sa', QAT: 'qa', AUS: 'au',
+  KSA: 'sa', SAU: 'sa',              // Arabia Saudita (ESPN: KSA)
+  QAT: 'qa', AUS: 'au',
   CHN: 'cn', IRQ: 'iq', JOR: 'jo',
   UAE: 'ae', IDN: 'id', UZB: 'uz',
   TKM: 'tm', KUW: 'kw', OMN: 'om',
   BHR: 'bh', IND: 'in', SYR: 'sy',
+  TJK: 'tj', KGZ: 'kg', KAZ: 'kz',
+  VIE: 'vn', THA: 'th', MAS: 'my', MYS: 'my',
+  PHI: 'ph', SIN: 'sg', PAK: 'pk',
+  LBN: 'lb', PLE: 'ps', YEM: 'ye',
   // OFC
   NZL: 'nz', FIJ: 'fj',
 }
@@ -73,7 +88,8 @@ function TeamFlag({ tla, name }: { tla: string; name: string }) {
       {iso2 ? (
         <span
           className={`fi fi-${iso2}`}
-          style={{ width: 80, height: 80, backgroundSize: 'cover', display: 'block', flexShrink: 0 }}
+          style={{ width: '100%', height: '100%', backgroundSize: 'cover', backgroundPosition: 'center', display: 'block' }}
+          role="img"
           aria-label={name}
         />
       ) : (
