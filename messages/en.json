@@ -107,6 +107,20 @@
   "carousel": {
     "today": "Today"
   },
+  "predictions": {
+    "title": "Your prediction",
+    "save": "Save",
+    "update": "Update",
+    "delete": "Delete",
+    "close": "Close",
+    "exact": "Exact score!",
+    "correct": "Correct result",
+    "wrong": "Wrong result",
+    "yourPick": "Your pick",
+    "actual": "Final score",
+    "lockMsg": "You can't change your prediction during the match",
+    "ariaLabel": "View / edit prediction"
+  },
   "stats": {
     "stadiums": "STADIUMS",
     "teams": "TEAMS"

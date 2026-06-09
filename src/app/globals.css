@@ -100,6 +100,7 @@ body {
 ::view-transition-new(root) { animation: 200ms ease-in  both vt-in;  }
 @keyframes vt-out { to   { opacity: 0; transform: translateY(-3px); } }
 @keyframes vt-in  { from { opacity: 0; transform: translateY(3px);  } }
+@keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
 .tab-panel {
   animation: tab-panel-in 140ms ease-out both;

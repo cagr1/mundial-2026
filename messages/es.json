@@ -107,6 +107,20 @@
   "carousel": {
     "today": "Hoy"
   },
+  "predictions": {
+    "title": "Tu pronóstico",
+    "save": "Guardar",
+    "update": "Actualizar",
+    "delete": "Borrar",
+    "close": "Cerrar",
+    "exact": "¡Marcador exacto!",
+    "correct": "Resultado correcto",
+    "wrong": "Resultado incorrecto",
+    "yourPick": "Tu predicción",
+    "actual": "Resultado final",
+    "lockMsg": "No puedes cambiar tu predicción durante el partido",
+    "ariaLabel": "Ver / editar pronóstico"
+  },
   "stats": {
     "stadiums": "ESTADIOS",
     "teams": "EQUIPOS"

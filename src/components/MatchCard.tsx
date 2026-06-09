@@ -2,8 +2,9 @@
 
 import { Icon } from '@iconify/react'
 import { useTranslations } from 'next-intl'
-import { Match } from '@/types/football'
+import { Match, Prediction } from '@/types/football'
 import { formatTime, isToday } from '@/lib/format-date'
+import PredictionBadge from './PredictionBadge'
 
 const TLA_FLAG: Record<string, string> = {
   MEX: 'mexico', USA: 'united-states', CAN: 'canada',
@@ -115,9 +116,9 @@ function CenterBlock({ match, timeZone }: { match: Match; timeZone: string }) {
   )
 }
 
-interface Props { match: Match; timeZone: string }
+interface Props { match: Match; timeZone: string; prediction?: Prediction; onPredict?: () => void }
 
-export default function MatchCard({ match, timeZone }: Props) {
+export default function MatchCard({ match, timeZone, prediction, onPredict }: Props) {
   const t = useTranslations('match')
   const isLive = LIVE_STATUSES.has(match.status)
   const today = isToday(match.utcDate, timeZone)
@@ -139,9 +140,14 @@ export default function MatchCard({ match, timeZone }: Props) {
         <span style={{ color: labelColor, fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', background: 'var(--graphite)', borderRadius: 999, padding: '3px 10px', lineHeight: 1.6 }}>
           {groupLabel}
         </span>
-        <span style={{ color: 'var(--text-faint)', fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', fontVariantNumeric: 'tabular-nums' }} suppressHydrationWarning>
-          {formatTime(match.utcDate, timeZone)} {t('localTime')}
-        </span>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {onPredict && (
+            <PredictionBadge match={match} prediction={prediction} onClick={onPredict} />
+          )}
+          <span style={{ color: 'var(--text-faint)', fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', fontVariantNumeric: 'tabular-nums' }} suppressHydrationWarning>
+            {formatTime(match.utcDate, timeZone)} {t('localTime')}
+          </span>
+        </div>
       </div>
 
       <div className="flex items-center justify-between gap-3">

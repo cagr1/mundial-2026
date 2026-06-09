@@ -16,7 +16,9 @@ import KnockoutBracket from './KnockoutBracket'
 import DateCarousel from './DateCarousel'
 import StatsBento from './StatsBento'
 import LanguageSwitcher from './LanguageSwitcher'
+import PredictionModal from './PredictionModal'
 import { useFavoriteTeam } from '@/hooks/useFavoriteTeam'
+import { usePredictions } from '@/hooks/usePredictions'
 import { Match, Standing, Team } from '@/types/football'
 import { formatDateKey } from '@/lib/format-date'
 
@@ -58,6 +60,8 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
 
   const [tab, setTab] = useState<Tab>('partidos')
   const { favorite, saveFavorite } = useFavoriteTeam()
+  const { predictions, setPrediction } = usePredictions()
+  const [predictingMatch, setPredictingMatch] = useState<Match | null>(null)
 
   const handleToggleFavorite = useCallback(
     (team: Team) => saveFavorite(favorite?.id === team.id ? null : team),
@@ -209,7 +213,7 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
               <FavoriteTeamCard team={favorite} matches={matches} timeZone={timeZone} onRemove={() => saveFavorite(null)} />
             )}
             <DateCarousel dates={matchDates} selected={selectedDate} onSelect={setSelectedDate} timeZone={timeZone} phaseLabel={phaseLabel} />
-            <MatchList matches={filteredMatches} timeZone={timeZone} />
+            <MatchList matches={filteredMatches} timeZone={timeZone} predictions={predictions} onPredict={setPredictingMatch} />
             <StatsBento />
           </div>
         ) : tab === 'grupos' ? (
@@ -253,6 +257,16 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
 
       {selectedGroup && (
         <GroupDrawer key={selectedGroup.group} standing={selectedGroup} matches={matches} timeZone={timeZone} onClose={() => setSelectedGroup(null)} />
+      )}
+
+      {predictingMatch && (
+        <PredictionModal
+          key={predictingMatch.id}
+          match={predictingMatch}
+          prediction={predictions[predictingMatch.id]}
+          onSave={setPrediction}
+          onClose={() => setPredictingMatch(null)}
+        />
       )}
 
       <nav

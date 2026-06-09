@@ -107,6 +107,20 @@
   "carousel": {
     "today": "今天"
   },
+  "predictions": {
+    "title": "你的预测",
+    "save": "保存",
+    "update": "更新",
+    "delete": "删除",
+    "close": "关闭",
+    "exact": "完美预测！",
+    "correct": "结果正确",
+    "wrong": "预测错误",
+    "yourPick": "你的预测",
+    "actual": "最终比分",
+    "lockMsg": "比赛进行中，无法修改预测",
+    "ariaLabel": "查看/编辑预测"
+  },
   "stats": {
     "stadiums": "球场",
     "teams": "球队"
