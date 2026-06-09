@@ -94,7 +94,7 @@ function MatchRow({ match, teamId, timeZone }: { match: Match; teamId: number; t
         )}
         <div className="min-w-0">
           <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-warm)' }}>
-            <span style={{ color: 'var(--text-disabled)', fontWeight: 400, marginRight: 4 }}>{isHome ? 'vs' : '@'}</span>
+            <span style={{ color: 'var(--text-disabled)', fontWeight: 400, marginRight: 4 }}>vs</span>
             {opponent.shortName}
           </p>
           <p className="eyebrow truncate mt-0.5" style={{ color: 'var(--text-disabled)', fontSize: '0.58rem' }}>
