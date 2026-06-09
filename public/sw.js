@@ -1,4 +1,4 @@
-const CACHE = 'mundial-2026-v5'
+const CACHE = 'mundial-2026-v6'
 // Do NOT precache '/' — it's force-dynamic and cached HTML may reference stale JS chunks
 const PRECACHE = ['/manifest.json', '/brand-mark.svg', '/icon-192.png', '/favicon.ico']
 
