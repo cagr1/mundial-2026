@@ -85,6 +85,9 @@ export interface Prediction {
 
 export type PredictionsMap = Record<number, Prediction>
 
+/** matchId → teamId elegido como ganador */
+export type BracketPicks = Record<number, number>
+
 export interface MatchesResponse {
   resultSet: { count: number; first: string; last: string; played: number }
   matches: Match[]

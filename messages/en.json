@@ -39,7 +39,8 @@
     "thirdPlace": "Third Place",
     "colQF": "Quarters",
     "colSF": "Semis",
-    "colFinal": "Final"
+    "colFinal": "Final",
+    "pickHint": "Tap a team to pick your winner"
   },
   "team": {
     "Goalkeeper": "Goalkeepers",

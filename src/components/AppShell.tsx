@@ -19,6 +19,7 @@ import LanguageSwitcher from './LanguageSwitcher'
 import PredictionModal from './PredictionModal'
 import { useFavoriteTeam } from '@/hooks/useFavoriteTeam'
 import { usePredictions } from '@/hooks/usePredictions'
+import { useBracketPicks } from '@/hooks/useBracketPicks'
 import { Match, Standing, Team } from '@/types/football'
 import { formatDateKey } from '@/lib/format-date'
 
@@ -61,6 +62,7 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
   const [tab, setTab] = useState<Tab>('partidos')
   const { favorite, saveFavorite } = useFavoriteTeam()
   const { predictions, setPrediction } = usePredictions()
+  const { picks, setPick } = useBracketPicks()
   const [predictingMatch, setPredictingMatch] = useState<Match | null>(null)
 
   const handleToggleFavorite = useCallback(
@@ -243,7 +245,7 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
           </div>
         ) : (
           <div key="bracket" className="tab-panel">
-            <KnockoutBracket matches={matches} timeZone={timeZone} />
+            <KnockoutBracket matches={matches} timeZone={timeZone} picks={picks} onPick={setPick} />
           </div>
         )}
 

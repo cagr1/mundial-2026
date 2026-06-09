@@ -39,7 +39,8 @@
     "thirdPlace": "三四名决赛",
     "colQF": "四分之一",
     "colSF": "半决赛",
-    "colFinal": "决赛"
+    "colFinal": "决赛",
+    "pickHint": "点击球队选择你的冠军"
   },
   "team": {
     "Goalkeeper": "门将",
