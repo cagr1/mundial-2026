@@ -6,39 +6,48 @@ import { Match, Prediction } from '@/types/football'
 import { formatTime, isToday } from '@/lib/format-date'
 import PredictionBadge from './PredictionBadge'
 
-const TLA_FLAG: Record<string, string> = {
-  MEX: 'mexico', USA: 'united-states', CAN: 'canada',
-  PAN: 'panama', CRC: 'costa-rica', HON: 'honduras',
-  SLV: 'el-salvador', GTM: 'guatemala', JAM: 'jamaica',
-  TRI: 'trinidad-and-tobago', HAI: 'haiti', CUB: 'cuba',
-  NCA: 'nicaragua', GUY: 'guyana', SUR: 'suriname',
-  ARG: 'argentina', BRA: 'brazil', COL: 'colombia',
-  ECU: 'ecuador', URU: 'uruguay', CHI: 'chile',
-  BOL: 'bolivia', PAR: 'paraguay', PER: 'peru', VEN: 'venezuela',
-  FRA: 'france', GER: 'germany', ESP: 'spain', POR: 'portugal',
-  NED: 'netherlands', BEL: 'belgium', ENG: 'united-kingdom',
-  ITA: 'italy', CRO: 'croatia', SUI: 'switzerland',
-  DEN: 'denmark', NOR: 'norway', SWE: 'sweden',
-  POL: 'poland', CZE: 'czechia', SVK: 'slovakia',
-  HUN: 'hungary', ROU: 'romania', SRB: 'serbia',
-  UKR: 'ukraine', TUR: 'turkey', GRE: 'greece',
-  ISL: 'iceland', SCO: 'scotland', WAL: 'wales',
-  IRL: 'ireland', AUT: 'austria', SVN: 'slovenia',
-  ALB: 'albania', GEO: 'georgia', MKD: 'north-macedonia',
-  MNE: 'montenegro', BIH: 'bosnia-and-herzegovina',
-  MAR: 'morocco', SEN: 'senegal', CMR: 'cameroon',
-  GHA: 'ghana', NGA: 'nigeria', NGR: 'nigeria',
-  EGY: 'egypt', RSA: 'south-africa', ALG: 'algeria',
-  TUN: 'tunisia', CIV: 'cote-divoire', GUI: 'guinea',
-  MLI: 'mali', BFA: 'burkina-faso', ZIM: 'zimbabwe',
-  MOZ: 'mozambique', TAN: 'tanzania', UGA: 'uganda',
-  KOR: 'south-korea', JPN: 'japan', IRN: 'iran',
-  SAU: 'saudi-arabia', QAT: 'qatar', AUS: 'australia',
-  CHN: 'china', IRQ: 'iraq', JOR: 'jordan',
-  UAE: 'united-arab-emirates', IDN: 'indonesia',
-  UZB: 'uzbekistan', TKM: 'turkmenistan', KUW: 'kuwait',
-  OMN: 'oman', BHR: 'bahrain', IND: 'india',
-  NZL: 'new-zealand', FIJ: 'fiji',
+// FIFA TLA → ISO 3166-1 alpha-2 (flag-icons uses lowercase codes)
+const TLA_ISO2: Record<string, string> = {
+  // CONCACAF
+  MEX: 'mx', USA: 'us', CAN: 'ca',
+  PAN: 'pa', CRC: 'cr', HON: 'hn',
+  SLV: 'sv', GTM: 'gt', JAM: 'jm',
+  TRI: 'tt', HAI: 'ht', CUB: 'cu',
+  NCA: 'ni', GUY: 'gy', SUR: 'sr',
+  // CONMEBOL
+  ARG: 'ar', BRA: 'br', COL: 'co',
+  ECU: 'ec', URU: 'uy', CHI: 'cl',
+  BOL: 'bo', PAR: 'py', PER: 'pe', VEN: 've',
+  // UEFA
+  FRA: 'fr', GER: 'de', ESP: 'es', POR: 'pt',
+  NED: 'nl', BEL: 'be',
+  ENG: 'gb-eng', SCO: 'gb-sct', WAL: 'gb-wls', NIR: 'gb-nir',
+  ITA: 'it', CRO: 'hr', SUI: 'ch',
+  DEN: 'dk', NOR: 'no', SWE: 'se',
+  POL: 'pl', CZE: 'cz', SVK: 'sk',
+  HUN: 'hu', ROU: 'ro', SRB: 'rs',
+  UKR: 'ua', TUR: 'tr', GRE: 'gr',
+  ISL: 'is', IRL: 'ie', AUT: 'at', SVN: 'si',
+  ALB: 'al', GEO: 'ge', MKD: 'mk',
+  MNE: 'me', BIH: 'ba', KOS: 'xk',
+  FIN: 'fi', EST: 'ee', LVA: 'lv', LTU: 'lt',
+  // CAF
+  MAR: 'ma', SEN: 'sn', CMR: 'cm',
+  GHA: 'gh', NGA: 'ng', NGR: 'ng',
+  EGY: 'eg', RSA: 'za', ALG: 'dz',
+  TUN: 'tn', CIV: 'ci', GUI: 'gn',
+  MLI: 'ml', BFA: 'bf', ZIM: 'zw',
+  MOZ: 'mz', TAN: 'tz', UGA: 'ug',
+  ANG: 'ao', COD: 'cd', ETH: 'et',
+  // AFC
+  KOR: 'kr', JPN: 'jp', IRN: 'ir',
+  SAU: 'sa', QAT: 'qa', AUS: 'au',
+  CHN: 'cn', IRQ: 'iq', JOR: 'jo',
+  UAE: 'ae', IDN: 'id', UZB: 'uz',
+  TKM: 'tm', KUW: 'kw', OMN: 'om',
+  BHR: 'bh', IND: 'in', SYR: 'sy',
+  // OFC
+  NZL: 'nz', FIJ: 'fj',
 }
 
 const GROUP_LABEL_COLOR: Record<string, string> = {
@@ -54,19 +63,24 @@ const LIVE_STATUSES = new Set(['LIVE', 'IN_PLAY', 'PAUSED'])
 const DONE_STATUSES = new Set(['FINISHED', 'AWARDED'])
 
 function TeamFlag({ tla, name }: { tla: string; name: string }) {
-  const flagName = TLA_FLAG[tla?.toUpperCase()]
-  if (flagName) {
-    return (
-      <div style={{ width: 56, height: 56, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, border: '2px solid var(--graphite)', background: 'var(--graphite)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Icon icon={`emojione-v1:flag-for-${flagName}`} style={{ width: 72, height: 72, display: 'block', flexShrink: 0 }} />
-      </div>
-    )
-  }
+  const iso2 = TLA_ISO2[tla?.toUpperCase()]
   return (
-    <div style={{ width: 56, height: 56, borderRadius: '50%', flexShrink: 0, border: '2px solid var(--graphite-2)', background: 'var(--graphite)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <span style={{ color: 'var(--text-faint)', fontSize: 11, fontWeight: 600, letterSpacing: '0.06em' }}>
-        {(tla ?? name ?? '?').slice(0, 3).toUpperCase()}
-      </span>
+    <div style={{
+      width: 56, height: 56, borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
+      border: '2px solid var(--graphite)', background: 'var(--graphite)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
+      {iso2 ? (
+        <span
+          className={`fi fi-${iso2}`}
+          style={{ width: 80, height: 80, backgroundSize: 'cover', display: 'block', flexShrink: 0 }}
+          aria-label={name}
+        />
+      ) : (
+        <span style={{ color: 'var(--text-faint)', fontSize: 11, fontWeight: 600, letterSpacing: '0.06em' }}>
+          {(tla ?? name ?? '?').slice(0, 3).toUpperCase()}
+        </span>
+      )}
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/routing'
 import '../globals.css'
+import 'flag-icons/css/flag-icons.min.css'
 
 const inter = Inter({
   variable: '--font-inter',
