@@ -1,0 +1,135 @@
+{
+  "nav": {
+    "partidos": "Jogos",
+    "grupos": "Grupos",
+    "equipos": "Seleções",
+    "bracket": "Chaveamento",
+    "ariaMain": "Navegação principal",
+    "ariaInstall": "Instalar app"
+  },
+  "stage": {
+    "GROUP_STAGE": "FASE DE GRUPOS",
+    "LAST_16": "OITAVAS DE FINAL",
+    "QUARTER_FINALS": "QUARTAS DE FINAL",
+    "SEMI_FINALS": "SEMIFINAIS",
+    "THIRD_PLACE": "TERCEIRO LUGAR",
+    "FINAL": "GRANDE FINAL"
+  },
+  "match": {
+    "live": "AO VIVO",
+    "ht": "INT",
+    "final": "Encerrado",
+    "upcoming": "EM BREVE",
+    "ft": "FT",
+    "groupsAdvance": "Os 2 primeiros de cada grupo avançam para a próxima fase",
+    "groupsUnavailable": "Grupos não disponíveis no momento",
+    "localTime": "local"
+  },
+  "bracket": {
+    "ROUND_OF_32": "Rodada de 32",
+    "LAST_16": "Oitavas",
+    "QUARTER_FINALS": "Quartas",
+    "SEMI_FINALS": "Semis",
+    "THIRD_PLACE": "3º Lugar",
+    "FINAL": "Final",
+    "tbd": "A definir",
+    "champion": "CAMPEÃO",
+    "available": "Chaveamento disponível na Fase Eliminatória",
+    "availableSince": "Disponível a partir de ~julho 2026 · Atualização automática",
+    "thirdPlace": "Terceiro Lugar",
+    "colQF": "Quartas",
+    "colSF": "Semis",
+    "colFinal": "Final"
+  },
+  "team": {
+    "Goalkeeper": "Goleiros",
+    "Defence": "Defensores",
+    "Midfield": "Meio-campistas",
+    "Offence": "Atacantes",
+    "tabMatches": "Jogos",
+    "tabSquad": "Elenco",
+    "noMatches": "Nenhum jogo disponível",
+    "squadUnavailable": "Elenco indisponível",
+    "squadUnavailableDesc": "Não foi possível carregar os jogadores desta seleção no momento.",
+    "playerTip": "toque no jogador para ver detalhes",
+    "close": "Fechar",
+    "all": "Todos",
+    "years": "anos",
+    "liveNow": "AO VIVO",
+    "dt": "Técnico",
+    "tap": "toque"
+  },
+  "groups": {
+    "qualificationRound": "FASE DE GRUPOS",
+    "team": "SELEÇÃO",
+    "standings": "CLASSIFICAÇÃO",
+    "fixtures": "JOGOS DO GRUPO",
+    "ariaDetails": "Ver detalhes {group}"
+  },
+  "countdown": {
+    "days": "dias",
+    "hours": "horas",
+    "minutes": "min",
+    "seconds": "seg",
+    "firstMatch": "Primeiro jogo"
+  },
+  "favorite": {
+    "title": "Minha Seleção",
+    "remove": "Remover",
+    "removeAria": "Remover seleção favorita",
+    "live": "Em jogo",
+    "next": "Próximo jogo",
+    "last": "Último resultado",
+    "noMatches": "Nenhum jogo disponível ainda"
+  },
+  "install": {
+    "back": "Voltar",
+    "backAria": "Voltar ao início",
+    "eyebrow": "Copa do Mundo 2026",
+    "title": "Instale o app",
+    "description": "Acesse jogos, grupos e horários direto da sua tela inicial.",
+    "alreadyInstalled": "O app já está instalado no seu dispositivo.",
+    "installing": "Instalando…",
+    "addToHome": "Adicionar à tela inicial",
+    "androidTitle": "Android · Chrome",
+    "androidStep1": "Seu navegador detectou que este app pode ser instalado.",
+    "androidStep2": "Toque no botão abaixo para adicioná-lo à tela inicial.",
+    "iosTitle": "iPhone · iPad (Safari)",
+    "iosStep1": "Abra esta página no Safari (não Chrome ou Firefox).",
+    "iosStep2": "Toque no botão Compartilhar na barra inferior.",
+    "iosStep3": "Role para baixo e escolha \"Adicionar à Tela de Início\".",
+    "iosStep4": "Toque em Adicionar para confirmar.",
+    "desktopTitle": "Computador · Chrome / Edge",
+    "desktopStep1": "Procure o ícone de instalação na barra de endereços (extrema direita).",
+    "desktopStep2": "Clique nele e confirme com Instalar.",
+    "desktopStep3": "O app abrirá em sua própria janela sem a barra do navegador."
+  },
+  "carousel": {
+    "today": "Hoje"
+  },
+  "predictions": {
+    "title": "Seu palpite",
+    "save": "Salvar",
+    "update": "Atualizar",
+    "delete": "Excluir",
+    "close": "Fechar",
+    "exact": "Placar exato!",
+    "correct": "Resultado correto",
+    "wrong": "Resultado errado",
+    "yourPick": "Seu palpite",
+    "actual": "Placar final",
+    "lockMsg": "Não é possível alterar seu palpite durante o jogo",
+    "ariaLabel": "Ver / editar palpite"
+  },
+  "stats": {
+    "stadiums": "ESTÁDIOS",
+    "teams": "SELEÇÕES"
+  },
+  "player": {
+    "notFound": "Jogador não encontrado",
+    "Goalkeeper": "Goleiro",
+    "Defence": "Defensor",
+    "Midfield": "Meio-campista",
+    "Offence": "Atacante"
+  }
+}

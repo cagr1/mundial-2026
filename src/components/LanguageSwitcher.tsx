@@ -5,10 +5,11 @@ import { useLocale } from 'next-intl'
 import { useRouter, usePathname } from '@/i18n/navigation'
 
 const LOCALES = [
-  { code: 'es', label: 'Español',  short: 'ES', flag: '🇲🇽' },
-  { code: 'en', label: 'English',  short: 'EN', flag: '🇺🇸' },
-  { code: 'zh', label: '中文',     short: '中文', flag: '🇨🇳' },
-  { code: 'hi', label: 'हिन्दी',  short: 'HI', flag: '🇮🇳' },
+  { code: 'es', label: 'Español',   short: 'ES', flag: '🇲🇽' },
+  { code: 'en', label: 'English',   short: 'EN', flag: '🇺🇸' },
+  { code: 'pt', label: 'Português', short: 'PT', flag: '🇧🇷' },
+  { code: 'zh', label: '中文',      short: '中文', flag: '🇨🇳' },
+  { code: 'hi', label: 'हिन्दी',   short: 'HI', flag: '🇮🇳' },
 ]
 
 export default function LanguageSwitcher() {
