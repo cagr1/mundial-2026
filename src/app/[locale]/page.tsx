@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 
 export const dynamic = 'force-dynamic'
 import { getESPNMatches, getESPNStandings, getESPNTeams } from '@/lib/espn-api'
+import { computeStandings } from '@/lib/standings'
 import AppShell from '@/components/AppShell'
 
 function AppSkeleton() {
@@ -32,7 +33,8 @@ async function AppData() {
   ])
 
   const matches = matchesResult.status === 'fulfilled' ? matchesResult.value : []
-  const standings = standingsResult.status === 'fulfilled' ? standingsResult.value : []
+  const rawStandings = standingsResult.status === 'fulfilled' ? standingsResult.value : []
+  const standings = computeStandings(rawStandings, matches)
   const teams = teamsResult.status === 'fulfilled' ? teamsResult.value : []
 
   const liveCount = matches.filter(
