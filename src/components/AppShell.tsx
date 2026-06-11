@@ -122,6 +122,13 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
     return () => window.clearTimeout(timer)
   }, [])
 
+  // Refresca datos del servidor (marcadores, tabla de posiciones) mientras haya partidos en vivo
+  useEffect(() => {
+    if (liveCount === 0) return
+    const interval = window.setInterval(() => router.refresh(), 60_000)
+    return () => window.clearInterval(interval)
+  }, [liveCount, router])
+
   useEffect(() => {
     const alreadyInstalled =
       window.matchMedia('(display-mode: standalone)').matches ||
@@ -184,8 +191,8 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
               </span>
               {liveCount > 0 && (
                 <div className="flex items-center gap-1.5 px-2 py-0.5 eyebrow"
-                  style={{ color: 'var(--patina)', border: '1px solid oklch(70% 0.12 188 / 0.35)', background: 'oklch(70% 0.12 188 / 0.08)', borderRadius: 'var(--r-sm)' }}>
-                  <span className="live-dot w-1.5 h-1.5 rounded-full block" style={{ background: 'var(--patina)' }} aria-hidden="true" />
+                  style={{ color: 'var(--live-green)', border: '1px solid oklch(82% 0.17 142 / 0.35)', background: 'oklch(82% 0.17 142 / 0.08)', borderRadius: 'var(--r-sm)' }}>
+                  <span className="live-dot w-1.5 h-1.5 rounded-full block" style={{ background: 'var(--live-green)' }} aria-hidden="true" />
                   {liveCount} live
                 </div>
               )}

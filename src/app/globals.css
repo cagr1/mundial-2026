@@ -35,6 +35,9 @@
   --patina-pale:    #c7e7ff;
   --patina-deep:    #005072;
 
+  /* Live indicator — green */
+  --live-green:     #4ade80;
+
   /* Warning */
   --vermilion:      #ffb4ab;
 

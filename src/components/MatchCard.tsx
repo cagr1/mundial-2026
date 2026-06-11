@@ -113,11 +113,18 @@ function CenterBlock({ match, timeZone }: { match: Match; timeZone: string }) {
       <div className="flex flex-col items-center justify-center gap-1"
         style={{ background: 'var(--graphite)', borderRadius: 12, minWidth: 80, padding: '8px 16px' }}>
         {isLive ? (
-          <div className="flex items-center gap-1.5">
-            <span className="live-dot w-1.5 h-1.5 rounded-full block" style={{ background: 'var(--patina)' }} aria-hidden="true" />
-            <span style={{ color: 'var(--patina)', fontSize: 10, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-              {match.status === 'PAUSED' ? t('ht') : t('live')}
-            </span>
+          <div className="flex flex-col items-center gap-0.5">
+            <div className="flex items-center gap-1.5">
+              <span className="live-dot w-1.5 h-1.5 rounded-full block" style={{ background: 'var(--live-green)' }} aria-hidden="true" />
+              <span style={{ color: 'var(--live-green)', fontSize: 10, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+                {match.status === 'PAUSED' ? t('ht') : t('live')}
+              </span>
+            </div>
+            {match.status !== 'PAUSED' && match.clock && (
+              <span style={{ color: 'var(--text-faint)', fontSize: 10, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+                {match.clock}
+              </span>
+            )}
           </div>
         ) : (
           <span style={{ color: 'var(--text-faint)', fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase' }}>

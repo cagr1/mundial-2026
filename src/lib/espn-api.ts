@@ -195,6 +195,9 @@ export async function getESPNMatches(): Promise<Match[]> {
       ESPN_STATUS[espnStatus] ??
       (isDone ? 'FINISHED' : isLive ? (espnStatus === 'STATUS_HALFTIME' ? 'PAUSED' : 'IN_PLAY') : 'SCHEDULED')
 
+    // Display clock, e.g. "45'+2'" — only meaningful while the match is live
+    const clock: string | null = isLive ? (comp.status?.displayClock ?? null) : null
+
     const venueName: string = comp.venue?.fullName ?? ''
     const venueCity: string = comp.venue?.address?.city ?? ''
     const venue: Venue | undefined =
@@ -216,6 +219,7 @@ export async function getESPNMatches(): Promise<Match[]> {
         halfTime: { home: null, away: null },
       },
       venue,
+      clock,
     })
   }
 

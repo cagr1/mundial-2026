@@ -76,6 +76,8 @@ export interface Match {
   awayTeam: Team
   score: Score
   venue?: Venue
+  /** Display clock for live matches, e.g. "45'+2'" — null when not live */
+  clock?: string | null
 }
 
 export interface Prediction {
