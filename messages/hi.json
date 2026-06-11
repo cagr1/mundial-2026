@@ -5,7 +5,9 @@
     "equipos": "टीम",
     "bracket": "नॉकआउट",
     "ariaMain": "मुख्य नेविगेशन",
-    "ariaInstall": "ऐप इंस्टॉल करें"
+    "ariaInstall": "ऐप इंस्टॉल करें",
+    "calendario": "कार्यक्रम",
+    "stats": "आँकड़े"
   },
   "stage": {
     "GROUP_STAGE": "ग्रुप स्टेज",
@@ -24,6 +26,52 @@
     "groupsAdvance": "प्रत्येक ग्रुप से शीर्ष 2 टीमें अगले राउंड में जाती हैं",
     "groupsUnavailable": "अभी ग्रुप उपलब्ध नहीं हैं",
     "localTime": "स्थानीय"
+  },
+  "matchDetail": {
+    "lineup": "लाइनअप",
+    "events": "घटनाएँ",
+    "stats": "आँकड़े",
+    "formation": "फ़ॉर्मेशन",
+    "starters": "शुरुआती ग्यारह",
+    "bench": "बेंच",
+    "noLineup": "लाइनअप अभी उपलब्ध नहीं",
+    "noEvents": "अभी कोई घटना नहीं",
+    "noStats": "आँकड़े अभी उपलब्ध नहीं",
+    "loading": "लोड हो रहा है…",
+    "error": "मैच विवरण लोड नहीं हो सका",
+    "stat": {
+      "possessionPct": "कब्ज़ा",
+      "totalShots": "शॉट्स",
+      "shotsOnTarget": "ऑन टारगेट",
+      "wonCorners": "कॉर्नर",
+      "foulsCommitted": "फ़ाउल",
+      "offsides": "ऑफ़साइड",
+      "yellowCards": "पीले कार्ड",
+      "redCards": "लाल कार्ड",
+      "totalPasses": "पास",
+      "totalTackles": "टैकल",
+      "saves": "बचाव"
+    },
+    "assist": "असिस्ट",
+    "penalty": "पेनल्टी",
+    "ownGoal": "आत्मघाती गोल",
+    "penaltyMissed": "पेनल्टी मिस"
+  },
+  "tournament": {
+    "scorers": "गोल स्कोरर",
+    "data": "टूर्नामेंट डेटा",
+    "player": "खिलाड़ी",
+    "goals": "गोल",
+    "matchesPlayed": "खेले गए मैच",
+    "totalGoals": "कुल गोल",
+    "avgGoals": "प्रति मैच गोल",
+    "stadiums": "स्टेडियम",
+    "teams": "टीमें",
+    "yellowCards": "पीले कार्ड",
+    "redCards": "लाल कार्ड",
+    "noScorers": "अभी कोई स्कोरर नहीं",
+    "noData": "डेटा अभी उपलब्ध नहीं",
+    "loading": "लोड हो रहा है…"
   },
   "bracket": {
     "ROUND_OF_32": "राउंड ऑफ 32",

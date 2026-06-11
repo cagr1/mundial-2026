@@ -2,17 +2,19 @@
 
 import { useState, useCallback } from 'react'
 import { Icon } from '@iconify/react'
+import { useLocale } from 'next-intl'
 import { Match } from '@/types/football'
+import { localizedCountry } from '@/lib/country-names'
 
 interface Props {
   match: Match
   timeZone: string
 }
 
-function buildOgUrl(match: Match, timeZone: string): string {
+function buildOgUrl(match: Match, timeZone: string, locale: string): string {
   const p = new URLSearchParams({
-    hname: match.homeTeam.shortName ?? match.homeTeam.name,
-    aname: match.awayTeam.shortName ?? match.awayTeam.name,
+    hname: localizedCountry(match.homeTeam.tla, locale, match.homeTeam.shortName ?? match.homeTeam.name),
+    aname: localizedCountry(match.awayTeam.tla, locale, match.awayTeam.shortName ?? match.awayTeam.name),
     htla: match.homeTeam.tla ?? '',
     atla: match.awayTeam.tla ?? '',
     date: match.utcDate,
@@ -37,19 +39,20 @@ type State = 'idle' | 'loading' | 'done' | 'error'
 
 export default function ShareButton({ match, timeZone }: Props) {
   const [state, setState] = useState<State>('idle')
+  const locale = useLocale()
 
   const handleShare = useCallback(async () => {
     if (state === 'loading') return
     setState('loading')
 
     try {
-      const ogUrl = buildOgUrl(match, timeZone)
+      const ogUrl = buildOgUrl(match, timeZone, locale)
       const res = await fetch(ogUrl)
       if (!res.ok) throw new Error(`OG fetch failed: ${res.status}`)
       const blob = await res.blob()
 
-      const homeShort = match.homeTeam.shortName ?? match.homeTeam.tla
-      const awayShort = match.awayTeam.shortName ?? match.awayTeam.tla
+      const homeShort = localizedCountry(match.homeTeam.tla, locale, match.homeTeam.shortName ?? match.homeTeam.tla)
+      const awayShort = localizedCountry(match.awayTeam.tla, locale, match.awayTeam.shortName ?? match.awayTeam.tla)
       const fileName = `${homeShort}-vs-${awayShort}.png`.replace(/\s+/g, '-')
       const file = new File([blob], fileName, { type: 'image/png' })
 
@@ -82,7 +85,7 @@ export default function ShareButton({ match, timeZone }: Props) {
       setState('error')
       setTimeout(() => setState('idle'), 2500)
     }
-  }, [match, timeZone, state])
+  }, [match, timeZone, state, locale])
 
   const icon =
     state === 'loading'

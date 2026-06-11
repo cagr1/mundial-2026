@@ -124,3 +124,76 @@ export interface TeamsResponse {
   count: number
   teams: Team[]
 }
+
+// ─── Match detail (summary) ─────────────────────────────────────────────────
+export type MatchEventType =
+  | 'goal'
+  | 'own-goal'
+  | 'penalty-goal'
+  | 'penalty-miss'
+  | 'yellow-card'
+  | 'red-card'
+  | 'substitution'
+  | 'other'
+
+export interface MatchEvent {
+  id: string
+  type: MatchEventType
+  /** Reloj de juego, p.ej. "45'+2'" */
+  minute: string
+  period: number
+  teamId: string | null
+  isHome: boolean | null
+  text: string
+  shortText: string
+  /** Nombres de los jugadores implicados (anotador/asistente, amonestado, entra/sale) */
+  players: string[]
+  scoringPlay: boolean
+}
+
+export interface LineupPlayer {
+  id: string
+  name: string
+  shortName: string
+  jersey: string
+  /** Abreviatura de posición, p.ej. "G", "CD-L" */
+  position: string
+  positionName: string
+  starter: boolean
+  subbedIn: boolean
+  subbedOut: boolean
+  formationPlace: string
+  goals: number
+  yellowCards: number
+  redCards: number
+}
+
+export interface TeamLineup {
+  teamId: string
+  isHome: boolean
+  formation: string | null
+  starters: LineupPlayer[]
+  substitutes: LineupPlayer[]
+}
+
+export interface TeamStat {
+  name: string
+  label: string
+  value: string
+}
+
+export interface MatchStatistics {
+  homeTeamId: string
+  awayTeamId: string
+  home: TeamStat[]
+  away: TeamStat[]
+}
+
+export interface MatchSummary {
+  matchId: number
+  lineups: TeamLineup[]
+  events: MatchEvent[]
+  statistics: MatchStatistics | null
+  /** false si ESPN aún no publica alineación/eventos/stats (partido por jugar) */
+  hasData: boolean
+}

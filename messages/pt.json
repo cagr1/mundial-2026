@@ -5,7 +5,9 @@
     "equipos": "Seleções",
     "bracket": "Chaveamento",
     "ariaMain": "Navegação principal",
-    "ariaInstall": "Instalar app"
+    "ariaInstall": "Instalar app",
+    "calendario": "Calendário",
+    "stats": "Estatísticas"
   },
   "stage": {
     "GROUP_STAGE": "FASE DE GRUPOS",
@@ -24,6 +26,52 @@
     "groupsAdvance": "Os 2 primeiros de cada grupo avançam para a próxima fase",
     "groupsUnavailable": "Grupos não disponíveis no momento",
     "localTime": "local"
+  },
+  "matchDetail": {
+    "lineup": "Escalação",
+    "events": "Eventos",
+    "stats": "Estatísticas",
+    "formation": "Formação",
+    "starters": "Titulares",
+    "bench": "Reservas",
+    "noLineup": "Escalação ainda indisponível",
+    "noEvents": "Sem eventos ainda",
+    "noStats": "Estatísticas ainda indisponíveis",
+    "loading": "Carregando…",
+    "error": "Não foi possível carregar os detalhes",
+    "stat": {
+      "possessionPct": "Posse de bola",
+      "totalShots": "Finalizações",
+      "shotsOnTarget": "No alvo",
+      "wonCorners": "Escanteios",
+      "foulsCommitted": "Faltas",
+      "offsides": "Impedimentos",
+      "yellowCards": "Cartões amarelos",
+      "redCards": "Cartões vermelhos",
+      "totalPasses": "Passes",
+      "totalTackles": "Desarmes",
+      "saves": "Defesas"
+    },
+    "assist": "Assist.",
+    "penalty": "Pênalti",
+    "ownGoal": "Gol contra",
+    "penaltyMissed": "Pênalti perdido"
+  },
+  "tournament": {
+    "scorers": "Artilheiros",
+    "data": "Dados do torneio",
+    "player": "Jogador",
+    "goals": "Gols",
+    "matchesPlayed": "Partidas disputadas",
+    "totalGoals": "Total de gols",
+    "avgGoals": "Gols por partida",
+    "stadiums": "Estádios",
+    "teams": "Seleções",
+    "yellowCards": "Cartões amarelos",
+    "redCards": "Cartões vermelhos",
+    "noScorers": "Ainda sem artilheiros",
+    "noData": "Dados ainda indisponíveis",
+    "loading": "Carregando…"
   },
   "bracket": {
     "ROUND_OF_32": "Rodada de 32",

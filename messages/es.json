@@ -5,7 +5,9 @@
     "equipos": "Equipos",
     "bracket": "Llaves",
     "ariaMain": "Navegación principal",
-    "ariaInstall": "Instalar app"
+    "ariaInstall": "Instalar app",
+    "calendario": "Calendario",
+    "stats": "Estadísticas"
   },
   "stage": {
     "GROUP_STAGE": "FASE DE GRUPOS",
@@ -24,6 +26,52 @@
     "groupsAdvance": "Los 2 primeros de cada grupo avanzan a la siguiente fase",
     "groupsUnavailable": "Grupos no disponibles en este momento",
     "localTime": "local"
+  },
+  "matchDetail": {
+    "lineup": "Alineación",
+    "events": "Eventos",
+    "stats": "Estadísticas",
+    "formation": "Formación",
+    "starters": "Titulares",
+    "bench": "Suplentes",
+    "noLineup": "Alineación no disponible aún",
+    "noEvents": "Sin eventos todavía",
+    "noStats": "Estadísticas no disponibles aún",
+    "loading": "Cargando…",
+    "error": "No se pudo cargar el detalle",
+    "stat": {
+      "possessionPct": "Posesión",
+      "totalShots": "Tiros",
+      "shotsOnTarget": "Tiros a puerta",
+      "wonCorners": "Córners",
+      "foulsCommitted": "Faltas",
+      "offsides": "Fuera de juego",
+      "yellowCards": "Tarjetas amarillas",
+      "redCards": "Tarjetas rojas",
+      "totalPasses": "Pases",
+      "totalTackles": "Entradas",
+      "saves": "Atajadas"
+    },
+    "assist": "Asist.",
+    "penalty": "Penal",
+    "ownGoal": "En propia",
+    "penaltyMissed": "Penal fallado"
+  },
+  "tournament": {
+    "scorers": "Goleadores",
+    "data": "Datos del torneo",
+    "player": "Jugador",
+    "goals": "Goles",
+    "matchesPlayed": "Partidos jugados",
+    "totalGoals": "Goles totales",
+    "avgGoals": "Goles por partido",
+    "stadiums": "Sedes",
+    "teams": "Selecciones",
+    "yellowCards": "Tarjetas amarillas",
+    "redCards": "Tarjetas rojas",
+    "noScorers": "Aún no hay goleadores",
+    "noData": "Datos no disponibles aún",
+    "loading": "Cargando…"
   },
   "bracket": {
     "ROUND_OF_32": "Ronda de 32",

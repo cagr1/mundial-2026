@@ -4,8 +4,9 @@ import { useState, useEffect, useCallback, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { Icon } from '@iconify/react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Match, Prediction } from '@/types/football'
+import { localizedCountry } from '@/lib/country-names'
 import { getPredictionResult, PredictionResult } from '@/hooks/usePredictions'
 
 const DONE = new Set(['FINISHED', 'AWARDED'])
@@ -88,6 +89,7 @@ function TeamDisplay({ name, crest, tla }: { name: string; crest: string; tla: s
 
 export default function PredictionModal({ match, prediction, onSave, onClose }: Props) {
   const t = useTranslations('predictions')
+  const locale = useLocale()
   const mounted = useSyncExternalStore(() => () => {}, () => true, () => false)
 
   const isDone = DONE.has(match.status)
@@ -186,7 +188,7 @@ export default function PredictionModal({ match, prediction, onSave, onClose }: 
 
         {/* Score input */}
         <div style={{ padding: '0 20px 24px', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <TeamDisplay name={match.homeTeam.shortName} crest={match.homeTeam.crest} tla={match.homeTeam.tla} />
+          <TeamDisplay name={localizedCountry(match.homeTeam.tla, locale, match.homeTeam.shortName)} crest={match.homeTeam.crest} tla={match.homeTeam.tla} />
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
             <ScoreCounter value={home} onChange={setHome} disabled={!canEdit} />
@@ -194,7 +196,7 @@ export default function PredictionModal({ match, prediction, onSave, onClose }: 
             <ScoreCounter value={away} onChange={setAway} disabled={!canEdit} />
           </div>
 
-          <TeamDisplay name={match.awayTeam.shortName} crest={match.awayTeam.crest} tla={match.awayTeam.tla} />
+          <TeamDisplay name={localizedCountry(match.awayTeam.tla, locale, match.awayTeam.shortName)} crest={match.awayTeam.crest} tla={match.awayTeam.tla} />
         </div>
 
         {/* Lock message */}

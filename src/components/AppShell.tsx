@@ -15,8 +15,11 @@ import FavoriteTeamCard from './FavoriteTeamCard'
 import KnockoutBracket from './KnockoutBracket'
 import DateCarousel from './DateCarousel'
 import StatsBento from './StatsBento'
+import SegmentedTabs from './SegmentedTabs'
+import TournamentStats from './TournamentStats'
 import LanguageSwitcher from './LanguageSwitcher'
 import PredictionModal from './PredictionModal'
+import MatchDrawer from './MatchDrawer'
 import { useFavoriteTeam } from '@/hooks/useFavoriteTeam'
 import { usePredictions } from '@/hooks/usePredictions'
 import { useBracketPicks } from '@/hooks/useBracketPicks'
@@ -28,7 +31,8 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
 }
 
-type Tab = 'partidos' | 'grupos' | 'equipos' | 'bracket'
+type Tab = 'partidos' | 'equipos' | 'bracket' | 'stats'
+type HomeView = 'calendario' | 'grupos'
 
 interface Props {
   matches: Match[]
@@ -45,9 +49,9 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
 
   const TABS: { id: Tab; label: string; icon: string; iconActive: string }[] = [
     { id: 'partidos', label: t('partidos'), icon: 'material-symbols:calendar-month-outline', iconActive: 'material-symbols:calendar-month' },
-    { id: 'grupos',   label: t('grupos'),   icon: 'material-symbols:grid-view-outline',      iconActive: 'material-symbols:grid-view' },
     { id: 'equipos',  label: t('equipos'),  icon: 'material-symbols:shield-outline',          iconActive: 'material-symbols:shield' },
     { id: 'bracket',  label: t('bracket'),  icon: 'material-symbols:account-tree-outline',    iconActive: 'material-symbols:account-tree' },
+    { id: 'stats',    label: t('stats'),    icon: 'material-symbols:bar-chart-4-bars',        iconActive: 'material-symbols:bar-chart-4-bars-rounded' },
   ]
 
   const STAGE_PHASE_LABELS: Record<string, string> = {
@@ -60,10 +64,12 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
   }
 
   const [tab, setTab] = useState<Tab>('partidos')
+  const [homeView, setHomeView] = useState<HomeView>('calendario')
   const { favorite, saveFavorite } = useFavoriteTeam()
   const { predictions, setPrediction } = usePredictions()
   const { picks, setPick } = useBracketPicks()
   const [predictingMatch, setPredictingMatch] = useState<Match | null>(null)
+  const [detailMatch, setDetailMatch] = useState<Match | null>(null)
 
   const handleToggleFavorite = useCallback(
     (team: Team) => saveFavorite(favorite?.id === team.id ? null : team),
@@ -106,8 +112,11 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const tabParam = params.get('tab')
-    if (tabParam === 'grupos' || tabParam === 'equipos' || tabParam === 'bracket') {
+    if (tabParam === 'equipos' || tabParam === 'bracket' || tabParam === 'stats') {
       window.setTimeout(() => setTab(tabParam as Tab), 0)
+    } else if (tabParam === 'grupos') {
+      // Grupos ahora es un sub-tab dentro de la pantalla de inicio
+      window.setTimeout(() => { setTab('partidos'); setHomeView('grupos') }, 0)
     }
   }, [])
 
@@ -125,7 +134,7 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
   // Refresca datos del servidor (marcadores, tabla de posiciones) mientras haya partidos en vivo
   useEffect(() => {
     if (liveCount === 0) return
-    const interval = window.setInterval(() => router.refresh(), 60_000)
+    const interval = window.setInterval(() => router.refresh(), 30_000)
     return () => window.clearInterval(interval)
   }, [liveCount, router])
 
@@ -217,42 +226,53 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
       <main className="flex-1 max-w-[500px] mx-auto w-full px-4 py-6 pb-32">
         {tab === 'partidos' ? (
           <div key="partidos" className="tab-panel">
-            {liveCount === 0 && <div className="mb-5"><Countdown targetDate={firstMatchDate} /></div>}
-            {favorite && (
-              <FavoriteTeamCard team={favorite} matches={matches} timeZone={timeZone} onRemove={() => saveFavorite(null)} />
-            )}
-            <DateCarousel dates={matchDates} selected={selectedDate} onSelect={setSelectedDate} timeZone={timeZone} phaseLabel={phaseLabel} />
-            <MatchList matches={filteredMatches} timeZone={timeZone} predictions={predictions} onPredict={setPredictingMatch} />
-            <StatsBento />
-          </div>
-        ) : tab === 'grupos' ? (
-          <div key="grupos" className="tab-panel">
-            {standings.length > 0 ? (
+            <SegmentedTabs<HomeView>
+              segments={[{ id: 'calendario', label: t('calendario') }, { id: 'grupos', label: t('grupos') }]}
+              active={homeView}
+              onChange={setHomeView}
+            />
+            {homeView === 'calendario' ? (
               <>
-                <p className="eyebrow mb-5" style={{ color: 'var(--text-faint)' }}>
-                  {tMatch('groupsAdvance')}
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {standings.map((s) => (
-                    <GroupStandings key={s.group} standing={s} onSelect={setSelectedGroup} />
-                  ))}
-                </div>
+                {liveCount === 0 && <div className="mb-5"><Countdown targetDate={firstMatchDate} /></div>}
+                {favorite && (
+                  <FavoriteTeamCard team={favorite} matches={matches} timeZone={timeZone} onRemove={() => saveFavorite(null)} />
+                )}
+                <DateCarousel dates={matchDates} selected={selectedDate} onSelect={setSelectedDate} timeZone={timeZone} phaseLabel={phaseLabel} />
+                <MatchList matches={filteredMatches} timeZone={timeZone} predictions={predictions} onPredict={setPredictingMatch} onSelect={setDetailMatch} />
+                <StatsBento />
               </>
             ) : (
-              <div className="py-12 text-center">
-                <p className="eyebrow" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>
-                  {tMatch('groupsUnavailable')}
-                </p>
-              </div>
+              standings.length > 0 ? (
+                <>
+                  <p className="eyebrow mb-5" style={{ color: 'var(--text-faint)' }}>
+                    {tMatch('groupsAdvance')}
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {standings.map((s) => (
+                      <GroupStandings key={s.group} standing={s} onSelect={setSelectedGroup} />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="py-12 text-center">
+                  <p className="eyebrow" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>
+                    {tMatch('groupsUnavailable')}
+                  </p>
+                </div>
+              )
             )}
           </div>
         ) : tab === 'equipos' ? (
           <div key="equipos" className="tab-panel">
             <TeamsGrid teams={teams} favoriteId={favorite?.id ?? null} onToggleFavorite={handleToggleFavorite} allMatches={matches} timeZone={timeZone} />
           </div>
-        ) : (
+        ) : tab === 'bracket' ? (
           <div key="bracket" className="tab-panel">
             <KnockoutBracket matches={matches} timeZone={timeZone} picks={picks} onPick={setPick} />
+          </div>
+        ) : (
+          <div key="stats" className="tab-panel">
+            <TournamentStats />
           </div>
         )}
 
@@ -275,6 +295,15 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
           prediction={predictions[predictingMatch.id]}
           onSave={setPrediction}
           onClose={() => setPredictingMatch(null)}
+        />
+      )}
+
+      {detailMatch && (
+        <MatchDrawer
+          key={detailMatch.id}
+          match={detailMatch}
+          timeZone={timeZone}
+          onClose={() => setDetailMatch(null)}
         />
       )}
 

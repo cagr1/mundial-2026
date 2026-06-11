@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1350" width="1080" height="1350" role="img" aria-label="Infografia WC 26">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#03101f"/>
+      <stop offset="0.55" stop-color="#061727"/>
+      <stop offset="1" stop-color="#020810"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff1b8"/>
+      <stop offset="0.42" stop-color="#ffd45d"/>
+      <stop offset="1" stop-color="#9b6a17"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#10243a"/>
+      <stop offset="1" stop-color="#071827"/>
+    </linearGradient>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="28" stdDeviation="28" flood-color="#000000" flood-opacity="0.42"/>
+    </filter>
+    <filter id="phoneShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="34" stdDeviation="24" flood-color="#000000" flood-opacity="0.48"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#ffd45d" flood-opacity="0.22"/>
+    </filter>
+
+    <clipPath id="phoneMainClip">
+      <rect x="385" y="333" width="310" height="671" rx="46"/>
+    </clipPath>
+    <clipPath id="phoneLeftClip">
+      <rect x="111" y="440" width="220" height="476" rx="36"/>
+    </clipPath>
+    <clipPath id="phoneRightClip">
+      <rect x="749" y="440" width="220" height="476" rx="36"/>
+    </clipPath>
+  </defs>
+
+  <rect width="1080" height="1350" fill="url(#bg)"/>
+  <path d="M92 145c210-72 395-90 571-56 117 23 220 72 324 143" fill="none" stroke="#17324f" stroke-width="1.5" opacity="0.5"/>
+  <path d="M116 1195c248 48 499 47 753-2" fill="none" stroke="#ffd45d" stroke-width="1.5" opacity="0.18"/>
+
+  <g transform="translate(70 46)">
+    <image href="file:///E:/Carlos/Development%20Tools/Proyectos/worldcup/mundial-2026/public/app-logo.png" x="0" y="0" width="64" height="64" preserveAspectRatio="xMidYMid slice"/>
+    <text x="88" y="30" fill="#ffe082" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="800" letter-spacing="4">WC 26</text>
+    <text x="88" y="58" fill="#90a4bc" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="3">WORLD CUP APP</text>
+  </g>
+
+  <g transform="translate(70 178)">
+    <text x="0" y="0" fill="#f6f8fc" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="850" letter-spacing="-2">Todo el Mundial.</text>
+    <text x="0" y="68" fill="#f6f8fc" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="850" letter-spacing="-2">En una app.</text>
+    <text x="0" y="112" fill="#9fb0c6" font-family="Inter, Arial, sans-serif" font-size="23" font-weight="600">Partidos, grupos, llaves, pronosticos y calendario en tu hora local.</text>
+  </g>
+
+  <g filter="url(#phoneShadow)">
+    <rect x="101" y="430" width="240" height="496" rx="46" fill="#06111f" stroke="#24394f" stroke-width="2"/>
+    <image href="file:///E:/Carlos/Development%20Tools/Proyectos/worldcup/mundial-2026/public/marketing/screen-groups.jpeg" x="111" y="440" width="220" height="476" clip-path="url(#phoneLeftClip)" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="111" y="440" width="220" height="476" rx="36" fill="none" stroke="#ffffff" stroke-opacity="0.08"/>
+  </g>
+
+  <g filter="url(#phoneShadow)">
+    <rect x="739" y="430" width="240" height="496" rx="46" fill="#06111f" stroke="#24394f" stroke-width="2"/>
+    <image href="file:///E:/Carlos/Development%20Tools/Proyectos/worldcup/mundial-2026/public/marketing/screen-calendar.jpeg" x="749" y="440" width="220" height="476" clip-path="url(#phoneRightClip)" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="749" y="440" width="220" height="476" rx="36" fill="none" stroke="#ffffff" stroke-opacity="0.08"/>
+  </g>
+
+  <g filter="url(#phoneShadow)">
+    <rect x="370" y="318" width="340" height="701" rx="58" fill="#06111f" stroke="url(#gold)" stroke-width="2.5"/>
+    <image href="file:///E:/Carlos/Development%20Tools/Proyectos/worldcup/mundial-2026/public/marketing/screen-bracket.jpeg" x="385" y="333" width="310" height="671" clip-path="url(#phoneMainClip)" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="385" y="333" width="310" height="671" rx="46" fill="none" stroke="#ffffff" stroke-opacity="0.08"/>
+  </g>
+
+  <g transform="translate(70 1038)">
+    <rect x="0" y="0" width="940" height="172" rx="36" fill="url(#panel)" stroke="#1d334d"/>
+    <g transform="translate(34 34)">
+      <text x="0" y="0" fill="#ffe082" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="850" letter-spacing="3">LO QUE HACE</text>
+      <text x="0" y="44" fill="#f5f8ff" font-family="Inter, Arial, sans-serif" font-size="38" font-weight="850">Sigue, predice y guarda cada partido.</text>
+      <text x="0" y="84" fill="#9fb0c6" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="650">Llaves interactivas · Grupos en vivo · Calendario automatico · 5 idiomas</text>
+    </g>
+  </g>
+
+  <g transform="translate(70 1246)">
+    <rect x="0" y="-35" width="630" height="70" rx="35" fill="#0d2237" stroke="#29425b"/>
+    <circle cx="38" cy="0" r="18" fill="url(#gold)"/>
+    <text x="70" y="8" fill="#f5f8ff" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="800">worldcup-kappa.vercel.app/en</text>
+    <text x="720" y="8" fill="#ffe082" font-family="Inter, Arial, sans-serif" font-size="23" font-weight="850" text-anchor="middle">Abrela en tu celular</text>
+  </g>
+</svg>

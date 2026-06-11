@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { Icon } from '@iconify/react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Match, BracketPicks } from '@/types/football'
 import { formatTime } from '@/lib/format-date'
+import { localizedCountry } from '@/lib/country-names'
 
 const STAGE_ORDER: Record<string, number> = {
   ROUND_OF_32: 0, LAST_16: 1, QUARTER_FINALS: 2, SEMI_FINALS: 3, THIRD_PLACE: 4, FINAL: 5,
@@ -111,6 +112,7 @@ function MatchNode({ match, timeZone, dim, tbd, picks, onPick }: {
   match: Match | null; timeZone: string; dim?: boolean; tbd: string
   picks?: BracketPicks; onPick?: (matchId: number, teamId: number) => void
 }) {
+  const locale = useLocale()
   const isDone = match ? DONE.has(match.status) : false
   const isLive = match ? LIVE.has(match.status) : false
   const canPick = !dim && match != null && UPCOMING.has(match.status)
@@ -143,14 +145,14 @@ function MatchNode({ match, timeZone, dim, tbd, picks, onPick }: {
       )}
       <div style={{ borderBottom: '1px solid var(--hairline)' }}>
         <TeamRow
-          crest={match?.homeTeam.crest ?? ''} name={match?.homeTeam.shortName ?? ''}
+          crest={match?.homeTeam.crest ?? ''} name={localizedCountry(match?.homeTeam.tla, locale, match?.homeTeam.shortName ?? '')}
           tla={match?.homeTeam.tla ?? ''} score={homeScore} winner={isDone ? homeWon : null}
           tbd={tbd} pickState={homePickState}
           onPick={canPick && match ? () => onPick?.(match.id, match.homeTeam.id) : undefined}
         />
       </div>
       <TeamRow
-        crest={match?.awayTeam.crest ?? ''} name={match?.awayTeam.shortName ?? ''}
+        crest={match?.awayTeam.crest ?? ''} name={localizedCountry(match?.awayTeam.tla, locale, match?.awayTeam.shortName ?? '')}
         tla={match?.awayTeam.tla ?? ''} score={awayScore} winner={isDone ? awayWon : null}
         tbd={tbd} pickState={awayPickState}
         onPick={canPick && match ? () => onPick?.(match.id, match.awayTeam.id) : undefined}
@@ -206,6 +208,7 @@ function BracketTree({ qf, sf, final, timeZone, dim, tbd, champion: championLabe
   timeZone: string; dim: boolean; tbd: string; champion: string
   picks?: BracketPicks; onPick?: (matchId: number, teamId: number) => void
 }) {
+  const locale = useLocale()
   const pairH = NODE_H + INNER_GAP + NODE_H
   const totalH = pairH + PAIR_GAP + pairH
 
@@ -279,7 +282,7 @@ function BracketTree({ qf, sf, final, timeZone, dim, tbd, champion: championLabe
                 </div>
               )}
               <span className="text-xs font-bold" style={{ color: 'var(--champagne)' }}>
-                {champion.shortName ?? champion.name}
+                {localizedCountry(champion.tla, locale, champion.shortName ?? champion.name)}
               </span>
             </div>
           </div>

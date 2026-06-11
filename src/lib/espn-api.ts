@@ -1,4 +1,7 @@
-import type { Match, MatchStatus, Team, Standing, StandingEntry, Venue } from '@/types/football'
+import type {
+  Match, MatchStatus, Team, Standing, StandingEntry, Venue,
+  MatchSummary, MatchEvent, MatchEventType, TeamLineup, LineupPlayer, TeamStat, MatchStatistics,
+} from '@/types/football'
 
 const SITE = 'https://site.api.espn.com'
 const LEAGUE = 'fifa.world'
@@ -147,7 +150,7 @@ export async function getESPNMatches(): Promise<Match[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     espnFetch<any>(
       `/apis/site/v2/sports/soccer/${LEAGUE}/scoreboard?dates=20260611-20260719&limit=200`,
-      60,
+      30,
     ),
     buildGroupMap(),
   ])
@@ -226,4 +229,176 @@ export async function getESPNMatches(): Promise<Match[]> {
   // Sort by date
   matches.sort((a, b) => a.utcDate.localeCompare(b.utcDate))
   return matches
+}
+
+// ─── Match summary (lineups / events / statistics) ──────────────────────────
+// ESPN usa variantes con sufijo `---` (p.ej. "goal---header", "goal---penalty",
+// "penalty---scored"). Normalizamos de forma robusta para no descartar goles
+// de cabeza/penal ni clasificarlos mal.
+function normalizeEventType(raw: string): MatchEventType | null {
+  const full = raw.toLowerCase()
+  const base = full.split('---')[0]
+  if (full.includes('own')) return 'own-goal'
+  if (full.includes('penalty')) {
+    if (full.includes('miss') || full.includes('saved')) return 'penalty-miss'
+    if (full.includes('goal') || full.includes('scored') || full.includes('converted')) return 'penalty-goal'
+    return null // penal concedido / otros estados sin desenlace
+  }
+  if (base === 'goal') return 'goal'
+  if (base === 'yellow-card') return 'yellow-card'
+  if (base === 'red-card' || base === 'yellow-red-card') return 'red-card'
+  if (base === 'substitution') return 'substitution'
+  return null
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function playerStat(stats: any[], name: string): number {
+  const s = stats?.find((x: { name: string }) => x.name === name)
+  const v = s?.value
+  return typeof v === 'number' ? v : Number(s?.displayValue ?? 0) || 0
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapRoster(entry: any): LineupPlayer {
+  const a = entry.athlete ?? {}
+  const stats = entry.stats ?? []
+  return {
+    id: String(a.id ?? ''),
+    name: a.displayName ?? a.fullName ?? '',
+    shortName: a.shortName ?? a.displayName ?? '',
+    jersey: entry.jersey ?? '',
+    position: entry.position?.abbreviation ?? '',
+    positionName: entry.position?.displayName ?? entry.position?.name ?? '',
+    starter: entry.starter === true,
+    subbedIn: entry.subbedIn === true,
+    subbedOut: entry.subbedOut === true,
+    formationPlace: entry.formationPlace ?? '',
+    goals: playerStat(stats, 'totalGoals'),
+    yellowCards: playerStat(stats, 'yellowCards'),
+    redCards: playerStat(stats, 'redCards'),
+  }
+}
+
+export async function getESPNMatchSummary(eventId: string | number, revalidate = 30): Promise<MatchSummary> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data = await espnFetch<any>(
+    `/apis/site/v2/sports/soccer/${LEAGUE}/summary?event=${eventId}`,
+    revalidate,
+  )
+
+  // Lineups
+  const lineups: TeamLineup[] = []
+  for (const r of data?.rosters ?? []) {
+    const isHome = r.homeAway === 'home'
+    const players: LineupPlayer[] = (r.roster ?? []).map(mapRoster)
+    lineups.push({
+      teamId: String(r.team?.id ?? ''),
+      isHome,
+      formation: r.formation ?? null,
+      starters: players.filter((p) => p.starter),
+      substitutes: players.filter((p) => !p.starter),
+    })
+  }
+  // home primero
+  lineups.sort((a, b) => (a.isHome === b.isHome ? 0 : a.isHome ? -1 : 1))
+
+  // Map team id → isHome (para los eventos)
+  const homeTeamId = lineups.find((l) => l.isHome)?.teamId
+    ?? String(data?.boxscore?.teams?.find((t: { homeAway?: string }) => t.homeAway === 'home')?.team?.id ?? '')
+
+  // Events
+  const events: MatchEvent[] = []
+  for (const e of data?.keyEvents ?? []) {
+    const rawType: string = e.type?.type ?? ''
+    const type = normalizeEventType(rawType)
+    // Sólo eventos relevantes (goles, tarjetas, cambios); descartamos kickoff/end, etc.
+    if (!type) continue
+    const teamId = e.team?.id != null ? String(e.team.id) : null
+    events.push({
+      id: String(e.id ?? `${events.length}`),
+      type,
+      minute: e.clock?.displayValue ?? '',
+      period: e.period?.number ?? 0,
+      teamId,
+      isHome: teamId != null && homeTeamId ? teamId === homeTeamId : null,
+      text: e.text ?? '',
+      shortText: e.shortText ?? '',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      players: (e.participants ?? []).map((p: any) => p.athlete?.displayName).filter(Boolean),
+      scoringPlay: e.scoringPlay === true,
+    })
+  }
+
+  // Statistics
+  let statistics: MatchStatistics | null = null
+  const boxTeams = data?.boxscore?.teams ?? []
+  if (boxTeams.length >= 2) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const home = boxTeams.find((t: any) => t.homeAway === 'home') ?? boxTeams[0]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const away = boxTeams.find((t: any) => t.homeAway === 'away') ?? boxTeams[1]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const mapStats = (t: any): TeamStat[] =>
+      (t?.statistics ?? []).map((s: { name: string; label: string; displayValue: string }) => ({
+        name: s.name, label: s.label, value: s.displayValue,
+      }))
+    const homeStats = mapStats(home)
+    const awayStats = mapStats(away)
+    if (homeStats.length || awayStats.length) {
+      statistics = {
+        homeTeamId: String(home?.team?.id ?? ''),
+        awayTeamId: String(away?.team?.id ?? ''),
+        home: homeStats,
+        away: awayStats,
+      }
+    }
+  }
+
+  return {
+    matchId: Number(eventId),
+    lineups,
+    events,
+    statistics,
+    hasData: lineups.length > 0 || events.length > 0 || statistics != null,
+  }
+}
+
+// ─── Totales del torneo (tarjetas agregadas) ────────────────────────────────
+const FINISHED_STATUSES = new Set<MatchStatus>(['FINISHED', 'AWARDED'])
+
+export interface TournamentStats {
+  matchesPlayed: number
+  totalGoals: number
+  yellowCards: number
+  redCards: number
+}
+
+function sumStat(stats: { name: string; value: string }[] | undefined, name: string): number {
+  const v = stats?.find((s) => s.name === name)?.value
+  return v ? Number(v) || 0 : 0
+}
+
+export async function getTournamentStats(): Promise<TournamentStats> {
+  const matches = await getESPNMatches()
+  const finished = matches.filter((m) => FINISHED_STATUSES.has(m.status))
+
+  let totalGoals = 0
+  for (const m of finished) {
+    totalGoals += (m.score.fullTime.home ?? 0) + (m.score.fullTime.away ?? 0)
+  }
+
+  // Las tarjetas sólo están en el summary de cada partido; los finalizados ya no
+  // cambian, así que se cachean con revalidate largo (10 min).
+  const summaries = await Promise.all(
+    finished.map((m) => getESPNMatchSummary(m.id, 600).catch(() => null)),
+  )
+  let yellowCards = 0
+  let redCards = 0
+  for (const s of summaries) {
+    if (!s?.statistics) continue
+    yellowCards += sumStat(s.statistics.home, 'yellowCards') + sumStat(s.statistics.away, 'yellowCards')
+    redCards += sumStat(s.statistics.home, 'redCards') + sumStat(s.statistics.away, 'redCards')
+  }
+
+  return { matchesPlayed: finished.length, totalGoals, yellowCards, redCards }
 }
