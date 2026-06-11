@@ -175,10 +175,14 @@ export async function getESPNMatches(): Promise<Match[]> {
     // Determine group from standings map
     const group = groupMap.get(Number(homeTeam.id)) ?? null
 
-    // Score
-    const espnStatus = comp.status?.type?.name ?? 'STATUS_SCHEDULED'
-    const isDone = espnStatus === 'STATUS_FINAL' || espnStatus === 'STATUS_FULL_TIME'
-    const isLive = espnStatus === 'STATUS_IN_PROGRESS' || espnStatus === 'STATUS_HALFTIME'
+    // Score — `type.state` ('pre' | 'in' | 'post') is the reliable live/done signal.
+    // `type.name` has many "in-progress" variants (STATUS_FIRST_HALF, STATUS_SECOND_HALF, etc.)
+    // that don't all match a fixed list, so derive isLive/isDone from `state` instead.
+    const statusType = comp.status?.type ?? {}
+    const espnStatus: string = statusType.name ?? 'STATUS_SCHEDULED'
+    const state: string = statusType.state ?? 'pre'
+    const isDone = state === 'post'
+    const isLive = state === 'in'
     const homeScore = isDone || isLive ? parseScore(home.score) : null
     const awayScore = isDone || isLive ? parseScore(away.score) : null
 
@@ -186,6 +190,10 @@ export async function getESPNMatches(): Promise<Match[]> {
     if (isDone && homeScore != null && awayScore != null) {
       winner = homeScore > awayScore ? 'HOME_TEAM' : homeScore < awayScore ? 'AWAY_TEAM' : 'DRAW'
     }
+
+    const status: MatchStatus =
+      ESPN_STATUS[espnStatus] ??
+      (isDone ? 'FINISHED' : isLive ? (espnStatus === 'STATUS_HALFTIME' ? 'PAUSED' : 'IN_PLAY') : 'SCHEDULED')
 
     const venueName: string = comp.venue?.fullName ?? ''
     const venueCity: string = comp.venue?.address?.city ?? ''
@@ -195,7 +203,7 @@ export async function getESPNMatches(): Promise<Match[]> {
     matches.push({
       id: Number(event.id),
       utcDate,
-      status: ESPN_STATUS[espnStatus] ?? 'SCHEDULED',
+      status,
       matchday: matchday ?? 1,
       stage,
       group,
