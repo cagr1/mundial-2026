@@ -5,7 +5,9 @@
     "equipos": "Teams",
     "bracket": "Bracket",
     "ariaMain": "Main navigation",
-    "ariaInstall": "Install app"
+    "ariaInstall": "Install app",
+    "calendario": "Schedule",
+    "stats": "Stats"
   },
   "stage": {
     "GROUP_STAGE": "GROUP STAGE",
@@ -24,6 +26,52 @@
     "groupsAdvance": "Top 2 from each group advance to the next round",
     "groupsUnavailable": "Groups not available at this time",
     "localTime": "local"
+  },
+  "matchDetail": {
+    "lineup": "Lineup",
+    "events": "Events",
+    "stats": "Stats",
+    "formation": "Formation",
+    "starters": "Starters",
+    "bench": "Bench",
+    "noLineup": "Lineup not available yet",
+    "noEvents": "No events yet",
+    "noStats": "Stats not available yet",
+    "loading": "Loading…",
+    "error": "Could not load match detail",
+    "stat": {
+      "possessionPct": "Possession",
+      "totalShots": "Shots",
+      "shotsOnTarget": "Shots on target",
+      "wonCorners": "Corners",
+      "foulsCommitted": "Fouls",
+      "offsides": "Offsides",
+      "yellowCards": "Yellow cards",
+      "redCards": "Red cards",
+      "totalPasses": "Passes",
+      "totalTackles": "Tackles",
+      "saves": "Saves"
+    },
+    "assist": "Assist",
+    "penalty": "Penalty",
+    "ownGoal": "Own goal",
+    "penaltyMissed": "Penalty missed"
+  },
+  "tournament": {
+    "scorers": "Top scorers",
+    "data": "Tournament data",
+    "player": "Player",
+    "goals": "Goals",
+    "matchesPlayed": "Matches played",
+    "totalGoals": "Total goals",
+    "avgGoals": "Goals per match",
+    "stadiums": "Stadiums",
+    "teams": "Teams",
+    "yellowCards": "Yellow cards",
+    "redCards": "Red cards",
+    "noScorers": "No scorers yet",
+    "noData": "Data not available yet",
+    "loading": "Loading…"
   },
   "bracket": {
     "ROUND_OF_32": "Round of 32",

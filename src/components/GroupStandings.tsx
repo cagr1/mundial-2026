@@ -2,8 +2,9 @@
 
 import Image from 'next/image'
 import { Icon } from '@iconify/react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Standing } from '@/types/football'
+import { localizedCountry } from '@/lib/country-names'
 
 const GROUP_ACCENT: Record<string, string> = {
   'Group A': 'var(--kinpaku)', 'Group B': 'var(--patina)',
@@ -18,6 +19,7 @@ interface Props { standing: Standing; onSelect?: (standing: Standing) => void }
 
 export default function GroupStandings({ standing, onSelect }: Props) {
   const t = useTranslations('groups')
+  const locale = useLocale()
   const label = standing.group.replace('GROUP_', 'Group ')
   const accent = GROUP_ACCENT[label] ?? 'var(--kinpaku)'
 
@@ -74,7 +76,7 @@ export default function GroupStandings({ standing, onSelect }: Props) {
                         <div className="shrink-0 rounded-sm" style={{ width: 24, height: 16, background: 'var(--graphite)' }} />
                       )}
                       <span className="text-xs font-semibold truncate" style={{ color: qualifies ? 'var(--text-warm)' : 'var(--text-muted)' }}>
-                        {entry.team.shortName}
+                        {localizedCountry(entry.team.tla, locale, entry.team.shortName)}
                       </span>
                     </div>
                   </td>

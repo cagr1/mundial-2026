@@ -7,6 +7,7 @@ import { Icon } from '@iconify/react'
 import { useTranslations, useLocale } from 'next-intl'
 import { Standing, Match } from '@/types/football'
 import { formatTime, formatDateKey } from '@/lib/format-date'
+import { localizedCountry } from '@/lib/country-names'
 
 const LIVE_S = new Set(['LIVE', 'IN_PLAY', 'PAUSED'])
 const DONE_S = new Set(['FINISHED', 'AWARDED'])
@@ -49,7 +50,7 @@ function FixtureRow({ match, timeZone }: { match: Match; timeZone: string }) {
       </div>
 
       <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
-        <span className="text-xs font-semibold truncate" style={{ color: 'var(--text-warm)' }}>{match.homeTeam.shortName}</span>
+        <span className="text-xs font-semibold truncate" style={{ color: 'var(--text-warm)' }}>{localizedCountry(match.homeTeam.tla, locale, match.homeTeam.shortName)}</span>
         {match.homeTeam.crest && (
           <div className="relative shrink-0" style={{ width: 20, height: 20 }}>
             <Image src={match.homeTeam.crest} alt={match.homeTeam.name} fill className="object-contain" sizes="20px" unoptimized />
@@ -73,7 +74,7 @@ function FixtureRow({ match, timeZone }: { match: Match; timeZone: string }) {
             <Image src={match.awayTeam.crest} alt={match.awayTeam.name} fill className="object-contain" sizes="20px" unoptimized />
           </div>
         )}
-        <span className="text-xs font-semibold truncate" style={{ color: 'var(--text-warm)' }}>{match.awayTeam.shortName}</span>
+        <span className="text-xs font-semibold truncate" style={{ color: 'var(--text-warm)' }}>{localizedCountry(match.awayTeam.tla, locale, match.awayTeam.shortName)}</span>
       </div>
     </div>
   )
@@ -152,7 +153,7 @@ export default function GroupDrawer({ standing, matches, timeZone, onClose }: Pr
                                 <Image src={entry.team.crest} alt={entry.team.name} fill unoptimized className="object-cover" sizes="20px" />
                               </div>
                             )}
-                            <span className="text-xs font-semibold truncate" style={{ color: qualifies ? 'var(--text-warm)' : 'var(--text-muted)' }}>{entry.team.shortName}</span>
+                            <span className="text-xs font-semibold truncate" style={{ color: qualifies ? 'var(--text-warm)' : 'var(--text-muted)' }}>{localizedCountry(entry.team.tla, locale, entry.team.shortName)}</span>
                           </div>
                         </td>
                         <td className="px-2 py-2.5 text-center tabnum text-xs" style={{ color: 'var(--text-muted)' }}>{entry.playedGames}</td>

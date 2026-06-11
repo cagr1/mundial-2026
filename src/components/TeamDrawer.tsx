@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback, useMemo, useSyncExternalStore } from 
 import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Icon } from '@iconify/react'
 import { useTranslations, useLocale } from 'next-intl'
 import { Team, TeamDetail, Player, Match } from '@/types/football'
 import { formatTime, formatDateKey } from '@/lib/format-date'
+import { localizedCountry } from '@/lib/country-names'
 
 const POSITION_ORDER = ['Goalkeeper', 'Defence', 'Midfield', 'Offence'] as const
 const POSITION_COLOR: Record<string, string> = {
@@ -95,7 +95,7 @@ function MatchRow({ match, teamId, timeZone }: { match: Match; teamId: number; t
         <div className="min-w-0">
           <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-warm)' }}>
             <span style={{ color: 'var(--text-disabled)', fontWeight: 400, marginRight: 4 }}>vs</span>
-            {opponent.shortName}
+            {localizedCountry(opponent.tla, locale, opponent.shortName)}
           </p>
           <p className="eyebrow truncate mt-0.5" style={{ color: 'var(--text-disabled)', fontSize: '0.58rem' }}>
             {match.group ? match.group.replace('GROUP_', 'Grupo ') : match.stage.replace(/_/g, ' ')}
@@ -254,7 +254,7 @@ export default function TeamDrawer({ team, onClose, allMatches = [], timeZone = 
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <h2 className="text-base font-bold truncate" style={{ color: 'var(--champagne)' }}>{team.name}</h2>
+              <h2 className="text-base font-bold truncate" style={{ color: 'var(--champagne)' }}>{localizedCountry(team.tla, locale, team.name)}</h2>
               {detail?.coach && (
                 <p className="eyebrow truncate" style={{ color: 'var(--text-disabled)', marginTop: 1 }}>
                   {t('dt')} · {detail.coach.name}

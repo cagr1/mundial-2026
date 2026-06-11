@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Icon } from '@iconify/react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Team, Match } from '@/types/football'
 import { formatTime, formatDayHeading } from '@/lib/format-date'
+import { localizedCountry } from '@/lib/country-names'
 
 const UPCOMING = new Set(['TIMED', 'SCHEDULED'])
 const DONE = new Set(['FINISHED', 'AWARDED'])
@@ -62,6 +63,7 @@ interface Props { team: Team; matches: Match[]; timeZone: string; onRemove: () =
 
 export default function FavoriteTeamCard({ team, matches, timeZone, onRemove }: Props) {
   const t = useTranslations('favorite')
+  const locale = useLocale()
   const teamMatches = matches.filter((m) => m.homeTeam.id === team.id || m.awayTeam.id === team.id)
 
   const nextMatch = teamMatches.filter((m) => UPCOMING.has(m.status)).sort((a, b) => new Date(a.utcDate).getTime() - new Date(b.utcDate).getTime())[0]
@@ -103,7 +105,7 @@ export default function FavoriteTeamCard({ team, matches, timeZone, onRemove }: 
             </div>
           )}
           <div>
-            <p className="font-bold leading-tight" style={{ color: 'var(--champagne)', fontSize: '1.1rem' }}>{team.shortName ?? team.name}</p>
+            <p className="font-bold leading-tight" style={{ color: 'var(--champagne)', fontSize: '1.1rem' }}>{localizedCountry(team.tla, locale, team.shortName ?? team.name)}</p>
             <p className="eyebrow mt-0.5" style={{ color: 'var(--text-disabled)', fontSize: '0.58rem' }}>{team.tla}</p>
           </div>
         </div>
@@ -132,7 +134,7 @@ export default function FavoriteTeamCard({ team, matches, timeZone, onRemove }: 
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold leading-tight truncate" style={{ color: 'var(--text-warm)' }}>
-                  {getOpponent(displayMatch).shortName ?? getOpponent(displayMatch).name}
+                  {localizedCountry(getOpponent(displayMatch).tla, locale, getOpponent(displayMatch).shortName ?? getOpponent(displayMatch).name)}
                 </p>
                 <p className="eyebrow mt-0.5" style={{ fontSize: '0.6rem', color: 'var(--text-disabled)' }} suppressHydrationWarning>
                   {DONE.has(displayMatch.status) || LIVE.has(displayMatch.status)

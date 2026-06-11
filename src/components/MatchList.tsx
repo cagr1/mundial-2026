@@ -1,7 +1,7 @@
 'use client'
 
 import { useLocale } from 'next-intl'
-import { Match, Prediction, PredictionsMap } from '@/types/football'
+import { Match, PredictionsMap } from '@/types/football'
 import { groupMatchesByDay, isToday } from '@/lib/format-date'
 import MatchCard from './MatchCard'
 
@@ -10,6 +10,7 @@ interface Props {
   timeZone: string
   predictions?: PredictionsMap
   onPredict?: (match: Match) => void
+  onSelect?: (match: Match) => void
 }
 
 function formatDayLabel(utcDate: string, timeZone: string, locale: string): { day: string; date: string } {
@@ -19,7 +20,7 @@ function formatDayLabel(utcDate: string, timeZone: string, locale: string): { da
   return { day, date }
 }
 
-export default function MatchList({ matches, timeZone, predictions = {}, onPredict }: Props) {
+export default function MatchList({ matches, timeZone, predictions = {}, onPredict, onSelect }: Props) {
   const locale = useLocale()
   const grouped = groupMatchesByDay(matches, timeZone)
 
@@ -74,6 +75,7 @@ export default function MatchList({ matches, timeZone, predictions = {}, onPredi
                   timeZone={timeZone}
                   prediction={predictions[match.id]}
                   onPredict={onPredict ? () => onPredict(match) : undefined}
+                  onSelect={onSelect ? () => onSelect(match) : undefined}
                 />
               ))}
             </div>

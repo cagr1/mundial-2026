@@ -3,7 +3,9 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Icon } from '@iconify/react'
+import { useLocale } from 'next-intl'
 import { Team, Match } from '@/types/football'
+import { localizedCountry } from '@/lib/country-names'
 import TeamDrawer from './TeamDrawer'
 
 function TeamCard({
@@ -17,6 +19,8 @@ function TeamCard({
   onSelect: () => void
   onToggleFavorite: (e: React.MouseEvent) => void
 }) {
+  const locale = useLocale()
+  const displayName = localizedCountry(team.tla, locale, team.shortName ?? team.name)
   return (
     <div
       className="soft-haptic relative"
@@ -71,7 +75,7 @@ function TeamCard({
             className="truncate font-semibold leading-tight"
             style={{ fontSize: 15, color: 'var(--text-warm)' }}
           >
-            {team.shortName ?? team.name}
+            {displayName}
           </p>
           <p
             className="eyebrow mt-0.5 truncate"
@@ -137,6 +141,7 @@ interface TeamsGridProps {
 }
 
 export default function TeamsGrid({ teams, favoriteId, onToggleFavorite, allMatches = [], timeZone = 'UTC' }: TeamsGridProps) {
+  const locale = useLocale()
   const [selected, setSelected] = useState<Team | null>(null)
   const [query, setQuery] = useState('')
   const teamsRef = useRef(teams)
@@ -199,9 +204,10 @@ export default function TeamsGrid({ teams, favoriteId, onToggleFavorite, allMatc
       (t) =>
         t.name.toLowerCase().includes(q) ||
         (t.shortName ?? '').toLowerCase().includes(q) ||
+        localizedCountry(t.tla, locale, '').toLowerCase().includes(q) ||
         (t.tla ?? '').toLowerCase().includes(q),
     )
-  }, [teams, query])
+  }, [teams, query, locale])
 
   return (
     <>

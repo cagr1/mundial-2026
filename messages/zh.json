@@ -5,7 +5,9 @@
     "equipos": "球队",
     "bracket": "淘汰赛",
     "ariaMain": "主导航",
-    "ariaInstall": "安装应用"
+    "ariaInstall": "安装应用",
+    "calendario": "赛程",
+    "stats": "数据"
   },
   "stage": {
     "GROUP_STAGE": "小组赛阶段",
@@ -24,6 +26,52 @@
     "groupsAdvance": "每组前2名晋级下一阶段",
     "groupsUnavailable": "暂无小组数据",
     "localTime": "本地时间"
+  },
+  "matchDetail": {
+    "lineup": "阵容",
+    "events": "事件",
+    "stats": "数据统计",
+    "formation": "阵型",
+    "starters": "首发",
+    "bench": "替补",
+    "noLineup": "暂无阵容",
+    "noEvents": "暂无事件",
+    "noStats": "暂无数据",
+    "loading": "加载中…",
+    "error": "无法加载比赛详情",
+    "stat": {
+      "possessionPct": "控球率",
+      "totalShots": "射门",
+      "shotsOnTarget": "射正",
+      "wonCorners": "角球",
+      "foulsCommitted": "犯规",
+      "offsides": "越位",
+      "yellowCards": "黄牌",
+      "redCards": "红牌",
+      "totalPasses": "传球",
+      "totalTackles": "抢断",
+      "saves": "扑救"
+    },
+    "assist": "助攻",
+    "penalty": "点球",
+    "ownGoal": "乌龙球",
+    "penaltyMissed": "点球罚失"
+  },
+  "tournament": {
+    "scorers": "射手榜",
+    "data": "赛事数据",
+    "player": "球员",
+    "goals": "进球",
+    "matchesPlayed": "已赛场次",
+    "totalGoals": "总进球",
+    "avgGoals": "场均进球",
+    "stadiums": "球场",
+    "teams": "球队",
+    "yellowCards": "黄牌",
+    "redCards": "红牌",
+    "noScorers": "暂无射手",
+    "noData": "暂无数据",
+    "loading": "加载中…"
   },
   "bracket": {
     "ROUND_OF_32": "三十二强",

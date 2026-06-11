@@ -1,69 +1,11 @@
 'use client'
 
 import { Icon } from '@iconify/react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Match, Prediction } from '@/types/football'
 import { formatTime, isToday } from '@/lib/format-date'
+import { TLA_ISO2, localizedCountry } from '@/lib/country-names'
 import PredictionBadge from './PredictionBadge'
-
-// ESPN abbreviation → ISO 3166-1 alpha-2 (flag-icons usa lowercase)
-// ESPN no siempre usa códigos FIFA: Arabia Saudita es KSA, no SAU, etc.
-// Se incluyen variantes para cubrir posibles cambios de la API.
-const TLA_ISO2: Record<string, string> = {
-  // CONCACAF
-  MEX: 'mx', USA: 'us', CAN: 'ca',
-  PAN: 'pa', CRC: 'cr', HON: 'hn', HND: 'hn',
-  SLV: 'sv', GTM: 'gt', JAM: 'jm',
-  TRI: 'tt', HAI: 'ht', CUB: 'cu',
-  NCA: 'ni', GUY: 'gy', SUR: 'sr',
-  CUW: 'cw',                          // Curaçao (ESPN: CUW)
-  // CONMEBOL
-  ARG: 'ar', BRA: 'br', COL: 'co',
-  ECU: 'ec', URU: 'uy', CHI: 'cl',
-  BOL: 'bo', PAR: 'py', PER: 'pe', VEN: 've',
-  // UEFA
-  FRA: 'fr', GER: 'de', ESP: 'es', POR: 'pt',
-  NED: 'nl', BEL: 'be',
-  ENG: 'gb-eng', SCO: 'gb-sct', WAL: 'gb-wls', NIR: 'gb-nir',
-  ITA: 'it', CRO: 'hr', HRV: 'hr', SUI: 'ch', CHE: 'ch',
-  DEN: 'dk', NOR: 'no', SWE: 'se',
-  POL: 'pl', CZE: 'cz', SVK: 'sk',
-  HUN: 'hu', ROU: 'ro', SRB: 'rs',
-  UKR: 'ua', TUR: 'tr', GRE: 'gr',
-  ISL: 'is', IRL: 'ie', AUT: 'at', SVN: 'si',
-  ALB: 'al', GEO: 'ge', MKD: 'mk',
-  MNE: 'me', BIH: 'ba', KOS: 'xk',
-  FIN: 'fi', EST: 'ee', LVA: 'lv', LTU: 'lt',
-  // CAF
-  MAR: 'ma', SEN: 'sn', CMR: 'cm',
-  GHA: 'gh', NGA: 'ng', NGR: 'ng',
-  EGY: 'eg', RSA: 'za', ZAF: 'za',
-  ALG: 'dz', DZA: 'dz',
-  TUN: 'tn', CIV: 'ci', GUI: 'gn',
-  MLI: 'ml', BFA: 'bf', ZIM: 'zw',
-  MOZ: 'mz', TAN: 'tz', UGA: 'ug',
-  ANG: 'ao', COD: 'cd', ETH: 'et',
-  CPV: 'cv',                          // Cabo Verde (ESPN: CPV)
-  GAB: 'ga', CGO: 'cg', TOG: 'tg',
-  BEN: 'bj', GNB: 'gw', SLE: 'sl',
-  LBR: 'lr', GNQ: 'gq', COM: 'km',
-  SSD: 'ss', SDN: 'sd', SOM: 'so',
-  RWA: 'rw', BDI: 'bi', ERI: 'er',
-  // AFC
-  KOR: 'kr', JPN: 'jp', IRN: 'ir',
-  KSA: 'sa', SAU: 'sa',              // Arabia Saudita (ESPN: KSA)
-  QAT: 'qa', AUS: 'au',
-  CHN: 'cn', IRQ: 'iq', JOR: 'jo',
-  UAE: 'ae', IDN: 'id', UZB: 'uz',
-  TKM: 'tm', KUW: 'kw', OMN: 'om',
-  BHR: 'bh', IND: 'in', SYR: 'sy',
-  TJK: 'tj', KGZ: 'kg', KAZ: 'kz',
-  VIE: 'vn', THA: 'th', MAS: 'my', MYS: 'my',
-  PHI: 'ph', SIN: 'sg', PAK: 'pk',
-  LBN: 'lb', PLE: 'ps', YEM: 'ye',
-  // OFC
-  NZL: 'nz', FIJ: 'fj',
-}
 
 const GROUP_LABEL_COLOR: Record<string, string> = {
   GROUP_A: 'var(--kinpaku)', GROUP_B: 'var(--patina)',
@@ -101,7 +43,7 @@ function TeamFlag({ tla, name }: { tla: string; name: string }) {
   )
 }
 
-function CenterBlock({ match, timeZone }: { match: Match; timeZone: string }) {
+function CenterBlock({ match }: { match: Match }) {
   const t = useTranslations('match')
   const isLive = LIVE_STATUSES.has(match.status)
   const isDone = DONE_STATUSES.has(match.status)
@@ -153,10 +95,13 @@ function CenterBlock({ match, timeZone }: { match: Match; timeZone: string }) {
   )
 }
 
-interface Props { match: Match; timeZone: string; prediction?: Prediction; onPredict?: () => void }
+interface Props { match: Match; timeZone: string; prediction?: Prediction; onPredict?: () => void; onSelect?: () => void }
 
-export default function MatchCard({ match, timeZone, prediction, onPredict }: Props) {
+export default function MatchCard({ match, timeZone, prediction, onPredict, onSelect }: Props) {
   const t = useTranslations('match')
+  const locale = useLocale()
+  const homeName = localizedCountry(match.homeTeam.tla, locale, match.homeTeam.shortName)
+  const awayName = localizedCountry(match.awayTeam.tla, locale, match.awayTeam.shortName)
   const isLive = LIVE_STATUSES.has(match.status)
   const today = isToday(match.utcDate, timeZone)
   const groupKey = match.group ?? ''
@@ -167,6 +112,7 @@ export default function MatchCard({ match, timeZone, prediction, onPredict }: Pr
     <article
       className={`match-card ${isLive ? 'is-live' : ''} ${today && !isLive ? 'is-today' : ''}`}
       style={{ background: 'var(--raised-lacquer)', borderRadius: 16, padding: 16, cursor: 'pointer', userSelect: 'none' }}
+      onClick={onSelect}
       onMouseDown={(e) => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.97)' }}
       onMouseUp={(e) => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)' }}
       onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)' }}
@@ -189,16 +135,16 @@ export default function MatchCard({ match, timeZone, prediction, onPredict }: Pr
 
       <div className="flex items-center justify-between gap-3">
         <div className="flex flex-col items-center gap-2 flex-1 min-w-0">
-          <TeamFlag tla={match.homeTeam.tla} name={match.homeTeam.name} />
+          <TeamFlag tla={match.homeTeam.tla} name={homeName} />
           <span className="text-center leading-tight truncate w-full" style={{ color: 'var(--text-warm)', fontSize: 15, fontWeight: 600 }}>
-            {match.homeTeam.shortName}
+            {homeName}
           </span>
         </div>
-        <CenterBlock match={match} timeZone={timeZone} />
+        <CenterBlock match={match} />
         <div className="flex flex-col items-center gap-2 flex-1 min-w-0">
-          <TeamFlag tla={match.awayTeam.tla} name={match.awayTeam.name} />
+          <TeamFlag tla={match.awayTeam.tla} name={awayName} />
           <span className="text-center leading-tight truncate w-full" style={{ color: 'var(--text-warm)', fontSize: 15, fontWeight: 600 }}>
-            {match.awayTeam.shortName}
+            {awayName}
           </span>
         </div>
       </div>
