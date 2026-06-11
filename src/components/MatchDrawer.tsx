@@ -42,6 +42,27 @@ function EventIcon({ type }: { type: MatchEvent['type'] }) {
   return <Icon icon="material-symbols:sports-soccer" width={16} height={16} style={{ color: 'var(--champagne)' }} />
 }
 
+function EventPlayers({ event }: { event: MatchEvent }) {
+  const players = event.players.filter(Boolean)
+  if (players.length === 0) return null
+
+  if (event.type === 'substitution' && players.length >= 2) {
+    return (
+      <span className="flex min-w-0 items-center gap-1.5 text-xs leading-snug" style={{ color: 'var(--text-warm)' }}>
+        <span className="truncate">{players[0]}</span>
+        <Icon icon="material-symbols:arrow-forward-rounded" width={13} height={13} className="shrink-0" style={{ color: 'var(--text-disabled)' }} />
+        <span className="truncate">{players[1]}</span>
+      </span>
+    )
+  }
+
+  return (
+    <span className="min-w-0 truncate text-xs leading-snug" style={{ color: 'var(--text-warm)' }}>
+      {players.join(' · ')}
+    </span>
+  )
+}
+
 function PlayerRow({ p, accent }: { p: LineupPlayer; accent: string }) {
   return (
     <div className="flex items-center gap-2 py-1">
@@ -286,7 +307,7 @@ export default function MatchDrawer({ match, timeZone, onClose }: Props) {
                       {e.minute}
                     </span>
                     <span className="shrink-0 mt-0.5 flex items-center justify-center" style={{ width: 18 }}><EventIcon type={e.type} /></span>
-                    <span className="text-xs leading-snug" style={{ color: 'var(--text-warm)' }}>{e.text || e.shortText}</span>
+                    <EventPlayers event={e} />
                   </div>
                 ))}
               </div>
