@@ -150,7 +150,7 @@ export async function getESPNMatches(): Promise<Match[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     espnFetch<any>(
       `/apis/site/v2/sports/soccer/${LEAGUE}/scoreboard?dates=20260611-20260719&limit=200`,
-      30,
+      15,
     ),
     buildGroupMap(),
   ])
@@ -279,7 +279,7 @@ function mapRoster(entry: any): LineupPlayer {
   }
 }
 
-export async function getESPNMatchSummary(eventId: string | number, revalidate = 30): Promise<MatchSummary> {
+export async function getESPNMatchSummary(eventId: string | number, revalidate = 15): Promise<MatchSummary> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data = await espnFetch<any>(
     `/apis/site/v2/sports/soccer/${LEAGUE}/summary?event=${eventId}`,

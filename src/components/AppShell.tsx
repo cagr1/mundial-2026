@@ -134,7 +134,7 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
   // Refresca datos del servidor (marcadores, tabla de posiciones) mientras haya partidos en vivo
   useEffect(() => {
     if (liveCount === 0) return
-    const interval = window.setInterval(() => router.refresh(), 30_000)
+    const interval = window.setInterval(() => router.refresh(), 15_000)
     return () => window.clearInterval(interval)
   }, [liveCount, router])
 

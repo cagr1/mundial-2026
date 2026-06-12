@@ -159,7 +159,7 @@ export default function MatchDrawer({ match, timeZone, onClose }: Props) {
   const [error, setError] = useState(false)
   const [tab, setTab] = useState<DetailTab>(isLive || isDone ? 'events' : 'lineup')
 
-  // Fetch del detalle; refresca cada 30s si el partido está en vivo.
+  // Fetch del detalle; refresca cada 15s si el partido está en vivo.
   useEffect(() => {
     let active = true
     async function load(initial: boolean) {
@@ -177,7 +177,7 @@ export default function MatchDrawer({ match, timeZone, onClose }: Props) {
     }
     load(true)
     if (!isLive) return () => { active = false }
-    const interval = window.setInterval(() => load(false), 30_000)
+    const interval = window.setInterval(() => load(false), 15_000)
     return () => { active = false; window.clearInterval(interval) }
   }, [match.id, isLive])
 
