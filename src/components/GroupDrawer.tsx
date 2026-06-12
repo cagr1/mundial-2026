@@ -21,9 +21,35 @@ const GROUP_ACCENT: Record<string, string> = {
   GROUP_K: 'oklch(70% 0.12 260)', GROUP_L: 'var(--vermilion)',
 }
 
-interface Props { standing: Standing; matches: Match[]; timeZone: string; onClose: () => void }
+interface Props { standing: Standing; matches: Match[]; timeZone: string; onClose: () => void; onSelectTeam?: (teamId: number) => void }
 
-function FixtureRow({ match, timeZone }: { match: Match; timeZone: string }) {
+function TeamChip({ name, crest, align, onClick }: { name: string; crest: string; align: 'left' | 'right'; onClick?: () => void }) {
+  const content = (
+    <div className="flex items-center gap-2 flex-1 min-w-0" style={{ justifyContent: align === 'right' ? 'flex-end' : 'flex-start' }}>
+      {align === 'right' && <span className="text-xs font-semibold truncate" style={{ color: 'var(--text-warm)' }}>{name}</span>}
+      {crest && (
+        <div className="relative shrink-0" style={{ width: 20, height: 20 }}>
+          <Image src={crest} alt={name} fill className="object-contain" sizes="20px" unoptimized />
+        </div>
+      )}
+      {align === 'left' && <span className="text-xs font-semibold truncate" style={{ color: 'var(--text-warm)' }}>{name}</span>}
+    </div>
+  )
+
+  if (!onClick) return content
+
+  return (
+    <button
+      onClick={(e) => { e.stopPropagation(); onClick() }}
+      className="flex-1 min-w-0 active:opacity-70 transition-opacity"
+      style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', textAlign: align }}
+    >
+      {content}
+    </button>
+  )
+}
+
+function FixtureRow({ match, timeZone, onSelectTeam }: { match: Match; timeZone: string; onSelectTeam?: (teamId: number) => void }) {
   const tMatch = useTranslations('match')
   const locale = useLocale()
   const isLive = LIVE_S.has(match.status)
@@ -49,14 +75,12 @@ function FixtureRow({ match, timeZone }: { match: Match; timeZone: string }) {
         )}
       </div>
 
-      <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
-        <span className="text-xs font-semibold truncate" style={{ color: 'var(--text-warm)' }}>{localizedCountry(match.homeTeam.tla, locale, match.homeTeam.shortName)}</span>
-        {match.homeTeam.crest && (
-          <div className="relative shrink-0" style={{ width: 20, height: 20 }}>
-            <Image src={match.homeTeam.crest} alt={match.homeTeam.name} fill className="object-contain" sizes="20px" unoptimized />
-          </div>
-        )}
-      </div>
+      <TeamChip
+        name={localizedCountry(match.homeTeam.tla, locale, match.homeTeam.shortName)}
+        crest={match.homeTeam.crest}
+        align="right"
+        onClick={onSelectTeam ? () => onSelectTeam(match.homeTeam.id) : undefined}
+      />
 
       <div className="shrink-0 flex items-center justify-center" style={{ minWidth: 52, background: 'var(--raised-lacquer)', borderRadius: 6, padding: '4px 8px' }}>
         {isDone || isLive ? (
@@ -68,19 +92,17 @@ function FixtureRow({ match, timeZone }: { match: Match; timeZone: string }) {
         )}
       </div>
 
-      <div className="flex items-center gap-2 flex-1 min-w-0">
-        {match.awayTeam.crest && (
-          <div className="relative shrink-0" style={{ width: 20, height: 20 }}>
-            <Image src={match.awayTeam.crest} alt={match.awayTeam.name} fill className="object-contain" sizes="20px" unoptimized />
-          </div>
-        )}
-        <span className="text-xs font-semibold truncate" style={{ color: 'var(--text-warm)' }}>{localizedCountry(match.awayTeam.tla, locale, match.awayTeam.shortName)}</span>
-      </div>
+      <TeamChip
+        name={localizedCountry(match.awayTeam.tla, locale, match.awayTeam.shortName)}
+        crest={match.awayTeam.crest}
+        align="left"
+        onClick={onSelectTeam ? () => onSelectTeam(match.awayTeam.id) : undefined}
+      />
     </div>
   )
 }
 
-export default function GroupDrawer({ standing, matches, timeZone, onClose }: Props) {
+export default function GroupDrawer({ standing, matches, timeZone, onClose, onSelectTeam }: Props) {
   const t = useTranslations('groups')
   const tTeam = useTranslations('team')
   const locale = useLocale()
@@ -144,7 +166,17 @@ export default function GroupDrawer({ standing, matches, timeZone, onClose }: Pr
                   {standing.table.map((entry, i) => {
                     const qualifies = i < 2
                     return (
-                      <tr key={entry.team.id} style={{ borderBottom: i < standing.table.length - 1 ? '1px solid var(--hairline)' : undefined, borderLeft: qualifies ? `2px solid ${accent}` : '2px solid transparent', background: qualifies ? `color-mix(in srgb, ${accent} 5%, transparent)` : undefined }}>
+                      <tr
+                        key={entry.team.id}
+                        onClick={onSelectTeam ? () => onSelectTeam(entry.team.id) : undefined}
+                        className={onSelectTeam ? 'active:bg-(--graphite)/30' : undefined}
+                        style={{
+                          borderBottom: i < standing.table.length - 1 ? '1px solid var(--hairline)' : undefined,
+                          borderLeft: qualifies ? `2px solid ${accent}` : '2px solid transparent',
+                          background: qualifies ? `color-mix(in srgb, ${accent} 5%, transparent)` : undefined,
+                          cursor: onSelectTeam ? 'pointer' : undefined,
+                        }}
+                      >
                         <td className="pl-3 pr-2 py-2.5"><span className="eyebrow tabnum" style={{ color: 'var(--text-disabled)', fontSize: '0.58rem' }}>{entry.position}</span></td>
                         <td className="px-2 py-2.5">
                           <div className="flex items-center gap-2">
@@ -181,7 +213,7 @@ export default function GroupDrawer({ standing, matches, timeZone, onClose }: Pr
                         {new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long', timeZone }).format(new Date(dateKey + 'T12:00:00'))}
                       </span>
                     </div>
-                    {dayMatches.map((m) => <FixtureRow key={m.id} match={m} timeZone={timeZone} />)}
+                    {dayMatches.map((m) => <FixtureRow key={m.id} match={m} timeZone={timeZone} onSelectTeam={onSelectTeam} />)}
                   </div>
                 ))}
               </div>

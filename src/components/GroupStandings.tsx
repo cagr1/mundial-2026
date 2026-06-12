@@ -24,14 +24,21 @@ export default function GroupStandings({ standing, onSelect }: Props) {
   const accent = GROUP_ACCENT[label] ?? 'var(--kinpaku)'
 
   return (
-    <div className="glass-card overflow-hidden" style={{ borderRadius: 12 }}>
-      <button
-        className="w-full px-4 py-3 flex items-center gap-3 text-left"
-        style={{ borderBottom: '1px solid var(--glass-border)', background: 'transparent', cursor: onSelect ? 'pointer' : 'default' }}
-        onClick={() => onSelect?.(standing)}
-        aria-label={onSelect ? t('ariaDetails', { group: label }) : undefined}
-        tabIndex={onSelect ? 0 : -1}
-      >
+    <div
+      className="glass-card overflow-hidden active:opacity-85 transition-opacity"
+      style={{ borderRadius: 12, cursor: onSelect ? 'pointer' : 'default' }}
+      onClick={() => onSelect?.(standing)}
+      onKeyDown={(e) => {
+        if (onSelect && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault()
+          onSelect(standing)
+        }
+      }}
+      role={onSelect ? 'button' : undefined}
+      tabIndex={onSelect ? 0 : undefined}
+      aria-label={onSelect ? t('ariaDetails', { group: label }) : undefined}
+    >
+      <div className="w-full px-4 py-3 flex items-center gap-3 text-left" style={{ borderBottom: '1px solid var(--glass-border)' }}>
         <div className="w-1 h-5 shrink-0 rounded-full" style={{ background: accent }} aria-hidden="true" />
         <h3 className="font-semibold uppercase tracking-wide" style={{ fontSize: 22, fontWeight: 600, color: 'var(--text-warm)', letterSpacing: '0.04em' }}>
           {label}
@@ -40,7 +47,7 @@ export default function GroupStandings({ standing, onSelect }: Props) {
           {t('qualificationRound')}
         </span>
         {onSelect && <Icon icon="material-symbols:chevron-right" width={18} height={18} style={{ color: 'var(--text-disabled)', flexShrink: 0 }} />}
-      </button>
+      </div>
 
       <div className="overflow-x-auto">
         <table className="w-full">

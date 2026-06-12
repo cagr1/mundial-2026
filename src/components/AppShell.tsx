@@ -88,6 +88,15 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
   const [timeZone, setTimeZone] = useState('UTC')
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedGroup, setSelectedGroup] = useState<Standing | null>(null)
+
+  const handleSelectTeamFromGroup = useCallback((teamId: number) => {
+    setSelectedGroup(null)
+    setTab('equipos')
+    const params = new URLSearchParams(window.location.search)
+    params.set('tab', 'equipos')
+    params.set('equipo', String(teamId))
+    window.history.replaceState(null, '', `/?${params.toString()}`)
+  }, [])
   const [deferredInstall, setDeferredInstall] = useState<BeforeInstallPromptEvent | null>(null)
   const [installAccepted, setInstallAccepted] = useState(false)
   const [showIntro, setShowIntro] = useState(true)
@@ -285,7 +294,7 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
       </main>
 
       {selectedGroup && (
-        <GroupDrawer key={selectedGroup.group} standing={selectedGroup} matches={matches} timeZone={timeZone} onClose={() => setSelectedGroup(null)} />
+        <GroupDrawer key={selectedGroup.group} standing={selectedGroup} matches={matches} timeZone={timeZone} onClose={() => setSelectedGroup(null)} onSelectTeam={handleSelectTeamFromGroup} />
       )}
 
       {predictingMatch && (
