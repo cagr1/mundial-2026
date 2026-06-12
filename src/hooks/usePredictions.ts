@@ -6,6 +6,8 @@ import { Prediction, PredictionsMap } from '@/types/football'
 const KEY = 'predictions_v1'
 const UPDATE_EVENT = 'predictions:update'
 
+const EMPTY: PredictionsMap = {}
+
 // Same stable-reference pattern as useFavoriteTeam
 let _cachedRaw: string | null = undefined as unknown as string | null
 let _cachedParsed: PredictionsMap = {}
@@ -28,7 +30,7 @@ function subscribe(callback: () => void) {
 }
 
 export function usePredictions() {
-  const predictions = useSyncExternalStore<PredictionsMap>(subscribe, getSnapshot, () => ({}))
+  const predictions = useSyncExternalStore<PredictionsMap>(subscribe, getSnapshot, () => EMPTY)
 
   const setPrediction = useCallback((matchId: number, prediction: Prediction | null) => {
     try {

@@ -6,6 +6,8 @@ import { BracketPicks } from '@/types/football'
 const KEY = 'bracket_picks_v1'
 const UPDATE_EVENT = 'bracketPicks:update'
 
+const EMPTY: BracketPicks = {}
+
 let _cachedRaw: string | null = undefined as unknown as string | null
 let _cachedParsed: BracketPicks = {}
 
@@ -27,7 +29,7 @@ function subscribe(cb: () => void) {
 }
 
 export function useBracketPicks() {
-  const picks = useSyncExternalStore<BracketPicks>(subscribe, getSnapshot, () => ({}))
+  const picks = useSyncExternalStore<BracketPicks>(subscribe, getSnapshot, () => EMPTY)
 
   const setPick = useCallback((matchId: number, teamId: number | null) => {
     try {
