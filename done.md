@@ -58,3 +58,10 @@
 - `--text-disabled` corregido de `#4f4633` (ilegible) a `#7a8fa8` — texto de estadio en MatchCard
 - `.playwright-mcp/` añadido a `.gitignore`
 - Archivos de prototipo eliminados: `PrototypeSwitcher.tsx`, `variants/`
+
+### F4 · Pronósticos (Predictions)
+- `usePredictions.ts` — hook con `useSyncExternalStore` + localStorage (patrón `useFavoriteTeam`), incluye `getPredictionResult` (exact/correct/wrong)
+- `PredictionBadge.tsx` — badge en `MatchCard`: lápiz si no hay predicción y el partido es próximo, score guardado con candado si está en vivo, score + ícono de resultado coloreado si ya finalizó
+- `PredictionModal.tsx` — bottom sheet con contadores +/- para home/away, banner de resultado post-partido
+- **Lock post-partido:** `canEdit = !isDone && !isLive` (`isDone` = `FINISHED`/`AWARDED`) — una vez finalizado o en vivo, el modal solo muestra el resultado y botón "Cerrar", sin editar ni borrar
+- Traducciones completas: en/es/hi/pt/zh (namespace `predictions`)
