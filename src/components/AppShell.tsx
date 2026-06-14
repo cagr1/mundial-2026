@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useSyncExternalStore } from 'react'
+import { useState, useEffect, useCallback, useMemo, useSyncExternalStore } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Icon } from '@iconify/react'
@@ -69,7 +69,11 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
   const { predictions, setPrediction } = usePredictions()
   const { picks, setPick } = useBracketPicks()
   const [predictingMatch, setPredictingMatch] = useState<Match | null>(null)
-  const [detailMatch, setDetailMatch] = useState<Match | null>(null)
+  const [detailMatchId, setDetailMatchId] = useState<number | null>(null)
+  const detailMatch = useMemo(
+    () => matches.find((m) => m.id === detailMatchId) ?? null,
+    [matches, detailMatchId],
+  )
 
   const handleToggleFavorite = useCallback(
     (team: Team) => saveFavorite(favorite?.id === team.id ? null : team),
@@ -247,7 +251,7 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
                   <FavoriteTeamCard team={favorite} matches={matches} timeZone={timeZone} onRemove={() => saveFavorite(null)} />
                 )}
                 <DateCarousel dates={matchDates} selected={selectedDate} onSelect={setSelectedDate} timeZone={timeZone} phaseLabel={phaseLabel} />
-                <MatchList matches={filteredMatches} timeZone={timeZone} predictions={predictions} onPredict={setPredictingMatch} onSelect={setDetailMatch} />
+                <MatchList matches={filteredMatches} timeZone={timeZone} predictions={predictions} onPredict={setPredictingMatch} onSelect={(m) => setDetailMatchId(m.id)} />
                 <StatsBento />
               </>
             ) : (
@@ -312,7 +316,7 @@ export default function AppShell({ matches, standings, teams, liveCount, firstMa
           key={detailMatch.id}
           match={detailMatch}
           timeZone={timeZone}
-          onClose={() => setDetailMatch(null)}
+          onClose={() => setDetailMatchId(null)}
         />
       )}
 

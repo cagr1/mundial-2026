@@ -8,6 +8,7 @@ import { useTranslations, useLocale } from 'next-intl'
 import { Match, MatchSummary, MatchEvent, TeamLineup, LineupPlayer } from '@/types/football'
 import { localizedCountry } from '@/lib/country-names'
 import { formatTime } from '@/lib/format-date'
+import { useLiveClock } from '@/hooks/useLiveClock'
 
 const LIVE_S = new Set(['LIVE', 'IN_PLAY', 'PAUSED'])
 const DONE_S = new Set(['FINISHED', 'AWARDED'])
@@ -151,6 +152,7 @@ export default function MatchDrawer({ match, timeZone, onClose }: Props) {
 
   const isLive = LIVE_S.has(match.status)
   const isDone = DONE_S.has(match.status)
+  const liveClock = useLiveClock(match.clock, isLive && match.status !== 'PAUSED')
   const homeName = localizedCountry(match.homeTeam.tla, locale, match.homeTeam.shortName)
   const awayName = localizedCountry(match.awayTeam.tla, locale, match.awayTeam.shortName)
 
@@ -244,7 +246,7 @@ export default function MatchDrawer({ match, timeZone, onClose }: Props) {
               {isLive ? (
                 <span className="eyebrow flex items-center gap-1 mt-1" style={{ color: 'var(--live-green)', fontSize: '0.55rem' }}>
                   <span className="live-dot w-1.5 h-1.5 rounded-full block" style={{ background: 'var(--live-green)' }} />
-                  {match.status === 'PAUSED' ? tMatch('ht') : (match.clock || tMatch('live'))}
+                  {match.status === 'PAUSED' ? tMatch('ht') : (liveClock || tMatch('live'))}
                 </span>
               ) : isDone ? (
                 <span className="eyebrow mt-1" style={{ color: 'var(--text-disabled)', fontSize: '0.55rem' }}>{tMatch('ft')}</span>

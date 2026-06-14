@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from 'next-intl'
 import { Match, Prediction } from '@/types/football'
 import { formatTime, isToday } from '@/lib/format-date'
 import { TLA_ISO2, localizedCountry } from '@/lib/country-names'
+import { useLiveClock } from '@/hooks/useLiveClock'
 import PredictionBadge from './PredictionBadge'
 
 const GROUP_LABEL_COLOR: Record<string, string> = {
@@ -47,6 +48,7 @@ function CenterBlock({ match }: { match: Match }) {
   const t = useTranslations('match')
   const isLive = LIVE_STATUSES.has(match.status)
   const isDone = DONE_STATUSES.has(match.status)
+  const liveClock = useLiveClock(match.clock, isLive && match.status !== 'PAUSED')
 
   if (isLive || isDone) {
     const home = match.score.fullTime.home ?? 0
@@ -62,9 +64,9 @@ function CenterBlock({ match }: { match: Match }) {
                 {match.status === 'PAUSED' ? t('ht') : t('live')}
               </span>
             </div>
-            {match.status !== 'PAUSED' && match.clock && (
+            {match.status !== 'PAUSED' && liveClock && (
               <span style={{ color: 'var(--text-faint)', fontSize: 10, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
-                {match.clock}
+                {liveClock}
               </span>
             )}
           </div>
